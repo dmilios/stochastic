@@ -11,5 +11,7 @@
 #ifndef STOCHASTIC_H_
 #define STOCHASTIC_H_
 
+#include "RandomVariable.h"
+#include "ExactDisribution.h"
 
 #endif /* STOCHASTIC_H_ */
