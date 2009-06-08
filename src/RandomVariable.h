@@ -18,8 +18,27 @@ private:
 
 public:
 	RandomVariable();
+	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
+
+	void setDistribution(Distribution *);
+
+	RandomVariable operator +(RandomVariable);
+	RandomVariable operator -(RandomVariable);
+	RandomVariable operator *(RandomVariable);
+	RandomVariable operator /(RandomVariable);
+
+	RandomVariable min(RandomVariable);
+	RandomVariable max(RandomVariable);
 };
+
+/*
+ * the very same implementation
+ * as in RandomVariable::min and RandomVariable::max,
+ * but these are called in a more intuitive way
+ */
+RandomVariable min(RandomVariable, RandomVariable);
+RandomVariable max(RandomVariable, RandomVariable);
 
 } // namespace stochastic
 

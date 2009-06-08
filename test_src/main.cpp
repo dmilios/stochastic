@@ -5,6 +5,8 @@
  *
  * main() is used for test purposes
  *
+ *
+ *      Author: Dimitrios Milios
  */
 
 // =============================================================
@@ -13,7 +15,8 @@
 // load "stochastic" library
 #include "../src/stochastic.h"
 
-#include <stdio.h>
+#include <cstdio>
+#include <iostream>
 
 
 void gnulot_test()
@@ -36,9 +39,9 @@ void gnulot_test()
 int printArguments(int argc, char *argv[])
 {
 	int i;
-	printf("\nThe arguments were:\n");
+	std::cout << "\nThe arguments were:\n";
 	for (i = 0; i < argc; i++)
-		printf("%s\n", argv[i]);
+		std::cout << argv[i]<< "\n" ;
 	return 0;
 }
 
@@ -50,6 +53,12 @@ int main(int argc, char *argv[])
 	stochastic::MixtureModel m;
 	stochastic::Linear l;
 	stochastic::ApproximatedDistribution a;
+
+	stochastic::RandomVariable r1(&g), r2(&u);
+	r1 = r2 + r1;
+	stochastic::min(r2, r2);
+
 	//gnulot_test();
+
 	return printArguments(argc, argv);
 }
