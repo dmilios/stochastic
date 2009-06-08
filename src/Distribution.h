@@ -15,6 +15,7 @@ public:
 	Distribution();
 	virtual ~Distribution();
 
+	//FIXME: change void to 'array of samples'
 	virtual void sample(int) = 0;
 };
 

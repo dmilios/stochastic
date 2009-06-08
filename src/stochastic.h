@@ -12,6 +12,13 @@
 #define STOCHASTIC_H_
 
 #include "RandomVariable.h"
-#include "ExactDisribution.h"
+#include "ApproximatedDistribution.h"
+#include "Distribution.h"
+
+#include "MixtureModel.h"
+#include "Gaussian.h"
+#include "Uniform.h"
+#include "Exponential.h"
+#include "Linear.h"
 
 #endif /* STOCHASTIC_H_ */

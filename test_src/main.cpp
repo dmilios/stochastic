@@ -44,7 +44,12 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	stochastic::RandomVariable rv;
+	stochastic::Gaussian g;
+	stochastic::Uniform u;
+	stochastic::Exponential e;
+	stochastic::MixtureModel m;
+	stochastic::Linear l;
+	stochastic::ApproximatedDistribution a;
 	//gnulot_test();
 	return printArguments(argc, argv);
 }
