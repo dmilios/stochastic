@@ -47,14 +47,17 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	stochastic::Gaussian g;
-	stochastic::Uniform u;
+	// TODO: override operators from PieceDistribution
+	//stochastic::Gaussian g;
+	//stochastic::Uniform u;
+	//stochastic::Linear l;
+
 	stochastic::Exponential e;
 	stochastic::MixtureModel m;
-	stochastic::Linear l;
-	stochastic::ApproximatedDistribution a;
 
-	stochastic::RandomVariable r1(&g), r2(&u);
+	stochastic::ApproximatedDistribution a;
+	stochastic::RandomVariable r1, r2;
+
 	r1 = r2 + r1;
 	stochastic::min(r2, r2);
 

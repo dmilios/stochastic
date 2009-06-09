@@ -8,11 +8,12 @@
 #ifndef EXPONENTIAL_H_
 #define EXPONENTIAL_H_
 
-#include "Distribution.h"
+#include "MixtureComponent.h"
 
 namespace stochastic {
 
-class Exponential : public stochastic::Distribution {
+class Exponential : public stochastic::MixtureComponent
+{
 public:
 	Exponential();
 	virtual ~Exponential();

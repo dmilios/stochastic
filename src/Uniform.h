@@ -9,21 +9,18 @@
 #define UNIFORM_H_
 
 #include "Distribution.h"
-#include "PieceDistribution.h"
+#include "ApproximationComponent.h"
 
 namespace stochastic {
 
-class Uniform : public stochastic::Distribution,
-		public stochastic::PieceDistribution {
+class Uniform : public stochastic::ApproximationComponent
+{
 public:
 	Uniform();
 	virtual ~Uniform();
 
 	//FIXME: change void to 'array of samples'
 	void sample(int);
-
-	double getWeight();
-	void setWeight(double);
 };
 
 } // namespace stochastic

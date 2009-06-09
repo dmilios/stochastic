@@ -46,7 +46,7 @@ RandomVariable RandomVariable::operator +(RandomVariable rightarg)
 RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 {
 	if (!distribution || !rightarg.distribution)
-			throw stochastic::UndefinedDistributionException();
+		throw stochastic::UndefinedDistributionException();
 
 	// TODO fill code
 	return RandomVariable();
@@ -55,7 +55,7 @@ RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 {
 	if (!distribution || !rightarg.distribution)
-			throw stochastic::UndefinedDistributionException();
+		throw stochastic::UndefinedDistributionException();
 
 	// TODO fill code
 	return RandomVariable();
@@ -64,7 +64,7 @@ RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 RandomVariable RandomVariable::operator /(RandomVariable rightarg)
 {
 	if (!distribution || !rightarg.distribution)
-			throw stochastic::UndefinedDistributionException();
+		throw stochastic::UndefinedDistributionException();
 
 	// TODO fill code
 	return RandomVariable();
@@ -79,7 +79,7 @@ RandomVariable RandomVariable::operator /(RandomVariable rightarg)
 RandomVariable RandomVariable::min(RandomVariable secondarg)
 {
 	if (!distribution || !secondarg.distribution)
-			throw stochastic::UndefinedDistributionException();
+		throw stochastic::UndefinedDistributionException();
 
 	// TODO fill code
 	return RandomVariable();
@@ -89,7 +89,7 @@ RandomVariable RandomVariable::min(RandomVariable secondarg)
 RandomVariable RandomVariable::max(RandomVariable secondarg)
 {
 	if (!distribution || !secondarg.distribution)
-			throw stochastic::UndefinedDistributionException();
+		throw stochastic::UndefinedDistributionException();
 
 	// TODO fill code
 	return RandomVariable();

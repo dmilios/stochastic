@@ -10,7 +10,8 @@
 
 namespace stochastic {
 
-class Distribution {
+class Distribution
+{
 public:
 	Distribution();
 	virtual ~Distribution();

@@ -10,12 +10,15 @@
 
 #include "Distribution.h"
 #include "MixtureModel.h"
+#include "ApproximationComponent.h"
+#include <vector>
 
 namespace stochastic {
 
-class ApproximatedDistribution : public stochastic::Distribution {
+class ApproximatedDistribution : public stochastic::MixtureModel
+{
 private:
-	stochastic::MixtureModel approximation;
+	std::vector <stochastic::ApproximationComponent> components;
 
 public:
 	ApproximatedDistribution();

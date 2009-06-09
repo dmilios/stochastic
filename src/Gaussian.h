@@ -9,21 +9,18 @@
 #define GAUSSIAN_H_
 
 #include "Distribution.h"
-#include "PieceDistribution.h"
+#include "ApproximationComponent.h"
 
 namespace stochastic {
 
-class Gaussian : public stochastic::Distribution,
-		public stochastic::PieceDistribution {
+class Gaussian : public stochastic::ApproximationComponent
+{
 public:
 	Gaussian();
 	virtual ~Gaussian();
 
 	//FIXME: change void to 'array of samples'
 	void sample(int);
-
-	double getWeight();
-	void setWeight(double);
 };
 
 } // namespace stochastic

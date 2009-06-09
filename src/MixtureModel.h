@@ -9,14 +9,19 @@
 #define MIXTUREMODEL_H_
 
 #include "Distribution.h"
-#include "PieceDistribution.h"
+#include "MixtureComponent.h"
 #include <vector>
 
 namespace stochastic {
 
-class MixtureModel : public stochastic::Distribution {
+class MixtureModel : public stochastic::Distribution
+{
 private:
-	std::vector<stochastic::PieceDistribution> components;
+	std::vector <stochastic::MixtureComponent> components;
+
+protected:
+	double numberOfComponents;
+	std::vector <double> weights;
 
 public:
 	MixtureModel();

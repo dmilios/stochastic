@@ -22,14 +22,4 @@ void Gaussian::sample(int numberOfSamples)
 {
 }
 
-double Gaussian::getWeight()
-{
-	return this->weight;
-}
-
-void Gaussian::setWeight(double weight)
-{
-	this->weight = weight;
-}
-
 } // namespace stochastic

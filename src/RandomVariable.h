@@ -12,7 +12,8 @@
 
 namespace stochastic {
 
-class RandomVariable {
+class RandomVariable
+{
 private:
 	Distribution * distribution;
 

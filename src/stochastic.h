@@ -12,9 +12,9 @@
 #define STOCHASTIC_H_
 
 #include "RandomVariable.h"
-#include "ApproximatedDistribution.h"
 #include "Distribution.h"
 
+#include "ApproximatedDistribution.h"
 #include "MixtureModel.h"
 #include "Gaussian.h"
 #include "Uniform.h"

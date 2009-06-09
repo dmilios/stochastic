@@ -22,14 +22,4 @@ void Uniform::sample(int numberOfSamples)
 {
 }
 
-double Uniform::getWeight()
-{
-	return this->weight;
-}
-
-void Uniform::setWeight(double weight)
-{
-	this->weight = weight;
-}
-
 } // namespace stochastic

@@ -12,7 +12,8 @@
 
 namespace stochastic {
 
-class UndefinedDistributionException : public std::exception {
+class UndefinedDistributionException : public std::exception
+{
 };
 
 }

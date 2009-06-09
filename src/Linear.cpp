@@ -22,14 +22,4 @@ void Linear::sample(int numberOfSamples)
 {
 }
 
-double Linear::getWeight()
-{
-	return this->weight;
-}
-
-void Linear::setWeight(double weight)
-{
-	this->weight = weight;
-}
-
 } // namespace stochastic
