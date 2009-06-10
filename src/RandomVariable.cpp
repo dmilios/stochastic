@@ -6,6 +6,7 @@
  */
 
 #include "RandomVariable.h"
+
 #include "UndefinedDistributionException.h"
 
 namespace stochastic {

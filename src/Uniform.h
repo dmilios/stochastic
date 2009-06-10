@@ -20,7 +20,16 @@ public:
 	virtual ~Uniform();
 
 	//FIXME: change void to 'array of samples'
+	// overload virtual methods of Distribution
 	void sample(int);
+
+	// overload virtual methods of ApproximationComponent
+	ApproximationComponent * add(ApproximationComponent *);
+	ApproximationComponent * subtract(ApproximationComponent *);
+	ApproximationComponent * multiply(ApproximationComponent *);
+	ApproximationComponent * divide(ApproximationComponent *);
+	ApproximationComponent * min(ApproximationComponent *);
+	ApproximationComponent * max(ApproximationComponent *);
 };
 
 } // namespace stochastic

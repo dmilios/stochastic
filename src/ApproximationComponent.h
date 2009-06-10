@@ -20,14 +20,15 @@ namespace stochastic {
 
 class ApproximationComponent : public stochastic::MixtureComponent
 {
+	int a;
 public:
-	virtual RandomVariable operator +(RandomVariable) = 0;
-	virtual RandomVariable operator -(RandomVariable) = 0;
-	virtual RandomVariable operator *(RandomVariable) = 0;
-	virtual RandomVariable operator /(RandomVariable) = 0;
+	virtual ApproximationComponent * add(ApproximationComponent *) = 0;
+	virtual ApproximationComponent * subtract(ApproximationComponent *) = 0;
+	virtual ApproximationComponent * multiply(ApproximationComponent *) = 0;
+	virtual ApproximationComponent * divide(ApproximationComponent *) = 0;
 
-	virtual RandomVariable min(RandomVariable) = 0;
-	virtual RandomVariable max(RandomVariable) = 0;
+	virtual ApproximationComponent * min(ApproximationComponent *) = 0;
+	virtual ApproximationComponent * max(ApproximationComponent *) = 0;
 };
 
 } // namespace stochastic

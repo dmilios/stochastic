@@ -8,12 +8,17 @@
 #ifndef UNDEFINEDDISTRIBUTIONEXCEPTION_H_
 #define UNDEFINEDDISTRIBUTIONEXCEPTION_H_
 
-#include <iostream>
+#include <iostream> // for std::exception
 
 namespace stochastic {
 
 class UndefinedDistributionException : public std::exception
 {
+public:
+	virtual const char *what() const throw()
+	{
+		return "UndefinedDistributionException";
+	}
 };
 
 }

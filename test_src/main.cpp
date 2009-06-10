@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <iostream>
 
+#include "../src/ApproximationComponent.h"
 
 void gnulot_test()
 {
@@ -47,19 +48,17 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	// TODO: override operators from PieceDistribution
-	//stochastic::Gaussian g;
-	//stochastic::Uniform u;
-	//stochastic::Linear l;
+	using namespace stochastic;
 
-	stochastic::Exponential e;
-	stochastic::MixtureModel m;
+	Gaussian g;
+	Uniform u;
+	Linear l;
 
-	stochastic::ApproximatedDistribution a;
-	stochastic::RandomVariable r1, r2;
+	Exponential e;
+	MixtureModel m;
 
-	r1 = r2 + r1;
-	stochastic::min(r2, r2);
+	ApproximatedDistribution a;
+	RandomVariable r1, r2;
 
 	//gnulot_test();
 
