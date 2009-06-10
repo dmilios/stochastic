@@ -20,9 +20,9 @@ Linear::~Linear()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void Linear::sample(int numberOfSamples)
+double Linear::nextSample()
 {
+	return 0;
 }
 
 /*

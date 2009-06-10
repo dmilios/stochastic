@@ -20,7 +20,6 @@ namespace stochastic {
 
 class ApproximationComponent : public stochastic::MixtureComponent
 {
-	int a;
 public:
 	virtual ApproximationComponent * add(ApproximationComponent *) = 0;
 	virtual ApproximationComponent * subtract(ApproximationComponent *) = 0;

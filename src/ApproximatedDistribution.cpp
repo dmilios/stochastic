@@ -17,9 +17,9 @@ ApproximatedDistribution::~ApproximatedDistribution()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void ApproximatedDistribution::sample(int numberOfSamples)
+double ApproximatedDistribution::nextSample()
 {
+	return 0;
 }
 
 } // namespace stochastic

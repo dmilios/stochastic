@@ -19,9 +19,8 @@ public:
 	Gaussian();
 	virtual ~Gaussian();
 
-	//FIXME: change void to 'array of samples'
 	// overload virtual methods of Distribution
-	void sample(int);
+	double nextSample();
 
 	// overload virtual methods of ApproximationComponent
 	ApproximationComponent * add(ApproximationComponent *);

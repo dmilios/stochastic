@@ -24,8 +24,7 @@ public:
 	ApproximatedDistribution();
 	virtual ~ApproximatedDistribution();
 
-	//FIXME: change void to 'array of samples'
-	void sample(int);
+	double nextSample();
 };
 
 } // namespace stochastic

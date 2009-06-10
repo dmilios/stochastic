@@ -15,13 +15,17 @@ namespace stochastic {
 
 class Uniform : public stochastic::ApproximationComponent
 {
+private:
+	double alpha;
+	double beta;
+
 public:
 	Uniform();
+	Uniform(double, double);
 	virtual ~Uniform();
 
-	//FIXME: change void to 'array of samples'
 	// overload virtual methods of Distribution
-	void sample(int);
+	double nextSample();
 
 	// overload virtual methods of ApproximationComponent
 	ApproximationComponent * add(ApproximationComponent *);

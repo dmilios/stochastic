@@ -14,15 +14,23 @@ namespace stochastic {
 
 Uniform::Uniform()
 {
+	this->alpha = 0;
+	this->beta = 1;
+}
+
+Uniform::Uniform(double alpha, double beta)
+{
+	this->alpha = alpha;
+	this->beta = beta;
 }
 
 Uniform::~Uniform()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void Uniform::sample(int numberOfSamples)
+double Uniform::nextSample()
 {
+	return this->nextUniform_0_1();
 }
 
 /*

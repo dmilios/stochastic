@@ -49,16 +49,18 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-
 	Gaussian g;
 	Uniform u;
 	Linear l;
-
 	Exponential e;
 	MixtureModel m;
-
 	ApproximatedDistribution a;
 	RandomVariable r1, r2;
+
+	std::vector <double> ss = u.sample(10000);
+	unsigned int i;
+	for (i = 0; i < ss.size(); i++)
+		std::cout << ss[i] << '\n';
 
 	//gnulot_test();
 

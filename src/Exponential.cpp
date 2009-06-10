@@ -17,9 +17,9 @@ Exponential::~Exponential()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void Exponential::sample(int numberOfSamples)
+double Exponential::nextSample()
 {
+	return 0;
 }
 
 } // namespace stochastic

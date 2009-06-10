@@ -20,9 +20,9 @@ Gaussian::~Gaussian()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void Gaussian::sample(int numberOfSamples)
+double Gaussian::nextSample()
 {
+	return 0;
 }
 
 /*

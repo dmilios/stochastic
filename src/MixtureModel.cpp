@@ -17,9 +17,9 @@ MixtureModel::~MixtureModel()
 {
 }
 
-//FIXME: change void to 'array of samples'
-void MixtureModel::sample(int numberOfSamples)
+double MixtureModel::nextSample()
 {
+	return 0;
 }
 
 } // namespace stochastic
