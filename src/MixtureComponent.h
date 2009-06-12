@@ -28,6 +28,6 @@ class MixtureComponent : public stochastic::Distribution
 {
 };
 
-}
+} // namespace stochastic
 
 #endif /* MIXTURECOMPONENT_H_ */

@@ -18,11 +18,9 @@
 #include <cstdio>
 #include <iostream>
 
-#include "../src/ApproximationComponent.h"
-
 void gnulot_test()
 {
-	FILE *gnuplot;
+	FILE * gnuplot;
 	gnuplot = popen("gnuplot", "w");
 
 	int x = 1;
@@ -37,6 +35,30 @@ void gnulot_test()
 	pclose(gnuplot);
 }
 
+void octave_test(std::vector <double> v)
+{
+	FILE * octave;
+	octave = fopen("samples.txt", "w");
+
+	fprintf(octave, "# name: x \n");
+	fflush(octave);
+	fprintf(octave, "# type: matrix \n");
+	fflush(octave);
+	fprintf(octave, "# rows: %d \n", (int)v.size());
+	fflush(octave);
+	fprintf(octave, "# columns: 1 \n");
+	fflush(octave);
+
+	unsigned int i;
+	for (i = 0; i < v.size(); i++)
+	{
+		fprintf(octave, "%f \n", v[i]);
+		fflush(octave);
+	}
+
+	fclose(octave);
+}
+
 int printArguments(int argc, char *argv[])
 {
 	int i;
@@ -49,7 +71,7 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-	Gaussian g;
+	Gaussian g(0, 1);
 	Uniform u;
 	Linear l;
 	Exponential e;
@@ -57,11 +79,8 @@ int main(int argc, char *argv[])
 	ApproximatedDistribution a;
 	RandomVariable r1, r2;
 
-	std::vector <double> ss = u.sample(10000);
-	unsigned int i;
-	for (i = 0; i < ss.size(); i++)
-		std::cout << ss[i] << '\n';
-
+	std::vector <double> ss = g.sample(10000);
+	octave_test(ss);
 	//gnulot_test();
 
 	return printArguments(argc, argv);

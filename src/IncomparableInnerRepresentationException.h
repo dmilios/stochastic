@@ -21,6 +21,6 @@ public:
 	}
 };
 
-}
+} // namespace stochastic
 
 #endif /* INCOMPARABLEINNERREPRESENTATIONEXCEPTION_H_ */

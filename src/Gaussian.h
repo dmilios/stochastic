@@ -15,9 +15,18 @@ namespace stochastic {
 
 class Gaussian : public stochastic::ApproximationComponent
 {
+private:
+	double mean;
+	double variance;
+	static const double pi;
+
 public:
 	Gaussian();
+	Gaussian(double);
+	Gaussian(double, double);
 	virtual ~Gaussian();
+
+	double pdf(double);
 
 	// overload virtual methods of Distribution
 	double nextSample();

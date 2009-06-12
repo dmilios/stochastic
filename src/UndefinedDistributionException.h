@@ -21,6 +21,6 @@ public:
 	}
 };
 
-}
+} // namespace stochastic
 
 #endif /* UNDEFINEDDISTRIBUTIONEXCEPTION_H_ */
