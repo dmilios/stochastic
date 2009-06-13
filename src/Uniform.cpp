@@ -7,8 +7,7 @@
 
 #include "Uniform.h"
 
-#include "IncomparableInnerRepresentationException.h"
-#include "InvalidParametersException.h"
+#include "exceptions.h"
 #include <typeinfo>
 
 namespace stochastic {
@@ -32,10 +31,16 @@ Uniform::~Uniform()
 {
 }
 
+double Uniform::pdf(double x)
+{
+	if (x < alpha || x > beta)
+		return 0;
+	return 1 / (beta - alpha);
+}
+
 double Uniform::nextSample()
 {
-	// Inverse transform sampling
-	return this->nextUniform_0_1() * (beta - alpha) + alpha;
+	return generator.nextDouble(alpha, beta);
 }
 
 /*

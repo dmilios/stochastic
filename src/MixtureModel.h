@@ -27,6 +27,7 @@ public:
 	MixtureModel();
 	virtual ~MixtureModel();
 
+	double pdf(double);
 	double nextSample();
 };
 

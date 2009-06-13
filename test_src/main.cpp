@@ -71,15 +71,15 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-	Gaussian g(0, 1);
+	Gaussian g;
 	Uniform u;
-	Linear l;
+	Linear l(0, 1, 1);
 	Exponential e;
 	MixtureModel m;
 	ApproximatedDistribution a;
 	RandomVariable r1, r2;
 
-	std::vector <double> ss = g.sample(10000);
+	std::vector <double> ss = e.sample(10000);
 	octave_test(ss);
 	//gnulot_test();
 

@@ -7,7 +7,7 @@
 
 #include "RandomVariable.h"
 
-#include "UndefinedDistributionException.h"
+#include "exceptions.h"
 
 namespace stochastic {
 

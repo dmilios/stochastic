@@ -13,13 +13,25 @@
 
 namespace stochastic {
 
+/**
+ * @brief Linear Distribution of the form: 'y = slope * x + c'
+ * 'alpha' and 'beta' define the interval
+ * where the distribution is defined
+ * */
 class Linear : public stochastic::ApproximationComponent
 {
+private:
+	double alpha;
+	double beta;
+	double slope;
+	double c;
+
 public:
-	Linear();
+	Linear(double, double, double);
 	virtual ~Linear();
 
 	// overload virtual methods of Distribution
+	double pdf(double);
 	double nextSample();
 
 	// overload virtual methods of ApproximationComponent

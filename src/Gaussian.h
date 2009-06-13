@@ -26,9 +26,8 @@ public:
 	Gaussian(double, double);
 	virtual ~Gaussian();
 
-	double pdf(double);
-
 	// overload virtual methods of Distribution
+	double pdf(double);
 	double nextSample();
 
 	// overload virtual methods of ApproximationComponent

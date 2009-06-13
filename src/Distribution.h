@@ -9,26 +9,23 @@
 #define DISTRIBUTION_H_
 
 #include <vector>
+#include "RandomGenerator.h"
 
 namespace stochastic {
 
 class Distribution
 {
-private:
-	static int seedInitialized;
-
 protected:
-	/**
-	 * 'nextUniform_0_1()' samples from a uniform(0,1) distribution.
-	 * All derived classes inherit this generator,
-	 * so as to sample from more complex distributions.
-	 * */
-	static double nextUniform_0_1();
+	static RandomGenerator generator;
+
+	double rejectionSampling(double, double, double);
 
 public:
 	Distribution();
 	virtual ~Distribution();
 
+	//virtual std::vector <double> pdfOutline(int) = 0;
+	virtual double pdf(double) = 0;
 	virtual double nextSample() = 0;
 	std::vector <double> sample(int);
 };

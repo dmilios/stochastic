@@ -17,6 +17,11 @@ ApproximatedDistribution::~ApproximatedDistribution()
 {
 }
 
+double ApproximatedDistribution::pdf(double x)
+{
+	return 0;
+}
+
 double ApproximatedDistribution::nextSample()
 {
 	return 0;

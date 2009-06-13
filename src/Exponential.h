@@ -14,11 +14,16 @@ namespace stochastic {
 
 class Exponential : public stochastic::MixtureComponent
 {
+private:
+	double lambda;
+
 public:
 	Exponential();
+	Exponential(double);
 	virtual ~Exponential();
 
 	// overload virtual methods of Distribution
+	double pdf(double);
 	double nextSample();
 };
 

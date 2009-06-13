@@ -17,6 +17,11 @@ MixtureModel::~MixtureModel()
 {
 }
 
+double MixtureModel::pdf(double x)
+{
+	return 0;
+}
+
 double MixtureModel::nextSample()
 {
 	return 0;

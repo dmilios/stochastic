@@ -24,6 +24,7 @@ public:
 	ApproximatedDistribution();
 	virtual ~ApproximatedDistribution();
 
+	double pdf(double);
 	double nextSample();
 };
 

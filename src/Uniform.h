@@ -25,6 +25,7 @@ public:
 	virtual ~Uniform();
 
 	// overload virtual methods of Distribution
+	double pdf(double);
 	double nextSample();
 
 	// overload virtual methods of ApproximationComponent
