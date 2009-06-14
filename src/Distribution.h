@@ -17,15 +17,17 @@ class Distribution
 {
 protected:
 	static RandomGenerator generator;
-
 	double rejectionSampling(double, double, double);
 
 public:
 	Distribution();
 	virtual ~Distribution();
 
-	//virtual std::vector <double> pdfOutline(int) = 0;
+	virtual const char * getName() = 0;
 	virtual double pdf(double) = 0;
+	virtual double getLeftMargin() = 0;
+	virtual double getRightMargin() = 0;
+
 	virtual double nextSample() = 0;
 	std::vector <double> sample(int);
 };

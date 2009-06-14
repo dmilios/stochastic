@@ -8,6 +8,8 @@
 #include "RandomVariable.h"
 
 #include "exceptions.h"
+#include <fstream>
+#include <string>
 
 namespace stochastic {
 
@@ -28,6 +30,52 @@ RandomVariable::~RandomVariable()
 void RandomVariable::setDistribution(Distribution * distribution)
 {
 	this->distribution = distribution;
+}
+
+const Distribution * RandomVariable::getDistribution()
+{
+	return this->distribution;
+}
+
+void RandomVariable::pdfOutline(int accuracy, std::vector <double> & x,
+		std::vector <double> & fx)
+{
+	if (!distribution)
+		throw stochastic::UndefinedDistributionException();
+
+	std::vector <double> y;
+	double x_curr;
+	double start = this->distribution->getLeftMargin();
+	double end = this->distribution->getRightMargin();
+	double step = (end - start) / (double) accuracy;
+	double margin = (end - start) / 10;
+	for (x_curr = start - margin; x_curr < end + margin; x_curr = x_curr + step)
+	{
+		x.push_back(x_curr);
+		fx.push_back(this->distribution->pdf(x_curr));
+	}
+}
+
+void RandomVariable::produceFileOfSamples(int n)
+{
+	if (!distribution)
+		throw stochastic::UndefinedDistributionException();
+
+	std::string fileName(distribution->getName());
+	fileName.append(".txt");
+
+	std::ofstream output;
+	std::vector <double> samples = distribution->sample(n);
+
+	output.open(fileName.c_str());
+	output << "# name: x \n";
+	output << "# type: matrix \n";
+	output << "# rows:" << (int)samples.size() << "\n";
+	output << "# columns: 1 \n";
+	unsigned int i;
+	for (i = 0; i < samples.size(); i++)
+		output << samples[i] << " \n";
+	output.close();
 }
 
 /*

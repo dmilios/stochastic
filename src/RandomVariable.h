@@ -10,6 +10,8 @@
 
 #include "Distribution.h"
 
+#include <vector>
+
 namespace stochastic {
 
 class RandomVariable
@@ -22,7 +24,10 @@ public:
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
 
+	const Distribution * getDistribution();
 	void setDistribution(Distribution *);
+	void pdfOutline(int, std::vector <double> &, std::vector <double> &);
+	void produceFileOfSamples(int);
 
 	RandomVariable operator +(RandomVariable);
 	RandomVariable operator -(RandomVariable);

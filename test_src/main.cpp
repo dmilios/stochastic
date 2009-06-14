@@ -35,28 +35,32 @@ void gnulot_test()
 	pclose(gnuplot);
 }
 
-void octave_test(std::vector <double> v)
+void pdf_test(std::vector <double> vx, std::vector <double> vy)
 {
-	FILE * octave;
-	octave = fopen("samples.txt", "w");
-
-	fprintf(octave, "# name: x \n");
-	fflush(octave);
-	fprintf(octave, "# type: matrix \n");
-	fflush(octave);
-	fprintf(octave, "# rows: %d \n", (int)v.size());
-	fflush(octave);
-	fprintf(octave, "# columns: 1 \n");
-	fflush(octave);
+	FILE * pdf;
+	pdf = fopen("pdf.dat", "w");
 
 	unsigned int i;
-	for (i = 0; i < v.size(); i++)
+	for (i = 0; i < vx.size(); i++)
 	{
-		fprintf(octave, "%f \n", v[i]);
-		fflush(octave);
+		fprintf(pdf, "%f\t%f\n", vx[i], vy[i]);
+		fflush(pdf);
 	}
+	fclose(pdf);
 
-	fclose(octave);
+
+	FILE * gnuplot;
+	gnuplot = popen("gnuplot", "w");
+
+	fprintf(gnuplot, "plot 'pdf.dat' with lines lw 1\n");
+	fflush(gnuplot);
+
+	printf("Press enter to continue...");
+	fflush(stdout);
+	getchar();
+
+	fputs("exit \n", gnuplot);
+	pclose(gnuplot);
 }
 
 int printArguments(int argc, char *argv[])
@@ -77,11 +81,15 @@ int main(int argc, char *argv[])
 	Exponential e;
 	MixtureModel m;
 	ApproximatedDistribution a;
-	RandomVariable r1, r2;
+	RandomVariable r1, r2(new Gaussian());
 
-	std::vector <double> ss = e.sample(10000);
-	octave_test(ss);
-	//gnulot_test();
+	int accuracy = 1000;
+	std::vector <double> vx;
+	std::vector <double> vy;
+	r2.pdfOutline(accuracy, vx, vy);
+
+	pdf_test(vx, vy);
+	r2.produceFileOfSamples(10);
 
 	return printArguments(argc, argv);
 }

@@ -27,8 +27,12 @@ public:
 	MixtureModel();
 	virtual ~MixtureModel();
 
+	// overload virtual methods of Distribution
+	virtual const char * getName();
 	double pdf(double);
 	double nextSample();
+	double getLeftMargin();
+	double getRightMargin();
 };
 
 } // namespace stochastic

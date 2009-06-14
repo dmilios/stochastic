@@ -39,6 +39,24 @@ public:
 	}
 };
 
+class FileNotFoundException : public std::exception
+{
+public:
+	virtual const char *what() const throw()
+	{
+		return "FileNotFoundException";
+	}
+};
+
+class InvalidDataFileException : public std::exception
+{
+public:
+	virtual const char *what() const throw()
+	{
+		return "InvalidDataFileException";
+	}
+};
+
 } // namespace stochastic
 
 

@@ -10,6 +10,8 @@
 #include "exceptions.h"
 #include <typeinfo>
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace stochastic {
 
@@ -30,11 +32,39 @@ Linear::~Linear()
 {
 }
 
+const char * Linear::getName()
+{
+	std::stringstream alpha_s;
+	std::stringstream beta_s;
+	std::stringstream slope_s;
+	alpha_s << this->alpha;
+	beta_s << this->beta;
+	slope_s << this->slope;
+
+	std::string name("lin_a");
+	name.append(alpha_s.str());
+	name.append("_b");
+	name.append(beta_s.str());
+	name.append("_sl");
+	name.append(slope_s.str());
+	return name.c_str();
+}
+
 double Linear::pdf(double x)
 {
 	if (x < alpha || x > beta)
 		return 0;
 	return slope * x + c;
+}
+
+double Linear::getLeftMargin()
+{
+	return this->alpha;
+}
+
+double Linear::getRightMargin()
+{
+	return this->beta;
 }
 
 double Linear::nextSample()

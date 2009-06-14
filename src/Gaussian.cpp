@@ -10,6 +10,8 @@
 #include "exceptions.h"
 #include <typeinfo>
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace stochastic {
 
@@ -40,19 +42,39 @@ Gaussian::~Gaussian()
 {
 }
 
+const char * Gaussian::getName()
+{
+	std::stringstream mean_s;
+	std::stringstream var_s;
+	mean_s << this->mean;
+	var_s << this->variance;
+
+	std::string name("norm_m");
+	name.append(mean_s.str());
+	name.append("_var");
+	name.append(var_s.str());
+	return name.c_str();
+}
+
 double Gaussian::pdf(double x)
 {
 	return (1 / sqrt(2 * pi * variance) * exp(-pow(x - mean, 2)
 			/ (2 * variance)));
 }
 
+double Gaussian::getLeftMargin()
+{
+	return mean - 4 * sqrt(variance);
+}
+
+double Gaussian::getRightMargin()
+{
+	return mean + 4 * sqrt(variance);
+}
+
 double Gaussian::nextSample()
 {
-	double highestProbability = pdf(mean);
-	double leftMargin = mean - 3 * sqrt(variance);
-	double rightMargin = mean + 3 * sqrt(variance);
-
-	return rejectionSampling(highestProbability, leftMargin, rightMargin);
+	return rejectionSampling(pdf(mean), getLeftMargin(), getRightMargin());
 }
 
 /*

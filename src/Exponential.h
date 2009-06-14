@@ -23,8 +23,11 @@ public:
 	virtual ~Exponential();
 
 	// overload virtual methods of Distribution
+	const char * getName();
 	double pdf(double);
 	double nextSample();
+	double getLeftMargin();
+	double getRightMargin();
 };
 
 } // namespace stochastic

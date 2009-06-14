@@ -9,6 +9,8 @@
 
 #include "exceptions.h"
 #include <cmath>
+#include <string>
+#include <sstream>
 
 namespace stochastic {
 
@@ -28,12 +30,32 @@ Exponential::~Exponential()
 {
 }
 
+const char * Exponential::getName()
+{
+	std::stringstream lambda_s;
+	lambda_s << this->lambda;
+	std::string name("exp_l");
+	name.append(lambda_s.str());
+	return name.c_str();
+}
+
 double Exponential::pdf(double x)
 {
 	if (x < 0)
 		return 0;
 	return lambda * exp(-lambda * x);
 }
+
+double Exponential::getLeftMargin()
+{
+	return 0;
+}
+
+double Exponential::getRightMargin()
+{
+	return (1 / lambda) * 5;
+}
+
 
 // sample using inverse CDF
 double Exponential::nextSample()

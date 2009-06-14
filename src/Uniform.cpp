@@ -9,6 +9,8 @@
 
 #include "exceptions.h"
 #include <typeinfo>
+#include <string>
+#include <sstream>
 
 namespace stochastic {
 
@@ -31,11 +33,35 @@ Uniform::~Uniform()
 {
 }
 
+const char * Uniform::getName()
+{
+	std::stringstream alpha_s;
+	std::stringstream beta_s;
+	alpha_s << this->alpha;
+	beta_s << this->beta;
+
+	std::string name("uni_a");
+	name.append(alpha_s.str());
+	name.append("_b");
+	name.append(beta_s.str());
+	return name.c_str();
+}
+
 double Uniform::pdf(double x)
 {
 	if (x < alpha || x > beta)
 		return 0;
 	return 1 / (beta - alpha);
+}
+
+double Uniform::getLeftMargin()
+{
+	return this->alpha;
+}
+
+double Uniform::getRightMargin()
+{
+	return this->beta;
 }
 
 double Uniform::nextSample()

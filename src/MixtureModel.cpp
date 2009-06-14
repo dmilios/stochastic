@@ -17,7 +17,22 @@ MixtureModel::~MixtureModel()
 {
 }
 
+const char * MixtureModel::getName()
+{
+	return "mm";
+}
+
 double MixtureModel::pdf(double x)
+{
+	return 0;
+}
+
+double MixtureModel::getLeftMargin()
+{
+	return 0;
+}
+
+double MixtureModel::getRightMargin()
 {
 	return 0;
 }
