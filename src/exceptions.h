@@ -9,15 +9,14 @@
 #define EXCEPTIONS_H_
 
 #include <iostream> // for std::exception
-
 namespace stochastic {
 
-class IncomparableInnerRepresentationException : public std::exception
+class IncompatibleComponentsException : public std::exception
 {
 public:
 	virtual const char *what() const throw()
 	{
-		return "IncomparableInnerRepresentationException";
+		return "IncompatibleComponentsException";
 	}
 };
 
@@ -54,6 +53,15 @@ public:
 	virtual const char *what() const throw()
 	{
 		return "InvalidDataFileException";
+	}
+};
+
+class InvalidWeightsException : public std::exception
+{
+public:
+	virtual const char *what() const throw()
+	{
+		return "InvalidWeightsException";
 	}
 };
 

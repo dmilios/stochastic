@@ -85,7 +85,7 @@ ApproximationComponent * Linear::add(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;
@@ -95,7 +95,7 @@ ApproximationComponent * Linear::subtract(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;
@@ -105,7 +105,7 @@ ApproximationComponent * Linear::multiply(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;
@@ -115,7 +115,7 @@ ApproximationComponent * Linear::divide(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;
@@ -131,7 +131,7 @@ ApproximationComponent * Linear::min(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;
@@ -141,7 +141,7 @@ ApproximationComponent * Linear::max(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Linear(0, 1, 1);
 
 	return result;

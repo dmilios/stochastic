@@ -75,21 +75,31 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
+	ApproximatedDistribution::setFixedNumberOfComponents(100);
+
 	Gaussian g;
 	Uniform u;
 	Linear l(0, 1, 1);
 	Exponential e;
-	MixtureModel m;
-	ApproximatedDistribution a;
-	RandomVariable r1, r2(new Gaussian());
+
+	std::vector <MixtureComponent *> c;
+	std::vector <double> w;
+	c.push_back(new Exponential(15));
+	w.push_back(1);
+	c.push_back(new Exponential());
+	w.push_back(3);
+	MixtureModel m(c, w);
+
+	ApproximatedDistribution a(new Gaussian);
+	RandomVariable r1(&m), r2(new Gaussian());
 
 	int accuracy = 1000;
 	std::vector <double> vx;
 	std::vector <double> vy;
-	r2.pdfOutline(accuracy, vx, vy);
+	r1.pdfOutline(accuracy, vx, vy);
 
 	pdf_test(vx, vy);
-	r2.produceFileOfSamples(10);
+	r1.produceFileOfSamples(10000);
 
 	return printArguments(argc, argv);
 }

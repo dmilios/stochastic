@@ -10,6 +10,7 @@
 
 #include "Distribution.h"
 #include "MixtureComponent.h"
+#include "exceptions.h"
 #include <vector>
 
 namespace stochastic {
@@ -17,14 +18,21 @@ namespace stochastic {
 class MixtureModel : public stochastic::Distribution
 {
 private:
-	std::vector <stochastic::MixtureComponent> components;
+	std::vector <stochastic::MixtureComponent *> components;
 
 protected:
-	double numberOfComponents;
 	std::vector <double> weights;
+	std::vector <double> cumulativeWeights; // needed for sampling
+
+	// This constructor exists just to be inherited
+	// it should not be visible out of the class
+	// No empty Mixture Models are allows to be declared
+	MixtureModel()
+	{
+	}
 
 public:
-	MixtureModel();
+	MixtureModel(std::vector <MixtureComponent *>, std::vector <double>);
 	virtual ~MixtureModel();
 
 	// overload virtual methods of Distribution

@@ -9,16 +9,26 @@
 
 #include "exceptions.h"
 #include "FileParser.h"
+#include <sstream>
 
 namespace stochastic {
 
-ApproximatedDistribution::ApproximatedDistribution()
+int ApproximatedDistribution::fixedNumberOfComponents = 10;
+
+// Static Method: sets the wanted number of components
+void ApproximatedDistribution::setFixedNumberOfComponents(int n)
 {
+	fixedNumberOfComponents = n;
 }
 
 ApproximatedDistribution::ApproximatedDistribution(const char * fileName)
 {
-	fit(fileName);
+	this->fit(fileName);
+}
+
+ApproximatedDistribution::ApproximatedDistribution(Distribution * distribution)
+{
+	this->fit(distribution);
 }
 
 ApproximatedDistribution::~ApproximatedDistribution()
@@ -38,6 +48,10 @@ void ApproximatedDistribution::fit(const char * fileName)
 	fit(data);
 }
 
+/**
+ * Private Method:
+ * fits an 'ApproximatedDistribution' to the data stored in the vector
+ * */
 void ApproximatedDistribution::fit(std::vector <double> data)
 {
 }
@@ -52,17 +66,15 @@ void ApproximatedDistribution::fit(Distribution * distribution)
 
 const char * ApproximatedDistribution::getName()
 {
-	return "appr";
-}
+	std::stringstream numberOfComponents_s;
+	numberOfComponents_s << this->components.size();
+	std::string firstComponent(components[0]->getName());
 
-double ApproximatedDistribution::pdf(double x)
-{
-	return 0;
-}
-
-double ApproximatedDistribution::nextSample()
-{
-	return 0;
+	std::string name("ap");
+	name.append(numberOfComponents_s.str());
+	name.append("_");
+	name.append(firstComponent);
+	return name.c_str();
 }
 
 } // namespace stochastic

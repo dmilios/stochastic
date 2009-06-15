@@ -79,7 +79,7 @@ ApproximationComponent * Uniform::add(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;
@@ -89,7 +89,7 @@ ApproximationComponent * Uniform::subtract(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;
@@ -99,7 +99,7 @@ ApproximationComponent * Uniform::multiply(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;
@@ -109,7 +109,7 @@ ApproximationComponent * Uniform::divide(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;
@@ -125,7 +125,7 @@ ApproximationComponent * Uniform::min(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;
@@ -135,7 +135,7 @@ ApproximationComponent * Uniform::max(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
 
 	return result;

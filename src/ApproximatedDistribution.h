@@ -18,20 +18,21 @@ namespace stochastic {
 class ApproximatedDistribution : public stochastic::MixtureModel
 {
 private:
-	std::vector <stochastic::ApproximationComponent> components;
+	static int fixedNumberOfComponents;
+
+	std::vector <stochastic::ApproximationComponent *> components;
 	void fit(const char *);
 	void fit(std::vector <double>);
 	void fit(Distribution *);
 
 public:
-	ApproximatedDistribution();
 	ApproximatedDistribution(const char *);
+	ApproximatedDistribution(Distribution *);
 	virtual ~ApproximatedDistribution();
 
-	// overload virtual methods of Distribution
-	const char * getName();
-	double pdf(double);
-	double nextSample();
+    static void setFixedNumberOfComponents(int);
+
+    const char *getName();
 };
 
 } // namespace stochastic

@@ -87,7 +87,7 @@ ApproximationComponent * Gaussian::add(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;
@@ -97,7 +97,7 @@ ApproximationComponent * Gaussian::subtract(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;
@@ -108,7 +108,7 @@ ApproximationComponent * Gaussian::multiply(
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;
@@ -119,7 +119,7 @@ ApproximationComponent * Gaussian::divide(
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;
@@ -136,7 +136,7 @@ ApproximationComponent * Gaussian::min(
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;
@@ -148,7 +148,7 @@ ApproximationComponent * Gaussian::max(
 	ApproximationComponent * result;
 	if (typeid(*this)
 			!= typeid(*secondarg))
-		throw stochastic::IncomparableInnerRepresentationException();
+		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
 
 	return result;

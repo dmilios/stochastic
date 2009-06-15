@@ -7,10 +7,42 @@
 
 #include "MixtureModel.h"
 
+#include <typeinfo>
+#include <cmath> // for INFINITY
+#include <sstream>
+
 namespace stochastic {
 
-MixtureModel::MixtureModel()
+MixtureModel::MixtureModel(std::vector <MixtureComponent *> components,
+		std::vector <double> weights)
 {
+	if (components.size() <= 0)
+		throw UndefinedDistributionException();
+	if (components.size() != weights.size())
+		throw InvalidWeightsException();
+
+	// Normalisation of weights, plus some additional checks
+	unsigned int i;
+	double sum = 0;
+	double cumulativeWeight = 0;
+	for (i = 0; i < weights.size(); i++)
+	{
+		if (weights[i] <= 0)
+			throw InvalidWeightsException();
+		if (typeid(* components[i]) != typeid(* components[0]))
+			throw IncompatibleComponentsException();
+
+		sum += weights[i];
+	}
+	for (i = 0; i < weights.size(); i++)
+	{
+		weights[i] /= sum;
+		cumulativeWeight += weights[i];
+		this->cumulativeWeights.push_back(cumulativeWeight);
+	}
+
+	this->components = components;
+	this->weights = weights;
 }
 
 MixtureModel::~MixtureModel()
@@ -19,27 +51,59 @@ MixtureModel::~MixtureModel()
 
 const char * MixtureModel::getName()
 {
-	return "mm";
+	std::stringstream numberOfComponents_s;
+	numberOfComponents_s << this->components.size();
+	std::string firstComponent(components[0]->getName());
+
+	std::string name("mm");
+	name.append(numberOfComponents_s.str());
+	name.append("_");
+	name.append(firstComponent);
+	return name.c_str();
 }
 
 double MixtureModel::pdf(double x)
 {
-	return 0;
+	if (x < this->getLeftMargin() || x > this->getRightMargin())
+		return 0;
+
+	unsigned int i;
+	double weighted_sum = 0;
+	for (i = 0; i < components.size(); i++)
+		weighted_sum += components[i]->pdf(x) * weights[i];
+	return weighted_sum;
 }
 
 double MixtureModel::getLeftMargin()
 {
-	return 0;
+	double minimum = INFINITY;
+	unsigned int i;
+	for (i = 0; i < components.size(); i++)
+		if (components[i]->getLeftMargin() < minimum)
+			minimum = components[i]->getLeftMargin();
+	return minimum;
 }
 
 double MixtureModel::getRightMargin()
 {
-	return 0;
+	double maximum = -INFINITY;
+	unsigned int i;
+	for (i = 0; i < components.size(); i++)
+		if (components[i]->getRightMargin() > maximum)
+			maximum = components[i]->getRightMargin();
+	return maximum;
 }
 
 double MixtureModel::nextSample()
 {
-	return 0;
+	double roulette = generator.nextDouble();
+	unsigned int i;
+	for (i = 0; i < weights.size(); i++)
+		if (roulette < cumulativeWeights[i])
+			return this->components[i]->nextSample();
+
+	// this line should never be executed
+	throw 0;
 }
 
 } // namespace stochastic
