@@ -90,8 +90,11 @@ int main(int argc, char *argv[])
 	w.push_back(3);
 	MixtureModel m(c, w);
 
-	ApproximatedDistribution a(new Gaussian);
-	RandomVariable r1(&m), r2(new Gaussian());
+	PiecewiseGaussian pg = "exp_l1.txt";
+	PiecewiseUniform pu = "exp_l1.txt";
+	PiecewiseLinear pl = "exp_l1.txt";
+
+	RandomVariable r1 = &m, r2 = new Gaussian();
 
 	int accuracy = 1000;
 	std::vector <double> vx;

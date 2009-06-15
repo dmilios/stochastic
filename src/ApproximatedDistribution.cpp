@@ -8,10 +8,12 @@
 #include "ApproximatedDistribution.h"
 
 #include "exceptions.h"
-#include "FileParser.h"
-#include <sstream>
+
+#include <iostream>
 
 namespace stochastic {
+
+FileParser ApproximatedDistribution::parser;
 
 int ApproximatedDistribution::fixedNumberOfComponents = 10;
 
@@ -19,16 +21,6 @@ int ApproximatedDistribution::fixedNumberOfComponents = 10;
 void ApproximatedDistribution::setFixedNumberOfComponents(int n)
 {
 	fixedNumberOfComponents = n;
-}
-
-ApproximatedDistribution::ApproximatedDistribution(const char * fileName)
-{
-	this->fit(fileName);
-}
-
-ApproximatedDistribution::ApproximatedDistribution(Distribution * distribution)
-{
-	this->fit(distribution);
 }
 
 ApproximatedDistribution::~ApproximatedDistribution()
@@ -40,41 +32,16 @@ ApproximatedDistribution::~ApproximatedDistribution()
  * fits an 'ApproximatedDistribution' to the data
  * contained in the file 'fileName'
  * */
-void ApproximatedDistribution::fit(const char * fileName)
+void ApproximatedDistribution::constructFrom(const char * fileName)
 {
 	std::vector <double> data;
-	FileParser parser;
 	data = parser.parseDataFile(fileName);
 	fit(data);
 }
 
-/**
- * Private Method:
- * fits an 'ApproximatedDistribution' to the data stored in the vector
- * */
-void ApproximatedDistribution::fit(std::vector <double> data)
+void ApproximatedDistribution::constructFrom(Distribution * distribution)
 {
-}
-
-/**
- * Private Method:
- * fits an 'ApproximatedDistribution' to the given distribution
- * */
-void ApproximatedDistribution::fit(Distribution * distribution)
-{
-}
-
-const char * ApproximatedDistribution::getName()
-{
-	std::stringstream numberOfComponents_s;
-	numberOfComponents_s << this->components.size();
-	std::string firstComponent(components[0]->getName());
-
-	std::string name("ap");
-	name.append(numberOfComponents_s.str());
-	name.append("_");
-	name.append(firstComponent);
-	return name.c_str();
+	fit(distribution);
 }
 
 } // namespace stochastic

@@ -15,6 +15,9 @@
 #include "Distribution.h"
 
 #include "ApproximatedDistribution.h"
+#include "PiecewiseGaussian.h"
+#include "PiecewiseUniform.h"
+#include "PiecewiseLinear.h"
 #include "MixtureModel.h"
 #include "Gaussian.h"
 #include "Uniform.h"

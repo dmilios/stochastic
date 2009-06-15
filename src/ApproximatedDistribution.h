@@ -11,28 +11,40 @@
 #include "Distribution.h"
 #include "MixtureModel.h"
 #include "ApproximationComponent.h"
+#include "FileParser.h"
 #include <vector>
 
 namespace stochastic {
 
+/**
+ * This class defines the interface of the Mixture Models
+ * that will be used as approximations of distributions
+ *
+ * The pure virtual 'fit' methods have to be overridden, so as to
+ * define different approximation methods for each approximation class,
+ * but a unique interface.
+ * */
 class ApproximatedDistribution : public stochastic::MixtureModel
 {
 private:
-	static int fixedNumberOfComponents;
+	static FileParser parser;
 
+protected:
+	static int fixedNumberOfComponents;
 	std::vector <stochastic::ApproximationComponent *> components;
-	void fit(const char *);
-	void fit(std::vector <double>);
-	void fit(Distribution *);
+
+	// used by the constructors to trigger virtual methods
+	void constructFrom(const char *);
+	void constructFrom(Distribution *);
+
+	virtual void fit(std::vector <double>) = 0;
+	virtual void fit(Distribution *) = 0;
 
 public:
-	ApproximatedDistribution(const char *);
-	ApproximatedDistribution(Distribution *);
 	virtual ~ApproximatedDistribution();
 
+	// in order to set the global fixedNumberOfComponents
     static void setFixedNumberOfComponents(int);
-
-    const char *getName();
 };
 
 } // namespace stochastic
