@@ -29,6 +29,7 @@ public:
 	// overload virtual methods of Distribution
 	const char * getName();
 	double pdf(double);
+	double cdf(double);
 	double nextSample();
 	double getLeftMargin();
 	double getRightMargin();

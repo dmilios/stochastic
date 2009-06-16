@@ -25,6 +25,7 @@ public:
 
 	virtual const char * getName() = 0;
 	virtual double pdf(double) = 0;
+	virtual double cdf(double) = 0;
 	virtual double getLeftMargin() = 0;
 	virtual double getRightMargin() = 0;
 

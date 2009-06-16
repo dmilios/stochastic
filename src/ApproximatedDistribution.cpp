@@ -23,25 +23,4 @@ void ApproximatedDistribution::setFixedNumberOfComponents(int n)
 	fixedNumberOfComponents = n;
 }
 
-ApproximatedDistribution::~ApproximatedDistribution()
-{
-}
-
-/**
- * Private Method:
- * fits an 'ApproximatedDistribution' to the data
- * contained in the file 'fileName'
- * */
-void ApproximatedDistribution::constructFrom(const char * fileName)
-{
-	std::vector <double> data;
-	data = parser.parseDataFile(fileName);
-	fit(data);
-}
-
-void ApproximatedDistribution::constructFrom(Distribution * distribution)
-{
-	fit(distribution);
-}
-
 } // namespace stochastic

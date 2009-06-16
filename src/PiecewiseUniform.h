@@ -10,6 +10,8 @@
 
 #include "ApproximatedDistribution.h"
 
+#include "Uniform.h"
+
 namespace stochastic {
 
 class PiecewiseUniform : public stochastic::ApproximatedDistribution
@@ -22,6 +24,8 @@ public:
 	PiecewiseUniform(const char *);
 	PiecewiseUniform(Distribution *);
 	virtual ~PiecewiseUniform();
+
+	const char * getName();
 };
 
 } // namespace stochastic

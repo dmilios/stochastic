@@ -22,6 +22,8 @@ public:
 	PiecewiseGaussian(const char *);
 	PiecewiseGaussian(Distribution *);
 	virtual ~PiecewiseGaussian();
+
+	const char * getName();
 };
 
 } // namespace stochastic

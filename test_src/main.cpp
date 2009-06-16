@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 	Gaussian g;
 	Uniform u;
-	Linear l(0, 1, 1);
+	Linear l(0, 1, 1); l.nextSample();
 	Exponential e;
 
 	std::vector <MixtureComponent *> c;
@@ -90,11 +90,9 @@ int main(int argc, char *argv[])
 	w.push_back(3);
 	MixtureModel m(c, w);
 
-	PiecewiseGaussian pg = "exp_l1.txt";
-	PiecewiseUniform pu = "exp_l1.txt";
-	PiecewiseLinear pl = "exp_l1.txt";
+	PiecewiseUniform pu = new Gaussian;
 
-	RandomVariable r1 = &m, r2 = new Gaussian();
+	RandomVariable r1 = &pu, r2 = new Exponential();
 
 	int accuracy = 1000;
 	std::vector <double> vx;
@@ -102,7 +100,7 @@ int main(int argc, char *argv[])
 	r1.pdfOutline(accuracy, vx, vy);
 
 	pdf_test(vx, vy);
-	r1.produceFileOfSamples(10000);
+	//r1.produceFileOfSamples(10000);
 
 	return printArguments(argc, argv);
 }

@@ -49,9 +49,22 @@ const char * Uniform::getName()
 
 double Uniform::pdf(double x)
 {
-	if (x < alpha || x > beta)
+	/**
+	 * NOTE: pdf is defined for 'a <= x < b'
+	 * instead of 'a <= x <= b', for convenience
+	 */
+	if (x < alpha || x >= beta)
 		return 0;
 	return 1 / (beta - alpha);
+}
+
+double Uniform::cdf(double x)
+{
+	if (x < alpha)
+		return 0;
+	if (x > beta)
+		return 1;
+	return (x - alpha) / (beta - alpha);
 }
 
 double Uniform::getLeftMargin()

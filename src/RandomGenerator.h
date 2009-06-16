@@ -49,7 +49,7 @@ public:
 	 */
 	int nextInt(int max)
 	{
-		int value = ((double) rand() / RAND_MAX) * (max + 1);
+		int value = int(((double) rand() / RAND_MAX) * (max + 1));
 		if (value > max)
 			value = 0;
 		return value;

@@ -52,9 +52,19 @@ const char * Linear::getName()
 
 double Linear::pdf(double x)
 {
-	if (x < alpha || x > beta)
+	/**
+	 * pdf is defined for 'a <= x < b'
+	 * instead of 'a <= x <= b', for convenience
+	 */
+	if (x < alpha || x >= beta)
 		return 0;
 	return slope * x + c;
+}
+
+double Linear::cdf(double x)
+{
+	// FIXME: CDFs for linears?
+	return 0;
 }
 
 double Linear::getLeftMargin()
@@ -69,10 +79,13 @@ double Linear::getRightMargin()
 
 double Linear::nextSample()
 {
+	// because pdf(beta)==0
+	double small = 0.00000000000001;
+
 	if (slope <= 0) // decreasing
 		return rejectionSampling(pdf(alpha), alpha, beta);
 	else // increasing
-		return rejectionSampling(pdf(beta), alpha, beta);
+		return rejectionSampling(pdf(beta - small), alpha, beta);
 }
 
 /*

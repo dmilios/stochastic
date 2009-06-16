@@ -11,16 +11,26 @@ namespace stochastic {
 
 PiecewiseLinear::PiecewiseLinear(const char * fileName)
 {
-	this->constructFrom(fileName);
+	std::vector <double> data;
+	data = parser.parseDataFile(fileName);
+	this->fit(data);
 }
 
 PiecewiseLinear::PiecewiseLinear(Distribution * distribution)
 {
-	this->constructFrom(distribution);
+	if (!distribution)
+		throw stochastic::UndefinedDistributionException();
+
+	this->fit(distribution);
 }
 
 PiecewiseLinear::~PiecewiseLinear()
 {
+}
+
+const char * PiecewiseLinear::getName()
+{
+	return "pLin";
 }
 
 void PiecewiseLinear::fit(std::vector <double> data)

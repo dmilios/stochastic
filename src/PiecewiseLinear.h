@@ -22,6 +22,8 @@ public:
 	PiecewiseLinear(const char *);
 	PiecewiseLinear(Distribution *);
 	virtual ~PiecewiseLinear();
+
+	const char * getName();
 };
 
 } // namespace stochastic

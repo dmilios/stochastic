@@ -21,16 +21,24 @@ MixtureModel::MixtureModel(std::vector <MixtureComponent *> components,
 	if (components.size() != weights.size())
 		throw InvalidWeightsException();
 
-	// Normalisation of weights, plus some additional checks
+	this->components = components;
+	this->weights = weights;
+	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+}
+
+MixtureModel::~MixtureModel()
+{
+}
+
+void MixtureModel::normalizeWeights()
+{
 	unsigned int i;
 	double sum = 0;
 	double cumulativeWeight = 0;
 	for (i = 0; i < weights.size(); i++)
 	{
-		if (weights[i] <= 0)
+		if (weights[i] < 0)
 			throw InvalidWeightsException();
-		if (typeid(* components[i]) != typeid(* components[0]))
-			throw IncompatibleComponentsException();
 
 		sum += weights[i];
 	}
@@ -40,13 +48,6 @@ MixtureModel::MixtureModel(std::vector <MixtureComponent *> components,
 		cumulativeWeight += weights[i];
 		this->cumulativeWeights.push_back(cumulativeWeight);
 	}
-
-	this->components = components;
-	this->weights = weights;
-}
-
-MixtureModel::~MixtureModel()
-{
 }
 
 const char * MixtureModel::getName()
@@ -67,11 +68,19 @@ double MixtureModel::pdf(double x)
 	if (x < this->getLeftMargin() || x > this->getRightMargin())
 		return 0;
 
+	//TODO: somehow make MM::pdf() more efficient
+
 	unsigned int i;
 	double weighted_sum = 0;
 	for (i = 0; i < components.size(); i++)
 		weighted_sum += components[i]->pdf(x) * weights[i];
 	return weighted_sum;
+}
+
+double MixtureModel::cdf(double x)
+{
+	//TODO: implement cdf() for MM
+	return 0;
 }
 
 double MixtureModel::getLeftMargin()

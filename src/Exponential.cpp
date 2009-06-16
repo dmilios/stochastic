@@ -46,6 +46,13 @@ double Exponential::pdf(double x)
 	return lambda * exp(-lambda * x);
 }
 
+double Exponential::cdf(double x)
+{
+	if (x < 0)
+		return 0;
+	return 1.0 - exp(-lambda * x);
+}
+
 double Exponential::getLeftMargin()
 {
 	return 0;

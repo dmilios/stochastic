@@ -26,22 +26,15 @@ namespace stochastic {
  * */
 class ApproximatedDistribution : public stochastic::MixtureModel
 {
-private:
-	static FileParser parser;
-
 protected:
+	static FileParser parser;
 	static int fixedNumberOfComponents;
-	std::vector <stochastic::ApproximationComponent *> components;
-
-	// used by the constructors to trigger virtual methods
-	void constructFrom(const char *);
-	void constructFrom(Distribution *);
 
 	virtual void fit(std::vector <double>) = 0;
 	virtual void fit(Distribution *) = 0;
 
 public:
-	virtual ~ApproximatedDistribution();
+	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents
     static void setFixedNumberOfComponents(int);
