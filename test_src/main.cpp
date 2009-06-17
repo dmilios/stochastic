@@ -15,53 +15,9 @@
 // load "stochastic" library
 #include "../src/stochastic.h"
 
+#include "Gnuplot.h"
 #include <cstdio>
 #include <iostream>
-
-void gnulot_test()
-{
-	FILE * gnuplot;
-	gnuplot = popen("gnuplot", "w");
-
-	int x = 1;
-	fprintf(gnuplot, "plot %d\n", x);
-	fflush(gnuplot);
-
-	printf("Press enter to continue...");
-	fflush(stdout);
-	getchar();
-
-	fputs("exit \n", gnuplot);
-	pclose(gnuplot);
-}
-
-void pdf_test(std::vector <double> vx, std::vector <double> vy)
-{
-	FILE * pdf;
-	pdf = fopen("pdf.dat", "w");
-
-	unsigned int i;
-	for (i = 0; i < vx.size(); i++)
-	{
-		fprintf(pdf, "%f\t%f\n", vx[i], vy[i]);
-		fflush(pdf);
-	}
-	fclose(pdf);
-
-
-	FILE * gnuplot;
-	gnuplot = popen("gnuplot", "w");
-
-	fprintf(gnuplot, "plot 'pdf.dat' with lines lw 1\n");
-	fflush(gnuplot);
-
-	printf("Press enter to continue...");
-	fflush(stdout);
-	getchar();
-
-	fputs("exit \n", gnuplot);
-	pclose(gnuplot);
-}
 
 int printArguments(int argc, char *argv[])
 {
@@ -75,11 +31,13 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-	ApproximatedDistribution::setFixedNumberOfComponents(100);
+	ApproximatedDistribution::setFixedNumberOfComponents(10);
+
+	Gnuplot plot;
 
 	Gaussian g;
 	Uniform u;
-	Linear l(0, 1, 1); l.nextSample();
+	Linear l(0, 1, 1);
 	Exponential e;
 
 	std::vector <MixtureComponent *> c;
@@ -91,15 +49,25 @@ int main(int argc, char *argv[])
 	MixtureModel m(c, w);
 
 	PiecewiseUniform pu = new Gaussian;
+	PiecewiseLinear pl = new Gaussian;
 
-	RandomVariable r1 = &pu, r2 = new Exponential();
+	RandomVariable r1 = new Gaussian;
+	RandomVariable r2 = &pu;
+	RandomVariable r3 = &pl;
 
 	int accuracy = 1000;
 	std::vector <double> vx;
 	std::vector <double> vy;
-	r1.pdfOutline(accuracy, vx, vy);
 
-	pdf_test(vx, vy);
+	r1.pdfOutline(accuracy, vx, vy);
+	plot.addCurve("a", vx, vy);
+	r2.pdfOutline(accuracy, vx, vy);
+	plot.addCurve("a", vx, vy);
+	r3.pdfOutline(accuracy, vx, vy);
+	plot.addCurve("a", vx, vy);
+
+	plot.plotCurves();
+
 	//r1.produceFileOfSamples(10000);
 
 	return printArguments(argc, argv);

@@ -68,7 +68,7 @@ double MixtureModel::pdf(double x)
 	if (x < this->getLeftMargin() || x > this->getRightMargin())
 		return 0;
 
-	//TODO: somehow make MM::pdf() more efficient
+	//TODO: somehow make MM::pdf() and MM::cdf() more efficient
 
 	unsigned int i;
 	double weighted_sum = 0;
@@ -79,8 +79,16 @@ double MixtureModel::pdf(double x)
 
 double MixtureModel::cdf(double x)
 {
-	//TODO: implement cdf() for MM
-	return 0;
+	if (x < this->getLeftMargin())
+		return 0;
+	 if(x >= this->getRightMargin())
+		 return 1;
+
+	unsigned int i;
+	double weighted_sum = 0;
+	for (i = 0; i < components.size(); i++)
+		weighted_sum += components[i]->cdf(x) * weights[i];
+	return weighted_sum;
 }
 
 double MixtureModel::getLeftMargin()

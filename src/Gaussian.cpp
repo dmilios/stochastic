@@ -62,9 +62,11 @@ double Gaussian::pdf(double x)
 			/ (2 * variance)));
 }
 
-//NOTE: Abromowitz and Stegun approximation for Gaussian CDF
 double Gaussian::cdf(double x)
 {
+	return 0.5 * (1 + erf((x - mean) / sqrt(2 * variance)));
+
+	//NOTE: Abromowitz and Stegun approximation for Gaussian CDF
 	const double b1 =  0.319381530;
 	const double b2 = -0.356563782;
 	const double b3 =  1.781477937;

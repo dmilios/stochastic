@@ -20,12 +20,15 @@ Linear::Linear(double alpha, double beta, double slope)
 	if (alpha >= beta)
 		throw InvalidParametersException();
 
-	//FIXME: check for negative pdf: adapt slope or range
-
 	this->alpha = alpha;
 	this->beta = beta;
 	this->slope = slope;
-	this->c = (1 - (slope/2) * (pow(beta, 2) - pow(alpha, 2))) / (beta-alpha);
+	this->constant = (1 - (slope/2) * (pow(beta, 2) - pow(alpha, 2))) / (beta-alpha);
+
+	if (slope * alpha + constant < 0)
+		throw InvalidParametersException();
+	if (slope * beta + constant < 0)
+		throw InvalidParametersException();
 }
 
 Linear::~Linear()
@@ -58,13 +61,17 @@ double Linear::pdf(double x)
 	 */
 	if (x < alpha || x >= beta)
 		return 0;
-	return slope * x + c;
+	return slope * x + constant;
 }
 
 double Linear::cdf(double x)
 {
-	// FIXME: CDFs for linears?
-	return 0;
+	if (x < alpha)
+		return 0;
+	if (x > beta)
+		return 1;
+	double c =  -(slope * pow(alpha, 2)) / 2 - constant * alpha;
+	return (slope * pow(x, 2)) / 2 + constant * x + c;
 }
 
 double Linear::getLeftMargin()

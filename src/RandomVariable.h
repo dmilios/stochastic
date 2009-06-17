@@ -27,6 +27,7 @@ public:
 	const Distribution * getDistribution();
 	void setDistribution(Distribution *);
 	void pdfOutline(int, std::vector <double> &, std::vector <double> &);
+	void cdfOutline(int, std::vector <double> &, std::vector <double> &);
 	void produceFileOfSamples(int);
 
 	RandomVariable operator +(RandomVariable);

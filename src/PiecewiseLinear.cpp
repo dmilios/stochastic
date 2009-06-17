@@ -39,6 +39,24 @@ void PiecewiseLinear::fit(std::vector <double> data)
 
 void PiecewiseLinear::fit(Distribution * distribution)
 {
+	double start = distribution->getLeftMargin();
+	double end = distribution->getRightMargin();
+	double step = (end - start) / (double) fixedNumberOfComponents;
+	ApproximationComponent * component;
+	double weight;
+	double slope;
+	int i;
+	double x = start;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->cdf(x + step) - distribution->cdf(x);
+		slope = (distribution->pdf(x + step) - distribution->pdf(x)) / (step);
+		component = new Linear(x, x + step, slope);
+		this->components.push_back(component);
+		this->weights.push_back(weight);
+		x += step;
+	}
+	this->normalizeWeights(); // constructs cumulativeWeights vector as well
 }
 
 } // namespace stochastic

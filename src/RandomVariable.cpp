@@ -43,7 +43,8 @@ void RandomVariable::pdfOutline(int accuracy, std::vector <double> & x,
 	if (!distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	std::vector <double> y;
+	x.clear();
+	fx.clear();
 	double x_curr;
 	double start = this->distribution->getLeftMargin();
 	double end = this->distribution->getRightMargin();
@@ -53,6 +54,26 @@ void RandomVariable::pdfOutline(int accuracy, std::vector <double> & x,
 	{
 		x.push_back(x_curr);
 		fx.push_back(this->distribution->pdf(x_curr));
+	}
+}
+
+void RandomVariable::cdfOutline(int accuracy, std::vector <double> & x,
+		std::vector <double> & fx)
+{
+	if (!distribution)
+		throw stochastic::UndefinedDistributionException();
+
+	x.clear();
+	fx.clear();
+	double x_curr;
+	double start = this->distribution->getLeftMargin();
+	double end = this->distribution->getRightMargin();
+	double step = (end - start) / (double) accuracy;
+	double margin = (end - start) / 10;
+	for (x_curr = start - margin; x_curr < end + margin; x_curr = x_curr + step)
+	{
+		x.push_back(x_curr);
+		fx.push_back(this->distribution->cdf(x_curr));
 	}
 }
 
@@ -70,7 +91,7 @@ void RandomVariable::produceFileOfSamples(int n)
 	output.open(fileName.c_str());
 	output << "# name: x \n";
 	output << "# type: matrix \n";
-	output << "# rows:" << (int)samples.size() << "\n";
+	output << "# rows:" << (int) samples.size() << "\n";
 	output << "# columns: 1 \n";
 	unsigned int i;
 	for (i = 0; i < samples.size(); i++)

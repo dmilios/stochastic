@@ -10,6 +10,8 @@
 
 #include "ApproximatedDistribution.h"
 
+#include "Gaussian.h"
+
 namespace stochastic {
 
 class PiecewiseGaussian : public stochastic::ApproximatedDistribution

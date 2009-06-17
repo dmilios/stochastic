@@ -24,7 +24,7 @@ private:
 	double alpha;
 	double beta;
 	double slope;
-	double c;
+	double constant;
 
 public:
 	Linear(double, double, double);

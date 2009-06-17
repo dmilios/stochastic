@@ -10,6 +10,8 @@
 
 #include "ApproximatedDistribution.h"
 
+#include "Linear.h"
+
 namespace stochastic {
 
 class PiecewiseLinear : public stochastic::ApproximatedDistribution
