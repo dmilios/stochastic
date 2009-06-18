@@ -39,6 +39,8 @@ void PiecewiseLinear::fit(std::vector <double> data)
 
 void PiecewiseLinear::fit(Distribution * distribution)
 {
+	//FIXME: Do something with PiecewiseLinear
+
 	double start = distribution->getLeftMargin();
 	double end = distribution->getRightMargin();
 	double step = (end - start) / (double) fixedNumberOfComponents;
@@ -50,13 +52,24 @@ void PiecewiseLinear::fit(Distribution * distribution)
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
 		weight = distribution->cdf(x + step) - distribution->cdf(x);
-		slope = (distribution->pdf(x + step) - distribution->pdf(x)) / (step);
-		component = new Linear(x, x + step, slope);
+		slope = (distribution->pdf(x + step) - distribution->pdf(x)) / step;
+
+		component = new Linear(x, x + step, slope / weight);
+
 		this->components.push_back(component);
 		this->weights.push_back(weight);
 		x += step;
 	}
 	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+
+//	weights.clear();
+//	for (i = 0; i < fixedNumberOfComponents; i++)
+//		weights.push_back(1);
+}
+
+double PiecewiseLinear::nextSample()
+{
+	return rejectionSampling(pdf(0.0001), getLeftMargin(), getRightMargin());
 }
 
 } // namespace stochastic

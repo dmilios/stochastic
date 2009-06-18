@@ -12,6 +12,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 namespace stochastic {
 
@@ -26,9 +27,9 @@ Linear::Linear(double alpha, double beta, double slope)
 	this->constant = (1 - (slope/2) * (pow(beta, 2) - pow(alpha, 2))) / (beta-alpha);
 
 	if (slope * alpha + constant < 0)
-		throw InvalidParametersException();
+		std::cerr << "Warning: Negative Probability\n";
 	if (slope * beta + constant < 0)
-		throw InvalidParametersException();
+		std::cerr << "Warning: Negative Probability\n";
 }
 
 Linear::~Linear()

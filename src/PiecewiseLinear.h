@@ -24,6 +24,7 @@ public:
 	PiecewiseLinear(const char *);
 	PiecewiseLinear(Distribution *);
 	virtual ~PiecewiseLinear();
+	double nextSample();
 
 	const char * getName();
 };

@@ -12,6 +12,8 @@
 
 using namespace std;
 
+int Gnuplot::accuracy = 1000;
+
 Gnuplot::Gnuplot()
 {
 	options = " with lines lw 1";
@@ -19,6 +21,31 @@ Gnuplot::Gnuplot()
 
 Gnuplot::~Gnuplot()
 {
+}
+
+void Gnuplot::setAccuracy(int n)
+{
+	accuracy = n;
+}
+
+void Gnuplot::addRV(stochastic::RandomVariable rv)
+{
+	string curveName;
+	stochastic::Distribution * rvDist = rv.getDistribution();
+	string rvName = rvDist->getName();
+	vector <double> vx, vy;
+
+	rv.pdfOutline(accuracy, vx, vy);
+	curveName = "PDF ";
+	curveName.append(rvName.c_str());
+	addCurve(curveName.c_str(), vx, vy);
+
+	vx.clear();
+	vy.clear();
+	rv.cdfOutline(accuracy, vx, vy);
+	curveName = "CDF ";
+	curveName.append(rvName.c_str());
+	addCurve(curveName.c_str(), vx, vy);
 }
 
 void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy)
@@ -43,12 +70,6 @@ void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy)
 	fclose(curve);
 }
 
-void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy,
-		string opt)
-{
-	addCurve(name, vx, vy);
-}
-
 void Gnuplot::plotCurves()
 {
 	FILE * gnuplot;
@@ -60,10 +81,10 @@ void Gnuplot::plotCurves()
 	fflush(gnuplot);
 	for (i = 0; i < names.size() - 1; i++)
 	{
-		fprintf(gnuplot, "'%s' %s, ", tmpFiles[i].c_str(), options.c_str());
+		fprintf(gnuplot, "'%s' title '%s' %s, ", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
 		fflush(gnuplot);
 	}
-	fprintf(gnuplot, "'%s' %s \n", tmpFiles[i].c_str(), options.c_str());
+	fprintf(gnuplot, "'%s' title '%s' %s \n", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
 	fflush(gnuplot);
 
 	printf("Press enter to continue...");

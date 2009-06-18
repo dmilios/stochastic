@@ -32,7 +32,7 @@ void RandomVariable::setDistribution(Distribution * distribution)
 	this->distribution = distribution;
 }
 
-const Distribution * RandomVariable::getDistribution()
+Distribution * RandomVariable::getDistribution()
 {
 	return this->distribution;
 }

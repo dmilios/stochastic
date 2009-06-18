@@ -31,7 +31,8 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-	ApproximatedDistribution::setFixedNumberOfComponents(10);
+	ApproximatedDistribution::setFixedNumberOfComponents(100);
+	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
 
@@ -49,26 +50,17 @@ int main(int argc, char *argv[])
 	MixtureModel m(c, w);
 
 	PiecewiseUniform pu = new Gaussian;
-	PiecewiseLinear pl = new Gaussian;
 
 	RandomVariable r1 = new Gaussian;
 	RandomVariable r2 = &pu;
-	RandomVariable r3 = &pl;
 
-	int accuracy = 1000;
 	std::vector <double> vx;
 	std::vector <double> vy;
 
-	r1.pdfOutline(accuracy, vx, vy);
-	plot.addCurve("a", vx, vy);
-	r2.pdfOutline(accuracy, vx, vy);
-	plot.addCurve("a", vx, vy);
-	r3.pdfOutline(accuracy, vx, vy);
-	plot.addCurve("a", vx, vy);
+	plot.addRV(r1);
+	plot.addRV(r2);
 
 	plot.plotCurves();
-
-	//r1.produceFileOfSamples(10000);
 
 	return printArguments(argc, argv);
 }

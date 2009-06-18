@@ -10,12 +10,14 @@
 
 #include <vector>
 #include <string>
+#include "../src/stochastic.h"
 
 using namespace std;
 
 class Gnuplot
 {
 private:
+	static int accuracy;
 	vector <string> names;
 	vector <string> tmpFiles;
 	string options;
@@ -24,8 +26,10 @@ public:
 	Gnuplot();
 	virtual ~Gnuplot();
 
+	static void setAccuracy(int);
+
+	void addRV(stochastic::RandomVariable);
 	void addCurve(string, vector <double>, vector <double>);
-	void addCurve(string, vector <double>, vector <double>, string);
 	void plotCurves();
 };
 

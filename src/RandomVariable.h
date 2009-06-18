@@ -24,7 +24,7 @@ public:
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
 
-	const Distribution * getDistribution();
+	Distribution * getDistribution();
 	void setDistribution(Distribution *);
 	void pdfOutline(int, std::vector <double> &, std::vector <double> &);
 	void cdfOutline(int, std::vector <double> &, std::vector <double> &);
