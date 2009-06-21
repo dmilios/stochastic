@@ -28,8 +28,10 @@ public:
 	virtual double cdf(double) = 0;
 	virtual double getLeftMargin() = 0;
 	virtual double getRightMargin() = 0;
-
 	virtual double nextSample() = 0;
+
+	double KL_Divergence(Distribution *);
+	double hellingerDistance(Distribution *);
 	std::vector <double> sample(int);
 };
 

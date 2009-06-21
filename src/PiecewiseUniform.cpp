@@ -39,19 +39,36 @@ void PiecewiseUniform::fit(std::vector <double> data)
 
 void PiecewiseUniform::fit(Distribution * distribution)
 {
-	double start = distribution->getLeftMargin();
-	double end = distribution->getRightMargin();
-	double step = (end - start) / (double) fixedNumberOfComponents;
 	ApproximationComponent * component;
 	double weight;
+
+	double start = distribution->getLeftMargin();
+	double end = distribution->getRightMargin();
+	double support = end - start;
+	double step = support / (double) fixedNumberOfComponents;
 	int i;
 	double x = start;
+
+	// check for support so as to revise the step
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
 		weight = distribution->cdf(x + step) - distribution->cdf(x);
-		component = new Uniform(x, x + step);
-		this->components.push_back(component);
-		this->weights.push_back(weight);
+		if (weight == 0)
+			support -= step;
+		x += step;
+	}
+	// revise the step
+	step = support / (double) fixedNumberOfComponents;
+	x = start;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->cdf(x + step) - distribution->cdf(x);
+		if (weight)
+		{
+			component = new Uniform(x, x + step);
+			this->components.push_back(component);
+			this->weights.push_back(weight);
+		}
 		x += step;
 	}
 	this->normalizeWeights(); // constructs cumulativeWeights vector as well

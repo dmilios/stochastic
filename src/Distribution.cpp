@@ -8,6 +8,7 @@
 #include "Distribution.h"
 
 #include <cmath>
+#include <limits>
 
 namespace stochastic {
 
@@ -20,6 +21,73 @@ Distribution::Distribution()
 
 Distribution::~Distribution()
 {
+}
+
+/* @brief Computes KL-Div(P||Q), where P==this, Q==arg
+ * Integral is computed by constructing interpolating linear functions */
+double Distribution::KL_Divergence(Distribution * arg)
+{
+	double result = 0;
+	int accuracy = 100;
+	double start = this->getLeftMargin();
+	double end = this->getRightMargin();
+	if (arg->getLeftMargin() < start)
+		start = arg->getLeftMargin();
+	if (arg->getRightMargin() > end)
+		end = arg->getRightMargin();
+
+	// FIXME: margin staff
+	double x = start;
+	double step = (end - start) / accuracy;
+	double fx_a, fx_b;
+	int i;
+	double px = this->pdf(x);
+	double qx = arg->pdf(x);
+
+	fx_a = px * log(px / qx);
+	for (i = 0; i < accuracy; i++)
+	{
+		px = this->pdf(x + step);
+		qx = arg->pdf(x + step);
+		if (!px || !qx) // any pdf is zero
+		{
+			x = x + step;
+			continue;
+		}
+		fx_b = px * log(px / qx);
+		result += step * (fx_a + fx_b) / 2;
+
+		fx_a = fx_b;
+		x = x + step;
+	}
+	return result;
+}
+
+double Distribution::hellingerDistance(Distribution * arg)
+{
+	double result = 0;
+	int accuracy = 100;
+	double start = this->getLeftMargin();
+	double end = this->getRightMargin();
+	if (arg->getLeftMargin() < start)
+		start = arg->getLeftMargin();
+	if (arg->getRightMargin() > end)
+		end = arg->getRightMargin();
+
+	double x = start;
+	double step = (end - start) / accuracy;
+	double fx_a, fx_b;
+	int i;
+
+	fx_a = pow(sqrt(this->pdf(x)) - sqrt(arg->pdf(x)), 2);
+	for (i = 0; i < accuracy; i++)
+	{
+		fx_b = pow(sqrt(this->pdf(x + step)) - sqrt(arg->pdf(x + step)), 2);
+		result += step * (fx_a + fx_b) / 2;
+		fx_a = fx_b;
+		x = x + step;
+	}
+	return sqrt(result / 2);
 }
 
 std::vector <double> Distribution::sample(int numberOfSamples)

@@ -8,7 +8,7 @@
 #include "MixtureModel.h"
 
 #include <typeinfo>
-#include <cmath> // for INFINITY
+#include <limits>
 #include <sstream>
 
 namespace stochastic {
@@ -93,7 +93,7 @@ double MixtureModel::cdf(double x)
 
 double MixtureModel::getLeftMargin()
 {
-	double minimum = INFINITY;
+	double minimum = std::numeric_limits<double>::infinity();
 	unsigned int i;
 	for (i = 0; i < components.size(); i++)
 		if (components[i]->getLeftMargin() < minimum)
@@ -103,7 +103,7 @@ double MixtureModel::getLeftMargin()
 
 double MixtureModel::getRightMargin()
 {
-	double maximum = -INFINITY;
+	double maximum = -std::numeric_limits<double>::infinity();
 	unsigned int i;
 	for (i = 0; i < components.size(); i++)
 		if (components[i]->getRightMargin() > maximum)
