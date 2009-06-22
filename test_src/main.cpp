@@ -32,7 +32,7 @@ int printArguments(int argc, char *argv[])
 int main(int argc, char *argv[])
 {
 	using namespace stochastic;
-	ApproximatedDistribution::setFixedNumberOfComponents(100);
+	ApproximatedDistribution::setFixedNumberOfComponents(10);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
@@ -51,18 +51,18 @@ int main(int argc, char *argv[])
 	MixtureModel m(c, w);
 
 	PiecewiseUniform pu = &m;
+	PiecewiseGaussian pg("exp_l1.txt");
 
-	RandomVariable r1 = &m;
-	RandomVariable r2 = &pu;
+	RandomVariable r1 = &pg;
+	RandomVariable r2 = &e;
 
-	std::vector <double> vx;
-	std::vector <double> vy;
+//	r2.produceFileOfSamples(1000);
 
 	plot.addRV(r1);
-	plot.addRV(r2);
+	//plot.addRV(r2);
 
-	std::cout << e.hellingerDistance(new Exponential(2)) << "\n";
-	//plot.plotCurves();
+	//std::cout << e.hellingerDistance(new Exponential(2)) << "\n";
+	plot.plotCurves();
 
 	return printArguments(argc, argv);
 }
