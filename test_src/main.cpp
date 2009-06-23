@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
 
 	Gaussian g, g1(1);
 	Uniform u(-4, 4);
-	Linear l(0, 1, 1);
 	Exponential e;
 
 	std::vector <MixtureComponent *> c;
