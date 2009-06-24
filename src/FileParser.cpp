@@ -27,9 +27,9 @@ void FileParser::addtoBuffer(char c)
 	buffer.append(tmp);
 }
 
-std::vector <double> FileParser::parseDataFile(const char * fileName)
+std::vector<double> FileParser::parseDataFile(const char * fileName)
 {
-	std::vector <double> data;
+	std::vector<double> data;
 	char ch;
 	States state = OUT;
 	buffer = "";
@@ -46,6 +46,18 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 		{
 			case '#':
 				state = IN_COMMENT;
+				break;
+			case 'e':
+				if (state != IN_COMMENT)
+				{
+					if (state == BEFORE_POINT || state == AFTER_POINT)
+					{
+						addtoBuffer(ch);
+						state = EXP_ENTERED;
+					}
+					else
+						throw stochastic::InvalidDataFileException();
+				}
 				break;
 			case '.':
 				if (state != IN_COMMENT)
@@ -67,6 +79,23 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 						addtoBuffer(ch);
 						state = SIGN_ENTERED;
 					}
+					else if (state == EXP_ENTERED)
+					{
+						addtoBuffer(ch);
+						state = AFTER_EXP;
+					}
+					else
+						throw stochastic::InvalidDataFileException();
+				}
+				break;
+			case '+':
+				if (state != IN_COMMENT)
+				{
+					if (state == EXP_ENTERED)
+					{
+						addtoBuffer(ch);
+						state = AFTER_EXP;
+					}
 					else
 						throw stochastic::InvalidDataFileException();
 				}
@@ -81,6 +110,8 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 							state = POINT_NEEDED;
 						else if (state == POINT_ENTERED)
 							state = AFTER_POINT;
+						else if (state == EXP_ENTERED)
+							state = AFTER_EXP;
 					}
 					else
 						throw stochastic::InvalidDataFileException();
@@ -104,6 +135,8 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 							state = BEFORE_POINT;
 						else if (state == POINT_ENTERED)
 							state = AFTER_POINT;
+						else if (state == EXP_ENTERED)
+							state = AFTER_EXP;
 					}
 					else
 						throw stochastic::InvalidDataFileException();
@@ -114,7 +147,8 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 			case '\t':
 				if (state != IN_COMMENT)
 				{
-					if (state == SIGN_ENTERED || state == POINT_ENTERED)
+					if (state == SIGN_ENTERED || state == POINT_ENTERED
+							|| state == EXP_ENTERED)
 						throw stochastic::InvalidDataFileException();
 
 					if (state != OUT)
@@ -129,7 +163,8 @@ std::vector <double> FileParser::parseDataFile(const char * fileName)
 			case '\r':
 				if (state != IN_COMMENT)
 				{
-					if (state == SIGN_ENTERED || state == POINT_ENTERED)
+					if (state == SIGN_ENTERED || state == POINT_ENTERED
+							|| state == EXP_ENTERED)
 						throw stochastic::InvalidDataFileException();
 
 					if (state != OUT)

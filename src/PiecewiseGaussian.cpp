@@ -39,6 +39,8 @@ const char * PiecewiseGaussian::getName()
 
 void PiecewiseGaussian::fit(std::vector<double> data)
 {
+	// FIXME: below zero variance bug
+
 	double means[fixedNumberOfComponents];
 	double variances[fixedNumberOfComponents];
 	double coefficients[fixedNumberOfComponents];

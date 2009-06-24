@@ -17,11 +17,12 @@
 #include "ApproximatedDistribution.h"
 #include "PiecewiseGaussian.h"
 #include "PiecewiseUniform.h"
-#include "PiecewiseLinear.h"
 #include "MixtureModel.h"
 #include "Gaussian.h"
 #include "Uniform.h"
 #include "Exponential.h"
-#include "Linear.h"
+#include "EmpiricalDistribution.h"
+
+#include "MonteCarloOperations.h"
 
 #endif /* STOCHASTIC_H_ */
