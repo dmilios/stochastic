@@ -46,6 +46,13 @@ void Gnuplot::addRV(stochastic::RandomVariable rv)
 	curveName = "CDF ";
 	curveName.append(rvName.c_str());
 	addCurve(curveName.c_str(), vx, vy);
+
+//	vx.clear();
+//	vy.clear();
+//	rv.quantileOutline(accuracy, vx, vy);
+//	curveName = "InverseCDF ";
+//	curveName.append(rvName.c_str());
+//	addCurve(curveName.c_str(), vx, vy);
 }
 
 void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy)

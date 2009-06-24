@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 	Uniform u(-4, 4);
 	Exponential e;
 	EmpiricalDistribution emp("pLin.txt");
+	(new RandomVariable(&emp))->produceFileOfSamples(100);
 
 	std::vector <MixtureComponent *> c;
 	std::vector <double> w;
@@ -56,10 +57,10 @@ int main(int argc, char *argv[])
 	RandomVariable r2 = new Gaussian(3, 1);
 	RandomVariable r3;
 
-	r3 = MonteCarloOperations::max(r1, r2);
+	r3 = MonteCarloOperations::min(r1, r2);
 
-	plot.addRV(r1);
-	plot.addRV(r2);
+	//plot.addRV(r1);
+	//plot.addRV(r2);
 	plot.addRV(r3);
 
 	plot.plotCurves();

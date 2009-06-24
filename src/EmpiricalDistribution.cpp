@@ -96,6 +96,9 @@ double EmpiricalDistribution::getRightMargin()
 
 double EmpiricalDistribution::nextSample()
 {
+	// FIXME: see why is it slow
+	//return quantile(generator.nextDouble());
+
 	return rejectionSampling(maxProbability, getLeftMargin(), getRightMargin());
 }
 

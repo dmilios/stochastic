@@ -9,6 +9,7 @@
 
 #include <cmath>
 #include <limits>
+#include "exceptions.h"
 
 namespace stochastic {
 
@@ -21,6 +22,34 @@ Distribution::Distribution()
 
 Distribution::~Distribution()
 {
+}
+
+/* Compute the inverse CDF of 'p' for the current distribution
+ * using Bisection method  */
+double Distribution::quantile(double p)
+{
+	if (p > 1 || p < 0)
+		throw InvalidParametersException();
+	if (p < 1e-4)
+		return this->getLeftMargin();
+	if (p > 1 - 1e-4)
+		return this->getRightMargin();
+
+	double a = getLeftMargin();
+	double b = getRightMargin();
+	double x, difference;
+	do
+	{
+		x = (a + b) / 2;
+		if ((cdf(a) - p) * (cdf(x) - p) >= 0)
+			a = x;
+		else if ((cdf(b) - p) * (cdf(b) - p) >= 0)
+			b = x;
+		difference = cdf(x) - p;
+		if (difference < 0)
+			difference = -difference;
+	} while (difference > 1e-5);
+	return x;
 }
 
 /* @brief Computes KL-Div(P||Q), where P==this, Q==arg
@@ -90,10 +119,10 @@ double Distribution::hellingerDistance(Distribution * arg)
 	return sqrt(result / 2);
 }
 
-std::vector <double> Distribution::sample(int numberOfSamples)
+std::vector<double> Distribution::sample(int numberOfSamples)
 {
 	int i;
-	std::vector <double> samples;
+	std::vector<double> samples;
 	for (i = 0; i < numberOfSamples; i++)
 		samples.push_back(nextSample());
 	return samples;

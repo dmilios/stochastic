@@ -77,6 +77,25 @@ void RandomVariable::cdfOutline(int accuracy, std::vector <double> & x,
 	}
 }
 
+void RandomVariable::quantileOutline(int accuracy, std::vector <double> & x,
+		std::vector <double> & fx)
+{
+	if (!distribution)
+		throw stochastic::UndefinedDistributionException();
+
+	x.clear();
+	fx.clear();
+	double p_curr;
+	double start = 0;
+	double end = 1;
+	double step = (end - start) / (double) accuracy;
+	for (p_curr = start; p_curr < end; p_curr = p_curr + step)
+	{
+		x.push_back(p_curr);
+		fx.push_back(this->distribution->quantile(p_curr));
+	}
+}
+
 void RandomVariable::produceFileOfSamples(int n)
 {
 	if (!distribution)

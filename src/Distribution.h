@@ -30,6 +30,7 @@ public:
 	virtual double getRightMargin() = 0;
 	virtual double nextSample() = 0;
 
+	double quantile(double);
 	double KL_Divergence(Distribution *);
 	double hellingerDistance(Distribution *);
 	std::vector <double> sample(int);
