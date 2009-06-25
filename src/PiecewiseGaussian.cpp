@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include "exceptions.h"
 
 namespace stochastic {
 
@@ -39,8 +40,6 @@ const char * PiecewiseGaussian::getName()
 
 void PiecewiseGaussian::fit(std::vector<double> data)
 {
-	// FIXME: below zero variance bug
-
 	double means[fixedNumberOfComponents];
 	double variances[fixedNumberOfComponents];
 	double coefficients[fixedNumberOfComponents];
@@ -61,7 +60,7 @@ void PiecewiseGaussian::fit(std::vector<double> data)
 	double responsibilities[instances][fixedNumberOfComponents];
 	unsigned int j;
 
-	double logLikelihood = -std::numeric_limits<double>::infinity();
+//	double logLikelihood = -std::numeric_limits<double>::infinity();
 	int iterations = 0;
 	while (iterations++ < 100)
 	{
@@ -101,19 +100,21 @@ void PiecewiseGaussian::fit(std::vector<double> data)
 			for (j = 0; j < instances; j++)
 				sum += responsibilities[j][k] * pow(data[j] - means[k], 2);
 			variances[k] = sum / ni[k];
+			if (!variances[k])
+				variances[k] = 0.001;
 		}
 
 		// Evaluate log likelihood
-		logLikelihood = 0;
-		for (j = 0; j < instances; j++)
-		{
-			double internalSum = 0;
-			for (k = 0; k < fixedNumberOfComponents; k++)
-				internalSum += coefficients[k] * Gaussian(means[k],
-						variances[k]).pdf(data[j]);
-			logLikelihood += log(internalSum);
-		}
-		printf("log likelihood: %f\n", logLikelihood);
+//		logLikelihood = 0;
+//		for (j = 0; j < instances; j++)
+//		{
+//			double internalSum = 0;
+//			for (k = 0; k < fixedNumberOfComponents; k++)
+//				internalSum += coefficients[k] * Gaussian(means[k],
+//						variances[k]).pdf(data[j]);
+//			logLikelihood += log(internalSum);
+//		}
+//		printf("log likelihood: %f\n", logLikelihood);
 	}
 
 	ApproximationComponent * component;

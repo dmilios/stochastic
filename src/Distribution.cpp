@@ -37,7 +37,8 @@ double Distribution::quantile(double p)
 
 	double a = getLeftMargin();
 	double b = getRightMargin();
-	double x, difference;
+	double x, difference = std::numeric_limits<double>::infinity();
+	int tries = 0;
 	do
 	{
 		x = (a + b) / 2;
@@ -45,10 +46,11 @@ double Distribution::quantile(double p)
 			a = x;
 		else if ((cdf(b) - p) * (cdf(b) - p) >= 0)
 			b = x;
-		difference = cdf(x) - p;
+		if (difference > cdf(x) - p)
+			difference = cdf(x) - p;
 		if (difference < 0)
 			difference = -difference;
-	} while (difference > 1e-5);
+	} while (difference > 1e-4 && tries++ < 100);
 	return x;
 }
 

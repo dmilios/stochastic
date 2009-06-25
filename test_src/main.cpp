@@ -41,7 +41,6 @@ int main(int argc, char *argv[])
 	Uniform u(-4, 4);
 	Exponential e;
 	EmpiricalDistribution emp("pLin.txt");
-	(new RandomVariable(&emp))->produceFileOfSamples(100);
 
 	std::vector <MixtureComponent *> c;
 	std::vector <double> w;
