@@ -20,6 +20,9 @@ private:
 	void fit(std::vector <double>);
 	void fit(Distribution *);
 
+	// NOTE: alternative fit using quantile
+	void fit2(Distribution * distribution);
+
 public:
 	PiecewiseUniform(const char *);
 	PiecewiseUniform(Distribution *);

@@ -46,20 +46,21 @@ int main(int argc, char *argv[])
 	std::vector <double> w;
 	c.push_back(new Gaussian);
 	w.push_back(1);
-	c.push_back(new Gaussian(4, 2));
+	c.push_back(new Gaussian(14, 2));
 	w.push_back(1);
 	MixtureModel m(c, w);
 
 	PiecewiseUniform pu = &m;
 
-	RandomVariable r1 = new Gaussian(2, 8);
-	RandomVariable r2 = new Gaussian(3, 1);
+	RandomVariable r1 = new Uniform(1, 4);
+	RandomVariable r2 = new Uniform(3, 5);
+
 	RandomVariable r3;
+	r3 = MonteCarloOperations::max(r1, r2);
+	r3 = new PiecewiseUniform(r3.getDistribution());
 
-	r3 = MonteCarloOperations::min(r1, r2);
-
-	//plot.addRV(r1);
-	//plot.addRV(r2);
+	plot.addRV(r1);
+	plot.addRV(r2);
 	plot.addRV(r3);
 
 	plot.plotCurves();

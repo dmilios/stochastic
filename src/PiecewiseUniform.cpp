@@ -74,4 +74,36 @@ void PiecewiseUniform::fit(Distribution * distribution)
 	this->normalizeWeights(); // constructs cumulativeWeights vector as well
 }
 
+// alternative fit using quantile
+void PiecewiseUniform::fit2(Distribution * distribution)
+{
+	ApproximationComponent * component;
+	double weight;
+	double step = 1 / (double) fixedNumberOfComponents;
+	int i;
+	double p = 0;
+	double x, x_step;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		try{
+		x = distribution->quantile(p);
+		x_step = distribution->quantile(p + step);
+		}
+		catch(InvalidParametersException e)
+		{
+		}
+		weight = distribution->cdf(x_step) - distribution->cdf(x);
+		if (weight)
+		{
+			component = new Uniform(x, x_step);
+			this->components.push_back(component);
+			this->weights.push_back(weight);
+		}
+		else
+			printf("zero weight\n");
+		p += step;
+	}
+	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+}
+
 } // namespace stochastic
