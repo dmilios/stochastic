@@ -48,10 +48,29 @@ double Distribution::quantile(double p)
 			b = x;
 		if (difference > cdf(x) - p)
 			difference = cdf(x) - p;
-		if (difference < 0)
-			difference = -difference;
+		difference = std::abs(difference);
 	} while (difference > 1e-4 && tries++ < 100);
 	return x;
+}
+
+double Distribution::kolmogorovDistance(Distribution * arg)
+{
+	int accuracy = 1000;
+	double supremum = 0;
+	double start = std::min(this->getLeftMargin(), arg->getLeftMargin());
+	double end = std::max(this->getRightMargin(), arg->getRightMargin());
+	double step = (end - start) / (double) accuracy;
+	double x = start;
+	double distance;
+	int i;
+	for (i = 0; i < accuracy; i++)
+	{
+		distance = std::abs(this->cdf(x) - arg->cdf(x));
+		if (supremum < distance)
+			supremum = distance;
+		x += step;
+	}
+	return supremum;
 }
 
 /* @brief Computes KL-Div(P||Q), where P==this, Q==arg

@@ -20,27 +20,21 @@ class MixtureModel : public stochastic::Distribution
 protected:
 	std::vector <stochastic::MixtureComponent *> components;
 	std::vector <double> weights;
-	std::vector <double> cumulativeWeights; // needed for sampling
-
-	void normalizeWeights();
-
-	// 'Protected' so as to keep compiler happy
-	// No empty Mixture Models are allowed to be declared
-	MixtureModel()
-	{
-	}
+	std::vector <double> cumulativeWeights;
+    void normalizeWeights();
+    MixtureModel()
+    {
+    }
 
 public:
-	MixtureModel(std::vector <MixtureComponent *>, std::vector <double>);
-	virtual ~MixtureModel();
-
-	// overload virtual methods of Distribution
-	virtual const char * getName();
-	double pdf(double);
-	double cdf(double);
-	double nextSample();
-	double getLeftMargin();
-	double getRightMargin();
+    MixtureModel(std::vector<MixtureComponent*>, std::vector<double>);
+    virtual ~MixtureModel();
+    const virtual char *getName();
+    double pdf(double);
+    double cdf(double);
+    double nextSample();
+    double getLeftMargin();
+    double getRightMargin();
 };
 
 } // namespace stochastic

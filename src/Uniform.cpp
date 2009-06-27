@@ -11,6 +11,8 @@
 #include <typeinfo>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <algorithm>
 
 namespace stochastic {
 
@@ -93,8 +95,10 @@ ApproximationComponent * Uniform::add(ApproximationComponent * rightarg)
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	double a = this->alpha + rightarg->getLeftMargin();
+	double b = this->beta + rightarg->getRightMargin();
+	result = new Uniform(a, b);
 	return result;
 }
 
@@ -103,8 +107,10 @@ ApproximationComponent * Uniform::subtract(ApproximationComponent * rightarg)
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	double a = this->alpha - rightarg->getRightMargin();
+	double b = this->beta - rightarg->getLeftMargin();
+	result = new Uniform(a, b);
 	return result;
 }
 
@@ -113,8 +119,17 @@ ApproximationComponent * Uniform::multiply(ApproximationComponent * rightarg)
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	std::vector<double> margins;
+	margins.push_back(alpha * rightarg->getLeftMargin());
+	margins.push_back(alpha * rightarg->getRightMargin());
+	margins.push_back(beta * rightarg->getLeftMargin());
+	margins.push_back(beta * rightarg->getRightMargin());
+	std::vector<double>::iterator a = std::min_element(
+									margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+									margins.begin(), margins.end());
+	result = new Uniform(* a, * b);
 	return result;
 }
 
@@ -123,8 +138,17 @@ ApproximationComponent * Uniform::divide(ApproximationComponent * rightarg)
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	std::vector<double> margins;
+	margins.push_back(alpha / rightarg->getLeftMargin());
+	margins.push_back(alpha / rightarg->getRightMargin());
+	margins.push_back(beta / rightarg->getLeftMargin());
+	margins.push_back(beta / rightarg->getRightMargin());
+	std::vector<double>::iterator a = std::min_element(
+									margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+									margins.begin(), margins.end());
+	result = new Uniform(* a, * b);
 	return result;
 }
 

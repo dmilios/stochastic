@@ -10,6 +10,7 @@
 #include "exceptions.h"
 
 #include <iostream>
+#include <vector>
 
 namespace stochastic {
 

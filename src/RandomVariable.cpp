@@ -8,8 +8,11 @@
 #include "RandomVariable.h"
 
 #include "exceptions.h"
+#include "ApproximationComponent.h"
+#include "PiecewiseUniform.h"
 #include <fstream>
 #include <string>
+#include <typeinfo>
 
 namespace stochastic {
 
@@ -127,6 +130,24 @@ RandomVariable RandomVariable::operator +(RandomVariable rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
+
+	ApproximatedDistribution * leftDistribution;
+	ApproximatedDistribution * rightDistribution;
+	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
+		leftDistribution = new PiecewiseUniform(this->distribution);
+	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
+		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+
+//	std::vector<ApproximationComponent *> leftComponents;
+//	std::vector<double> LeftWeights;
+//	std::vector<ApproximationComponent *> rightComponents;
+//	std::vector<double> rightWeights;
+//	leftComponents = leftDistribution->getComponents();
+//	LeftWeights = leftDistribution->getWeights();
+//	rightComponents = rightDistribution->getComponents();
+//	rightWeights = rightDistribution->getWeights();
+//	unsigned int i, j;
+//	for (i = 0; i < 100; i++);
 
 	return RandomVariable();
 }
