@@ -20,10 +20,10 @@ private:
 public:
     static void setNumberOfSamples(int);
 
-	static RandomVariable add(RandomVariable, RandomVariable);
-	static RandomVariable subtract(RandomVariable, RandomVariable);
-	static RandomVariable multiply(RandomVariable, RandomVariable);
-	static RandomVariable divide(RandomVariable, RandomVariable);
+	static RandomVariable sum(RandomVariable, RandomVariable);
+	static RandomVariable difference(RandomVariable, RandomVariable);
+	static RandomVariable product(RandomVariable, RandomVariable);
+	static RandomVariable ratio(RandomVariable, RandomVariable);
 
 	static RandomVariable min(RandomVariable, RandomVariable);
 	static RandomVariable max(RandomVariable, RandomVariable);

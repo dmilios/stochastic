@@ -8,13 +8,13 @@
 #ifndef PIECEWISEGAUSSIAN_H_
 #define PIECEWISEGAUSSIAN_H_
 
-#include "ApproximatedDistribution.h"
+#include "PiecewiseBase.h"
 
 #include "Gaussian.h"
 
 namespace stochastic {
 
-class PiecewiseGaussian : public stochastic::ApproximatedDistribution
+class PiecewiseGaussian : public stochastic::PiecewiseBase
 {
 private:
 	void fit(std::vector <double>);

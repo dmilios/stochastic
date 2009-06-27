@@ -8,13 +8,13 @@
 #ifndef PIECEWISEUNIFORM_H_
 #define PIECEWISEUNIFORM_H_
 
-#include "ApproximatedDistribution.h"
+#include "PiecewiseBase.h"
 
 #include "Uniform.h"
 
 namespace stochastic {
 
-class PiecewiseUniform : public stochastic::ApproximatedDistribution
+class PiecewiseUniform : public stochastic::PiecewiseBase
 {
 private:
 	void fit(std::vector <double>);

@@ -117,7 +117,7 @@ void PiecewiseGaussian::fit(std::vector<double> data)
 //		printf("log likelihood: %f\n", logLikelihood);
 	}
 
-	ApproximationComponent * component;
+	PiecewiseComponent * component;
 	for (k = 0; k < fixedNumberOfComponents; k++)
 	{
 		component = new Gaussian(means[k], variances[k]);

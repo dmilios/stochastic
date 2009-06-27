@@ -25,7 +25,7 @@ void MonteCarloOperations::setNumberOfSamples(int n)
  * --- Standard Binary Operations: '+', '-', '*', '/'
  */
 
-RandomVariable MonteCarloOperations::add(RandomVariable arg1,
+RandomVariable MonteCarloOperations::sum(RandomVariable arg1,
 		RandomVariable arg2)
 {
 	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamples);
@@ -37,7 +37,7 @@ RandomVariable MonteCarloOperations::add(RandomVariable arg1,
 	return RandomVariable(new EmpiricalDistribution(produced_data));
 }
 
-RandomVariable MonteCarloOperations::subtract(RandomVariable arg1,
+RandomVariable MonteCarloOperations::difference(RandomVariable arg1,
 		RandomVariable arg2)
 {
 	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamples);
@@ -49,7 +49,7 @@ RandomVariable MonteCarloOperations::subtract(RandomVariable arg1,
 	return RandomVariable(new EmpiricalDistribution(produced_data));
 }
 
-RandomVariable MonteCarloOperations::multiply(RandomVariable arg1,
+RandomVariable MonteCarloOperations::product(RandomVariable arg1,
 		RandomVariable arg2)
 {
 	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamples);
@@ -61,7 +61,7 @@ RandomVariable MonteCarloOperations::multiply(RandomVariable arg1,
 	return RandomVariable(new EmpiricalDistribution(produced_data));
 }
 
-RandomVariable MonteCarloOperations::divide(RandomVariable arg1,
+RandomVariable MonteCarloOperations::ratio(RandomVariable arg1,
 		RandomVariable arg2)
 {
 	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamples);

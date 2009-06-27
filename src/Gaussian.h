@@ -9,11 +9,11 @@
 #define GAUSSIAN_H_
 
 #include "Distribution.h"
-#include "ApproximationComponent.h"
+#include "PiecewiseComponent.h"
 
 namespace stochastic {
 
-class Gaussian : public stochastic::ApproximationComponent
+class Gaussian : public stochastic::PiecewiseComponent
 {
 private:
 	double mean;
@@ -34,13 +34,13 @@ public:
 	double getLeftMargin();
 	double getRightMargin();
 
-	// overload virtual methods of ApproximationComponent
-	Distribution * add(ApproximationComponent *);
-	Distribution * subtract(ApproximationComponent *);
-	Distribution * multiply(ApproximationComponent *);
-	Distribution * divide(ApproximationComponent *);
-	Distribution * min(ApproximationComponent *);
-	Distribution * max(ApproximationComponent *);
+	// overload virtual methods of PiecewiseComponent
+	MixtureComponent * sum(PiecewiseComponent *);
+	MixtureComponent * difference(PiecewiseComponent *);
+	MixtureComponent * product(PiecewiseComponent *);
+	MixtureComponent * ratio(PiecewiseComponent *);
+	MixtureComponent * min(PiecewiseComponent *);
+	MixtureComponent * max(PiecewiseComponent *);
 };
 
 } // namespace stochastic

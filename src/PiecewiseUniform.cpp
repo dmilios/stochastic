@@ -39,7 +39,7 @@ void PiecewiseUniform::fit(std::vector <double> data)
 
 void PiecewiseUniform::fit(Distribution * distribution)
 {
-	ApproximationComponent * component;
+	PiecewiseComponent * component;
 	double weight;
 
 	double start = distribution->getLeftMargin();
@@ -77,7 +77,7 @@ void PiecewiseUniform::fit(Distribution * distribution)
 // alternative fit using quantile
 void PiecewiseUniform::fit2(Distribution * distribution)
 {
-	ApproximationComponent * component;
+	PiecewiseComponent * component;
 	double weight;
 	double step = 1 / (double) fixedNumberOfComponents;
 	int i;

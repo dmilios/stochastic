@@ -1,16 +1,16 @@
 /*
- * ApproximatedDistribution.h
+ * PiecewiseBase.h
  *
  *  Created on: 08-Jun-2009
  *      Author: Dimitrios Milios
  */
 
-#ifndef APPROXIMATEDDISTRIBUTION_H_
-#define APPROXIMATEDDISTRIBUTION_H_
+#ifndef PIECEWISEBASE_H_
+#define PIECEWISEBASE_H_
 
 #include "Distribution.h"
 #include "MixtureModel.h"
-#include "ApproximationComponent.h"
+#include "PiecewiseComponent.h"
 #include "FileParser.h"
 #include <vector>
 
@@ -24,7 +24,7 @@ namespace stochastic {
  * define different approximation methods for each approximation class,
  * but a unique interface.
  * */
-class ApproximatedDistribution : public stochastic::MixtureModel
+class PiecewiseBase : public stochastic::MixtureModel
 {
 protected:
 	static FileParser parser;
@@ -39,15 +39,15 @@ public:
 	// in order to set the global fixedNumberOfComponents
     static void setFixedNumberOfComponents(int);
 
-    Distribution * add(ApproximatedDistribution *);
-    Distribution * subtract(ApproximatedDistribution *);
-    Distribution * multiply(ApproximatedDistribution *);
-    Distribution * divide(ApproximatedDistribution *);
+    MixtureModel * sum(PiecewiseBase *);
+    MixtureModel * difference(PiecewiseBase *);
+    MixtureModel * product(PiecewiseBase *);
+    MixtureModel * ratio(PiecewiseBase *);
 
-    Distribution * min(ApproximatedDistribution *);
-    Distribution * max(ApproximatedDistribution *);
+    MixtureModel * min(PiecewiseBase *);
+    MixtureModel * max(PiecewiseBase *);
 };
 
 } // namespace stochastic
 
-#endif /* APPROXIMATEDDISTRIBUTION_H_ */
+#endif /* PIECEWISEBASE_H_ */

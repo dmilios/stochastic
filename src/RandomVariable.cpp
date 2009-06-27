@@ -8,7 +8,6 @@
 #include "RandomVariable.h"
 
 #include "exceptions.h"
-#include "ApproximationComponent.h"
 #include "PiecewiseUniform.h"
 #include <fstream>
 #include <string>
@@ -131,15 +130,16 @@ RandomVariable RandomVariable::operator +(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	ApproximatedDistribution * leftDistribution;
-	ApproximatedDistribution * rightDistribution;
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
 	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
 		leftDistribution = new PiecewiseUniform(this->distribution);
 	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
 		rightDistribution = new PiecewiseUniform(rightarg.distribution);
 
-	PiecewiseUniform result = leftDistribution->add(rightDistribution);
-	return RandomVariable(leftDistribution->add(rightDistribution));
+	Distribution * raw = leftDistribution->sum(rightDistribution);
+	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	return RandomVariable(result);
 }
 
 RandomVariable RandomVariable::operator -(RandomVariable rightarg)
@@ -147,15 +147,16 @@ RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	ApproximatedDistribution * leftDistribution;
-	ApproximatedDistribution * rightDistribution;
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
 	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
 		leftDistribution = new PiecewiseUniform(this->distribution);
 	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
 		rightDistribution = new PiecewiseUniform(rightarg.distribution);
 
-	PiecewiseUniform result = leftDistribution->subtract(rightDistribution);
-	return RandomVariable(leftDistribution->subtract(rightDistribution));
+	Distribution * raw = leftDistribution->difference(rightDistribution);
+	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	return RandomVariable(result);
 }
 
 RandomVariable RandomVariable::operator *(RandomVariable rightarg)
@@ -163,15 +164,16 @@ RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	ApproximatedDistribution * leftDistribution;
-	ApproximatedDistribution * rightDistribution;
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
 	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
 		leftDistribution = new PiecewiseUniform(this->distribution);
 	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
 		rightDistribution = new PiecewiseUniform(rightarg.distribution);
 
-	PiecewiseUniform result = leftDistribution->multiply(rightDistribution);
-	return RandomVariable(leftDistribution->multiply(rightDistribution));
+	Distribution * raw = leftDistribution->product(rightDistribution);
+	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	return RandomVariable(result);
 }
 
 RandomVariable RandomVariable::operator /(RandomVariable rightarg)
@@ -179,15 +181,16 @@ RandomVariable RandomVariable::operator /(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	ApproximatedDistribution * leftDistribution;
-	ApproximatedDistribution * rightDistribution;
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
 	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
 		leftDistribution = new PiecewiseUniform(this->distribution);
 	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
 		rightDistribution = new PiecewiseUniform(rightarg.distribution);
 
-	PiecewiseUniform result = leftDistribution->divide(rightDistribution);
-	return RandomVariable(leftDistribution->divide(rightDistribution));
+	Distribution * raw = leftDistribution->ratio(rightDistribution);
+	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	return RandomVariable(result);
 }
 
 /*

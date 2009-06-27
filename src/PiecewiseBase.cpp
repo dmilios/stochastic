@@ -5,7 +5,7 @@
  *      Author: Dimitrios Milios
  */
 
-#include "ApproximatedDistribution.h"
+#include "PiecewiseBase.h"
 
 #include "exceptions.h"
 
@@ -15,17 +15,17 @@
 
 namespace stochastic {
 
-FileParser ApproximatedDistribution::parser;
+FileParser PiecewiseBase::parser;
 
-int ApproximatedDistribution::fixedNumberOfComponents = 10;
+int PiecewiseBase::fixedNumberOfComponents = 10;
 
 // Static Method: sets the wanted number of components
-void ApproximatedDistribution::setFixedNumberOfComponents(int n)
+void PiecewiseBase::setFixedNumberOfComponents(int n)
 {
 	fixedNumberOfComponents = n;
 }
 
-Distribution * ApproximatedDistribution::add(ApproximatedDistribution * arg)
+MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
@@ -33,20 +33,23 @@ Distribution * ApproximatedDistribution::add(ApproximatedDistribution * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	ApproximationComponent * leftComponent;
-	ApproximationComponent * rightComponent;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			leftComponent = (ApproximationComponent *)this->components[i];
-			rightComponent = (ApproximationComponent *)arg->components[j];
-			resultComponents.push_back((MixtureComponent *)leftComponent->add(rightComponent));
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->sum(right);
+
+			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-Distribution * ApproximatedDistribution::subtract(ApproximatedDistribution * arg)
+MixtureModel * PiecewiseBase::difference(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
@@ -54,20 +57,23 @@ Distribution * ApproximatedDistribution::subtract(ApproximatedDistribution * arg
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	ApproximationComponent * leftComponent;
-	ApproximationComponent * rightComponent;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			leftComponent = (ApproximationComponent *)this->components[i];
-			rightComponent = (ApproximationComponent *)arg->components[j];
-			resultComponents.push_back((MixtureComponent *)leftComponent->subtract(rightComponent));
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->difference(right);
+
+			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-Distribution * ApproximatedDistribution::multiply(ApproximatedDistribution * arg)
+MixtureModel * PiecewiseBase::product(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
@@ -75,20 +81,23 @@ Distribution * ApproximatedDistribution::multiply(ApproximatedDistribution * arg
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	ApproximationComponent * leftComponent;
-	ApproximationComponent * rightComponent;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			leftComponent = (ApproximationComponent *)this->components[i];
-			rightComponent = (ApproximationComponent *)arg->components[j];
-			resultComponents.push_back((MixtureComponent *)leftComponent->multiply(rightComponent));
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->product(right);
+
+			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-Distribution * ApproximatedDistribution::divide(ApproximatedDistribution * arg)
+MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
@@ -96,27 +105,30 @@ Distribution * ApproximatedDistribution::divide(ApproximatedDistribution * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	ApproximationComponent * leftComponent;
-	ApproximationComponent * rightComponent;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			leftComponent = (ApproximationComponent *)this->components[i];
-			rightComponent = (ApproximationComponent *)arg->components[j];
-			resultComponents.push_back((MixtureComponent *)leftComponent->divide(rightComponent));
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->ratio(right);
+
+			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-Distribution *ApproximatedDistribution:: min(ApproximatedDistribution * arg)
+MixtureModel *PiecewiseBase:: min(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
 	return 0;
 }
 
-Distribution * ApproximatedDistribution::max(ApproximatedDistribution * arg)
+MixtureModel * PiecewiseBase::max(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();

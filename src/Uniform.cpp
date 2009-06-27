@@ -90,9 +90,9 @@ double Uniform::nextSample()
  * --- for Uniform Approximation Component
  */
 
-Distribution * Uniform::add(ApproximationComponent * rightarg)
+MixtureComponent * Uniform::sum(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -102,9 +102,9 @@ Distribution * Uniform::add(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Uniform::subtract(ApproximationComponent * rightarg)
+MixtureComponent * Uniform::difference(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -114,9 +114,9 @@ Distribution * Uniform::subtract(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Uniform::multiply(ApproximationComponent * rightarg)
+MixtureComponent * Uniform::product(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -133,9 +133,9 @@ Distribution * Uniform::multiply(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Uniform::divide(ApproximationComponent * rightarg)
+MixtureComponent * Uniform::ratio(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -158,9 +158,9 @@ Distribution * Uniform::divide(ApproximationComponent * rightarg)
  * --- for Uniform Approximation Component
  */
 
-Distribution * Uniform::min(ApproximationComponent * secondarg)
+MixtureComponent * Uniform::min(PiecewiseComponent * secondarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;
@@ -168,9 +168,9 @@ Distribution * Uniform::min(ApproximationComponent * secondarg)
 	return result;
 }
 
-Distribution * Uniform::max(ApproximationComponent * secondarg)
+MixtureComponent * Uniform::max(PiecewiseComponent * secondarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Uniform;

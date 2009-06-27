@@ -108,9 +108,9 @@ double Gaussian::nextSample()
  * --- for Gaussian Approximation Component
  */
 
-Distribution * Gaussian::add(ApproximationComponent * rightarg)
+MixtureComponent * Gaussian::sum(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
@@ -118,9 +118,9 @@ Distribution * Gaussian::add(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Gaussian::subtract(ApproximationComponent * rightarg)
+MixtureComponent * Gaussian::difference(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
@@ -128,9 +128,9 @@ Distribution * Gaussian::subtract(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Gaussian::multiply(ApproximationComponent * rightarg)
+MixtureComponent * Gaussian::product(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
@@ -138,9 +138,9 @@ Distribution * Gaussian::multiply(ApproximationComponent * rightarg)
 	return result;
 }
 
-Distribution * Gaussian::divide(ApproximationComponent * rightarg)
+MixtureComponent * Gaussian::ratio(PiecewiseComponent * rightarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
@@ -154,9 +154,9 @@ Distribution * Gaussian::divide(ApproximationComponent * rightarg)
  * --- for Gaussian Approximation Component
  */
 
-Distribution * Gaussian::min(ApproximationComponent * secondarg)
+MixtureComponent * Gaussian::min(PiecewiseComponent * secondarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*secondarg))
 		throw stochastic::IncompatibleComponentsException();
 	result = new Gaussian;
@@ -164,9 +164,9 @@ Distribution * Gaussian::min(ApproximationComponent * secondarg)
 	return result;
 }
 
-Distribution * Gaussian::max(ApproximationComponent * secondarg)
+MixtureComponent * Gaussian::max(PiecewiseComponent * secondarg)
 {
-	ApproximationComponent * result;
+	PiecewiseComponent * result;
 	if (typeid(*this)
 			!= typeid(*secondarg))
 		throw stochastic::IncompatibleComponentsException();
