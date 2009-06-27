@@ -38,6 +38,14 @@ public:
 
 	// in order to set the global fixedNumberOfComponents
     static void setFixedNumberOfComponents(int);
+
+    Distribution * add(ApproximatedDistribution *);
+    Distribution * subtract(ApproximatedDistribution *);
+    Distribution * multiply(ApproximatedDistribution *);
+    Distribution * divide(ApproximatedDistribution *);
+
+    Distribution * min(ApproximatedDistribution *);
+    Distribution * max(ApproximatedDistribution *);
 };
 
 } // namespace stochastic

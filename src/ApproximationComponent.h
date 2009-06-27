@@ -21,13 +21,13 @@ namespace stochastic {
 class ApproximationComponent : public stochastic::MixtureComponent
 {
 public:
-	virtual ApproximationComponent * add(ApproximationComponent *) = 0;
-	virtual ApproximationComponent * subtract(ApproximationComponent *) = 0;
-	virtual ApproximationComponent * multiply(ApproximationComponent *) = 0;
-	virtual ApproximationComponent * divide(ApproximationComponent *) = 0;
+	virtual Distribution * add(ApproximationComponent *) = 0;
+	virtual Distribution * subtract(ApproximationComponent *) = 0;
+	virtual Distribution * multiply(ApproximationComponent *) = 0;
+	virtual Distribution * divide(ApproximationComponent *) = 0;
 
-	virtual ApproximationComponent * min(ApproximationComponent *) = 0;
-	virtual ApproximationComponent * max(ApproximationComponent *) = 0;
+	virtual Distribution * min(ApproximationComponent *) = 0;
+	virtual Distribution * max(ApproximationComponent *) = 0;
 };
 
 } // namespace stochastic

@@ -138,18 +138,8 @@ RandomVariable RandomVariable::operator +(RandomVariable rightarg)
 	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
 		rightDistribution = new PiecewiseUniform(rightarg.distribution);
 
-//	std::vector<ApproximationComponent *> leftComponents;
-//	std::vector<double> LeftWeights;
-//	std::vector<ApproximationComponent *> rightComponents;
-//	std::vector<double> rightWeights;
-//	leftComponents = leftDistribution->getComponents();
-//	LeftWeights = leftDistribution->getWeights();
-//	rightComponents = rightDistribution->getComponents();
-//	rightWeights = rightDistribution->getWeights();
-//	unsigned int i, j;
-//	for (i = 0; i < 100; i++);
-
-	return RandomVariable();
+	PiecewiseUniform result = leftDistribution->add(rightDistribution);
+	return RandomVariable(leftDistribution->add(rightDistribution));
 }
 
 RandomVariable RandomVariable::operator -(RandomVariable rightarg)
@@ -157,7 +147,15 @@ RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	return RandomVariable();
+	ApproximatedDistribution * leftDistribution;
+	ApproximatedDistribution * rightDistribution;
+	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
+		leftDistribution = new PiecewiseUniform(this->distribution);
+	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
+		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+
+	PiecewiseUniform result = leftDistribution->subtract(rightDistribution);
+	return RandomVariable(leftDistribution->subtract(rightDistribution));
 }
 
 RandomVariable RandomVariable::operator *(RandomVariable rightarg)
@@ -165,7 +163,15 @@ RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	return RandomVariable();
+	ApproximatedDistribution * leftDistribution;
+	ApproximatedDistribution * rightDistribution;
+	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
+		leftDistribution = new PiecewiseUniform(this->distribution);
+	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
+		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+
+	PiecewiseUniform result = leftDistribution->multiply(rightDistribution);
+	return RandomVariable(leftDistribution->multiply(rightDistribution));
 }
 
 RandomVariable RandomVariable::operator /(RandomVariable rightarg)
@@ -173,7 +179,15 @@ RandomVariable RandomVariable::operator /(RandomVariable rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	return RandomVariable();
+	ApproximatedDistribution * leftDistribution;
+	ApproximatedDistribution * rightDistribution;
+	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
+		leftDistribution = new PiecewiseUniform(this->distribution);
+	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
+		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+
+	PiecewiseUniform result = leftDistribution->divide(rightDistribution);
+	return RandomVariable(leftDistribution->divide(rightDistribution));
 }
 
 /*

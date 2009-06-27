@@ -33,12 +33,12 @@ public:
 	double getRightMargin();
 
 	// overload virtual methods of ApproximationComponent
-	ApproximationComponent * add(ApproximationComponent *);
-	ApproximationComponent * subtract(ApproximationComponent *);
-	ApproximationComponent * multiply(ApproximationComponent *);
-	ApproximationComponent * divide(ApproximationComponent *);
-	ApproximationComponent * min(ApproximationComponent *);
-	ApproximationComponent * max(ApproximationComponent *);
+	Distribution * add(ApproximationComponent *);
+	Distribution * subtract(ApproximationComponent *);
+	Distribution * multiply(ApproximationComponent *);
+	Distribution * divide(ApproximationComponent *);
+	Distribution * min(ApproximationComponent *);
+	Distribution * max(ApproximationComponent *);
 };
 
 } // namespace stochastic

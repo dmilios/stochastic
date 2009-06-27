@@ -37,31 +37,32 @@ int main(int argc, char *argv[])
 
 	Gnuplot plot;
 
-	Gaussian g, g1(1);
-	Uniform u(-4, 4);
-	Exponential e;
-	EmpiricalDistribution emp("pLin.txt");
-
-	std::vector <MixtureComponent *> c;
-	std::vector <double> w;
-	c.push_back(new Gaussian);
-	w.push_back(1);
-	c.push_back(new Gaussian(14, 2));
-	w.push_back(1);
-	MixtureModel m(c, w);
-
-	PiecewiseUniform pu = &m;
+//	Gaussian g, g1(1);
+//	Uniform u(-4, 4);
+//	Exponential e;
+//	EmpiricalDistribution emp("pLin.txt");
+//
+//	std::vector <MixtureComponent *> c;
+//	std::vector <double> w;
+//	c.push_back(new Gaussian);
+//	w.push_back(1);
+//	c.push_back(new Gaussian(14, 2));
+//	w.push_back(1);
+//	MixtureModel m(c, w);
+//
+//	PiecewiseUniform pu = &m;
 
 	RandomVariable r1 = new Gaussian(-5);
 	RandomVariable r2 = new Gaussian(5);
-	RandomVariable r3 = new Gaussian(0, 2);
+	RandomVariable r3 = r1 / r2;
 
 	RandomVariable r4;
-	r4 = MonteCarloOperations::add(r1, r2);
-	r4 = new PiecewiseUniform(r4.getDistribution());
 
-	plot.addRV(r1);
-	plot.addRV(r2);
+	r4 = MonteCarloOperations::divide(r1, r2);
+//	r4 = new PiecewiseUniform(r4.getDistribution());
+
+//	plot.addRV(r1);
+//	plot.addRV(r2);
 	plot.addRV(r3);
 	plot.addRV(r4);
 

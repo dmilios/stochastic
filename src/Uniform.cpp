@@ -90,7 +90,7 @@ double Uniform::nextSample()
  * --- for Uniform Approximation Component
  */
 
-ApproximationComponent * Uniform::add(ApproximationComponent * rightarg)
+Distribution * Uniform::add(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
@@ -102,7 +102,7 @@ ApproximationComponent * Uniform::add(ApproximationComponent * rightarg)
 	return result;
 }
 
-ApproximationComponent * Uniform::subtract(ApproximationComponent * rightarg)
+Distribution * Uniform::subtract(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
@@ -114,7 +114,7 @@ ApproximationComponent * Uniform::subtract(ApproximationComponent * rightarg)
 	return result;
 }
 
-ApproximationComponent * Uniform::multiply(ApproximationComponent * rightarg)
+Distribution * Uniform::multiply(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
@@ -133,7 +133,7 @@ ApproximationComponent * Uniform::multiply(ApproximationComponent * rightarg)
 	return result;
 }
 
-ApproximationComponent * Uniform::divide(ApproximationComponent * rightarg)
+Distribution * Uniform::divide(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
@@ -158,7 +158,7 @@ ApproximationComponent * Uniform::divide(ApproximationComponent * rightarg)
  * --- for Uniform Approximation Component
  */
 
-ApproximationComponent * Uniform::min(ApproximationComponent * secondarg)
+Distribution * Uniform::min(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
@@ -168,7 +168,7 @@ ApproximationComponent * Uniform::min(ApproximationComponent * secondarg)
 	return result;
 }
 
-ApproximationComponent * Uniform::max(ApproximationComponent * secondarg)
+Distribution * Uniform::max(ApproximationComponent * secondarg)
 {
 	ApproximationComponent * result;
 	if (typeid(* this) != typeid(* secondarg))

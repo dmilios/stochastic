@@ -108,7 +108,7 @@ double Gaussian::nextSample()
  * --- for Gaussian Approximation Component
  */
 
-ApproximationComponent * Gaussian::add(ApproximationComponent * rightarg)
+Distribution * Gaussian::add(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
@@ -118,8 +118,7 @@ ApproximationComponent * Gaussian::add(ApproximationComponent * rightarg)
 	return result;
 }
 
-ApproximationComponent * Gaussian::subtract(
-		ApproximationComponent * rightarg)
+Distribution * Gaussian::subtract(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
@@ -129,8 +128,7 @@ ApproximationComponent * Gaussian::subtract(
 	return result;
 }
 
-ApproximationComponent * Gaussian::multiply(
-		ApproximationComponent * rightarg)
+Distribution * Gaussian::multiply(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
@@ -140,8 +138,7 @@ ApproximationComponent * Gaussian::multiply(
 	return result;
 }
 
-ApproximationComponent * Gaussian::divide(
-		ApproximationComponent * rightarg)
+Distribution * Gaussian::divide(ApproximationComponent * rightarg)
 {
 	ApproximationComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
@@ -157,27 +154,25 @@ ApproximationComponent * Gaussian::divide(
  * --- for Gaussian Approximation Component
  */
 
- ApproximationComponent * Gaussian::min(
-		 ApproximationComponent * secondarg)
- {
-	 ApproximationComponent * result;
-	 if (typeid(*this) != typeid(*secondarg))
-		 throw stochastic::IncompatibleComponentsException();
-	 result = new Gaussian;
+Distribution * Gaussian::min(ApproximationComponent * secondarg)
+{
+	ApproximationComponent * result;
+	if (typeid(*this) != typeid(*secondarg))
+		throw stochastic::IncompatibleComponentsException();
+	result = new Gaussian;
 
-	 return result;
- }
+	return result;
+}
 
- ApproximationComponent * Gaussian::max(
-		 ApproximationComponent * secondarg)
- {
-	 ApproximationComponent * result;
-	 if (typeid(*this)
-			 != typeid(*secondarg))
-		 throw stochastic::IncompatibleComponentsException();
-	 result = new Gaussian;
+Distribution * Gaussian::max(ApproximationComponent * secondarg)
+{
+	ApproximationComponent * result;
+	if (typeid(*this)
+			!= typeid(*secondarg))
+		throw stochastic::IncompatibleComponentsException();
+	result = new Gaussian;
 
-	 return result;
- }
+	return result;
+}
 
 } // namespace stochastic
