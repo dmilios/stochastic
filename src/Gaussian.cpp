@@ -110,22 +110,20 @@ double Gaussian::nextSample()
 
 MixtureComponent * Gaussian::sum(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
-	return result;
+	Gaussian * arg = (Gaussian *) rightarg;
+	return new Gaussian(mean + arg->mean, variance + arg->variance);
 }
 
 MixtureComponent * Gaussian::difference(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
-	return result;
+	Gaussian * arg = (Gaussian *) rightarg;
+	return new Gaussian(mean - arg->mean, variance + arg->variance);
 }
 
 MixtureComponent * Gaussian::product(PiecewiseComponent * rightarg)

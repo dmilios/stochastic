@@ -30,10 +30,10 @@ protected:
 	static FileParser parser;
 	static int fixedNumberOfComponents;
 
-	virtual void fit(std::vector <double>) = 0;
-	virtual void fit(Distribution *) = 0;
-
 public:
+	virtual PiecewiseBase * fit(std::vector <double>) = 0;
+	virtual PiecewiseBase * fit(Distribution *) = 0;
+
 	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents

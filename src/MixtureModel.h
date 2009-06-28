@@ -18,23 +18,23 @@ namespace stochastic {
 class MixtureModel : public stochastic::Distribution
 {
 protected:
-	std::vector <stochastic::MixtureComponent *> components;
-	std::vector <double> weights;
-	std::vector <double> cumulativeWeights;
-    void normalizeWeights();
-    MixtureModel()
-    {
-    }
+	std::vector<stochastic::MixtureComponent *> components;
+	std::vector<double> weights;
+	std::vector<double> cumulativeWeights;
+	std::vector<double> constructCumulativeWeights(std::vector<double> &);
+	MixtureModel()
+	{
+	}
 
 public:
-    MixtureModel(std::vector<MixtureComponent*>, std::vector<double>);
-    virtual ~MixtureModel();
-    const virtual char *getName();
-    double pdf(double);
-    double cdf(double);
-    double nextSample();
-    double getLeftMargin();
-    double getRightMargin();
+	MixtureModel(std::vector<MixtureComponent*>, std::vector<double>);
+	virtual ~MixtureModel();
+	const virtual char *getName();
+	double pdf(double);
+	double cdf(double);
+	double nextSample();
+	double getLeftMargin();
+	double getRightMargin();
 };
 
 } // namespace stochastic

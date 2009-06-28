@@ -125,14 +125,48 @@ MixtureModel *PiecewiseBase:: min(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
-	return 0;
+
+	std::vector<MixtureComponent *> resultComponents;
+	std::vector<double> resultWeights;
+	int i, j;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+		for (j = 0; j < fixedNumberOfComponents; j++)
+		{
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->min(right);
+
+			resultComponents.push_back(currentResult);
+			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+		}
+	return new MixtureModel(resultComponents, resultWeights);
 }
 
 MixtureModel * PiecewiseBase::max(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))
 		throw stochastic::IncompatibleComponentsException();
-	return 0;
+
+	std::vector<MixtureComponent *> resultComponents;
+	std::vector<double> resultWeights;
+	int i, j;
+	PiecewiseComponent * left;
+	PiecewiseComponent * right;
+	MixtureComponent * currentResult;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+		for (j = 0; j < fixedNumberOfComponents; j++)
+		{
+			left = (PiecewiseComponent *)this->components[i];
+			right = (PiecewiseComponent *)arg->components[j];
+			currentResult = (MixtureComponent *)left->max(right);
+
+			resultComponents.push_back(currentResult);
+			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+		}
+	return new MixtureModel(resultComponents, resultWeights);
 }
 
 } // namespace stochastic

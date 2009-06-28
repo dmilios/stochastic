@@ -13,8 +13,8 @@
 
 namespace stochastic {
 
-MixtureModel::MixtureModel(std::vector <MixtureComponent *> components,
-		std::vector <double> weights)
+MixtureModel::MixtureModel(std::vector<MixtureComponent *> components,
+		std::vector<double> weights)
 {
 	if (components.size() <= 0)
 		throw UndefinedDistributionException();
@@ -23,31 +23,34 @@ MixtureModel::MixtureModel(std::vector <MixtureComponent *> components,
 
 	this->components = components;
 	this->weights = weights;
-	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+	cumulativeWeights = this->constructCumulativeWeights(weights);
 }
 
 MixtureModel::~MixtureModel()
 {
 }
 
-void MixtureModel::normalizeWeights()
+std::vector<double> MixtureModel::constructCumulativeWeights(
+		std::vector<double> & w)
 {
+	std::vector<double> cweights;
 	unsigned int i;
 	double sum = 0;
 	double cumulativeWeight = 0;
-	for (i = 0; i < weights.size(); i++)
+	for (i = 0; i < w.size(); i++)
 	{
-		if (weights[i] < 0)
+		if (w[i] < 0)
 			throw InvalidWeightsException();
 
-		sum += weights[i];
+		sum += w[i];
 	}
-	for (i = 0; i < weights.size(); i++)
+	for (i = 0; i < w.size(); i++)
 	{
-		weights[i] /= sum;
-		cumulativeWeight += weights[i];
-		this->cumulativeWeights.push_back(cumulativeWeight);
+		w[i] /= sum;
+		cumulativeWeight += w[i];
+		cweights.push_back(cumulativeWeight);
 	}
+	return cweights;
 }
 
 const char * MixtureModel::getName()
@@ -81,8 +84,8 @@ double MixtureModel::cdf(double x)
 {
 	if (x < this->getLeftMargin())
 		return 0;
-	 if(x >= this->getRightMargin())
-		 return 1;
+	if (x >= this->getRightMargin())
+		return 1;
 
 	unsigned int i;
 	double weighted_sum = 0;

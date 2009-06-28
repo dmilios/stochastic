@@ -15,6 +15,14 @@
 
 namespace stochastic {
 
+PiecewiseBase * RandomVariable::approximator = new PiecewiseUniform;
+
+// static method
+void RandomVariable::setApproximatorType(PiecewiseBase * type)
+{
+	RandomVariable::approximator = type;
+}
+
 RandomVariable::RandomVariable()
 {
 	this->distribution = 0;
@@ -132,13 +140,17 @@ RandomVariable RandomVariable::operator +(RandomVariable rightarg)
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
-		leftDistribution = new PiecewiseUniform(this->distribution);
-	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
-		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* rightarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(rightarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) rightarg.distribution;
 
 	Distribution * raw = leftDistribution->sum(rightDistribution);
-	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
@@ -149,13 +161,17 @@ RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
-		leftDistribution = new PiecewiseUniform(this->distribution);
-	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
-		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* rightarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(rightarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) rightarg.distribution;
 
 	Distribution * raw = leftDistribution->difference(rightDistribution);
-	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
@@ -166,13 +182,17 @@ RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
-		leftDistribution = new PiecewiseUniform(this->distribution);
-	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
-		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* rightarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(rightarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) rightarg.distribution;
 
 	Distribution * raw = leftDistribution->product(rightDistribution);
-	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
@@ -183,13 +203,17 @@ RandomVariable RandomVariable::operator /(RandomVariable rightarg)
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(PiecewiseUniform))
-		leftDistribution = new PiecewiseUniform(this->distribution);
-	if (typeid(* rightarg.distribution) != typeid(PiecewiseUniform))
-		rightDistribution = new PiecewiseUniform(rightarg.distribution);
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* rightarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(rightarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) rightarg.distribution;
 
 	Distribution * raw = leftDistribution->ratio(rightDistribution);
-	PiecewiseUniform * result = new PiecewiseUniform(raw);
+	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
@@ -204,7 +228,20 @@ RandomVariable RandomVariable::min(RandomVariable secondarg)
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	return RandomVariable();
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* secondarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(secondarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) secondarg.distribution;
+
+	Distribution * raw = leftDistribution->min(rightDistribution);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
 }
 
 // The first argument is 'this' object
@@ -213,7 +250,20 @@ RandomVariable RandomVariable::max(RandomVariable secondarg)
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	return RandomVariable();
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+	if (typeid(* secondarg.distribution) != typeid(* approximator))
+		rightDistribution = approximator->fit(secondarg.distribution);
+	else
+		rightDistribution = (PiecewiseBase *) secondarg.distribution;
+
+	Distribution * raw = leftDistribution->max(rightDistribution);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
 }
 
 // the very same implementation as in RandomVariable::min,

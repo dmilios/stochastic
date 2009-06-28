@@ -9,6 +9,7 @@
 #define RANDOMVARIABLE_H_
 
 #include "Distribution.h"
+#include "PiecewiseBase.h"
 
 #include <vector>
 
@@ -18,11 +19,14 @@ class RandomVariable
 {
 private:
 	Distribution * distribution;
+	static PiecewiseBase * approximator;
 
 public:
 	RandomVariable();
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
+
+	static void setApproximatorType(PiecewiseBase *);
 
 	Distribution * getDistribution();
 	void setDistribution(Distribution *);

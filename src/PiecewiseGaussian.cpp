@@ -14,11 +14,19 @@
 
 namespace stochastic {
 
+PiecewiseGaussian::PiecewiseGaussian()
+{
+}
+
 PiecewiseGaussian::PiecewiseGaussian(const char * fileName)
 {
 	std::vector<double> data;
 	data = parser.parseDataFile(fileName);
-	this->fit(data);
+
+	PiecewiseGaussian temp = * (PiecewiseGaussian *)fit(data);
+	this->weights = temp.weights;
+	this->components = temp.components;
+	this->cumulativeWeights = temp.cumulativeWeights;
 }
 
 PiecewiseGaussian::PiecewiseGaussian(Distribution * distribution)
@@ -26,7 +34,10 @@ PiecewiseGaussian::PiecewiseGaussian(Distribution * distribution)
 	if (!distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	this->fit(distribution);
+	PiecewiseGaussian temp = * (PiecewiseGaussian *)fit(distribution);
+	this->weights = temp.weights;
+	this->components = temp.components;
+	this->cumulativeWeights = temp.cumulativeWeights;
 }
 
 PiecewiseGaussian::~PiecewiseGaussian()
@@ -38,8 +49,10 @@ const char * PiecewiseGaussian::getName()
 	return "pNorm";
 }
 
-void PiecewiseGaussian::fit(std::vector<double> data)
+PiecewiseBase * PiecewiseGaussian::fit(std::vector<double> data)
 {
+	PiecewiseGaussian * result = new PiecewiseGaussian;
+
 	double means[fixedNumberOfComponents];
 	double variances[fixedNumberOfComponents];
 	double coefficients[fixedNumberOfComponents];
@@ -121,14 +134,17 @@ void PiecewiseGaussian::fit(std::vector<double> data)
 	for (k = 0; k < fixedNumberOfComponents; k++)
 	{
 		component = new Gaussian(means[k], variances[k]);
-		this->components.push_back(component);
-		this->weights.push_back(coefficients[k]);
+		result->components.push_back(component);
+		result->weights.push_back(coefficients[k]);
 	}
-	this->normalizeWeights();
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
 }
 
-void PiecewiseGaussian::fit(Distribution * distribution)
+PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 {
+	std::vector<double> data = distribution->sample(1000);
+	return fit(data);
 }
 
 } // namespace stochastic

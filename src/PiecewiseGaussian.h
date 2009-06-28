@@ -16,14 +16,14 @@ namespace stochastic {
 
 class PiecewiseGaussian : public stochastic::PiecewiseBase
 {
-private:
-	void fit(std::vector <double>);
-	void fit(Distribution *);
-
 public:
+	PiecewiseGaussian();
 	PiecewiseGaussian(const char *);
 	PiecewiseGaussian(Distribution *);
 	virtual ~PiecewiseGaussian();
+
+	PiecewiseBase * fit(std::vector <double>);
+	PiecewiseBase * fit(Distribution *);
 
 	const char * getName();
 };

@@ -9,11 +9,19 @@
 
 namespace stochastic {
 
+PiecewiseUniform::PiecewiseUniform()
+{
+}
+
 PiecewiseUniform::PiecewiseUniform(const char * fileName)
 {
 	std::vector <double> data;
 	data = parser.parseDataFile(fileName);
-	this->fit(data);
+
+	PiecewiseUniform temp = * (PiecewiseUniform *)fit(data);
+	this->weights = temp.weights;
+	this->components = temp.components;
+	this->cumulativeWeights = temp.cumulativeWeights;
 }
 
 PiecewiseUniform::PiecewiseUniform(Distribution * distribution)
@@ -21,7 +29,10 @@ PiecewiseUniform::PiecewiseUniform(Distribution * distribution)
 	if (!distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	this->fit(distribution);
+	PiecewiseUniform temp = * (PiecewiseUniform *)fit(distribution);
+	this->weights = temp.weights;
+	this->components = temp.components;
+	this->cumulativeWeights = temp.cumulativeWeights;
 }
 
 PiecewiseUniform::~PiecewiseUniform()
@@ -33,15 +44,17 @@ const char * PiecewiseUniform::getName()
 	return "pUni";
 }
 
-void PiecewiseUniform::fit(std::vector <double> data)
+PiecewiseBase * PiecewiseUniform::fit(std::vector <double> data)
 {
+	return 0;
 }
 
-void PiecewiseUniform::fit(Distribution * distribution)
+PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 {
+	PiecewiseUniform * result = new PiecewiseUniform;
+
 	PiecewiseComponent * component;
 	double weight;
-
 	double start = distribution->getLeftMargin();
 	double end = distribution->getRightMargin();
 	double support = end - start;
@@ -66,17 +79,20 @@ void PiecewiseUniform::fit(Distribution * distribution)
 		if (weight)
 		{
 			component = new Uniform(x, x + step);
-			this->components.push_back(component);
-			this->weights.push_back(weight);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
 		}
 		x += step;
 	}
-	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
 }
 
 // alternative fit using quantile
-void PiecewiseUniform::fit2(Distribution * distribution)
+PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
 {
+	PiecewiseUniform * result;
+
 	PiecewiseComponent * component;
 	double weight;
 	double step = 1 / (double) fixedNumberOfComponents;
@@ -96,14 +112,15 @@ void PiecewiseUniform::fit2(Distribution * distribution)
 		if (weight)
 		{
 			component = new Uniform(x, x_step);
-			this->components.push_back(component);
-			this->weights.push_back(weight);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
 		}
 		else
 			printf("zero weight\n");
 		p += step;
 	}
-	this->normalizeWeights(); // constructs cumulativeWeights vector as well
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
 }
 
 } // namespace stochastic
