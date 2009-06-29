@@ -143,8 +143,49 @@ PiecewiseBase * PiecewiseGaussian::fit(std::vector<double> data)
 
 PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 {
-	std::vector<double> data = distribution->sample(1000);
-	return fit(data);
+	PiecewiseGaussian * result = new PiecewiseGaussian;
+
+	PiecewiseComponent * component;
+	double weight;
+	double start = distribution->getLeftMargin();
+	double end = distribution->getRightMargin();
+	double support = end - start;
+	double step = support / (double) fixedNumberOfComponents;
+	int i;
+	double stadardDeviation = support / (8 * fixedNumberOfComponents);
+	double range = 4 * stadardDeviation;
+	double x = start + range;
+
+
+	// check for support so as to revise the step
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
+		if (weight == 0)
+			support -= step;
+		x += step;
+	}
+	// revise the step
+	step = support / (double) fixedNumberOfComponents;
+	stadardDeviation = support / (8 * fixedNumberOfComponents);
+	range = 4 * stadardDeviation;
+	x = start + range;
+
+
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
+		if (weight)
+		{
+			double var = pow(range, 2);
+			component = new Gaussian(x, var);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
+		}
+		x += step;
+	}
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
 }
 
 } // namespace stochastic

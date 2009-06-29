@@ -23,7 +23,7 @@ MixtureModel::MixtureModel(std::vector<MixtureComponent *> components,
 
 	this->components = components;
 	this->weights = weights;
-	cumulativeWeights = this->constructCumulativeWeights(weights);
+	cumulativeWeights = this->constructCumulativeWeights(this->weights);
 }
 
 MixtureModel::~MixtureModel()

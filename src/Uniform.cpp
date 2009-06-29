@@ -92,7 +92,7 @@ double Uniform::nextSample()
 
 MixtureComponent * Uniform::sum(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -104,7 +104,7 @@ MixtureComponent * Uniform::sum(PiecewiseComponent * rightarg)
 
 MixtureComponent * Uniform::difference(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -116,7 +116,7 @@ MixtureComponent * Uniform::difference(PiecewiseComponent * rightarg)
 
 MixtureComponent * Uniform::product(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -135,7 +135,7 @@ MixtureComponent * Uniform::product(PiecewiseComponent * rightarg)
 
 MixtureComponent * Uniform::ratio(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
@@ -160,21 +160,25 @@ MixtureComponent * Uniform::ratio(PiecewiseComponent * rightarg)
 
 MixtureComponent * Uniform::min(PiecewiseComponent * secondarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	double a = std::min<double>(alpha, secondarg->getLeftMargin());
+	double b = std::min<double>(beta, secondarg->getRightMargin());
+	result = new Uniform(a, b);
 	return result;
 }
 
 MixtureComponent * Uniform::max(PiecewiseComponent * secondarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(* this) != typeid(* secondarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Uniform;
 
+	double a = std::max<double>(alpha, secondarg->getLeftMargin());
+	double b = std::max<double>(beta, secondarg->getRightMargin());
+	result = new Uniform(a, b);
 	return result;
 }
 

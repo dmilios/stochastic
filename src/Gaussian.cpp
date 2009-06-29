@@ -12,6 +12,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 namespace stochastic {
 
@@ -128,21 +129,43 @@ MixtureComponent * Gaussian::difference(PiecewiseComponent * rightarg)
 
 MixtureComponent * Gaussian::product(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
+	std::vector<double> margins;
+	margins.push_back(getLeftMargin() * rightarg->getLeftMargin());
+	margins.push_back(getLeftMargin() * rightarg->getRightMargin());
+	margins.push_back(getRightMargin() * rightarg->getLeftMargin());
+	margins.push_back(getRightMargin() * rightarg->getRightMargin());
+	std::vector<double>::iterator a = std::min_element(
+			margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+			margins.begin(), margins.end());
+	double var = pow((* b - * a) / 8, 2);
+	double m = (* a + * b) / 2;
+	result = new Gaussian(m, var);
 	return result;
 }
 
 MixtureComponent * Gaussian::ratio(PiecewiseComponent * rightarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(*this) != typeid(*rightarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
+	std::vector<double> margins;
+	margins.push_back(getLeftMargin() / rightarg->getLeftMargin());
+	margins.push_back(getLeftMargin() / rightarg->getRightMargin());
+	margins.push_back(getRightMargin() / rightarg->getLeftMargin());
+	margins.push_back(getRightMargin() / rightarg->getRightMargin());
+	std::vector<double>::iterator a = std::min_element(
+			margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+			margins.begin(), margins.end());
+	double var = pow((* b - * a) / 8, 2);
+	double m = (* a + * b) / 2;
+	result = new Gaussian(m, var);
 	return result;
 }
 
@@ -154,22 +177,30 @@ MixtureComponent * Gaussian::ratio(PiecewiseComponent * rightarg)
 
 MixtureComponent * Gaussian::min(PiecewiseComponent * secondarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(*this) != typeid(*secondarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
+	double a = std::min<double>(getLeftMargin(), secondarg->getLeftMargin());
+	double b = std::min<double>(getRightMargin(), secondarg->getRightMargin());
+	double var = pow((b - a) / 8, 2);
+	double m = (a + b) / 2;
+	result = new Gaussian(m, var);
 	return result;
 }
 
 MixtureComponent * Gaussian::max(PiecewiseComponent * secondarg)
 {
-	PiecewiseComponent * result;
+	MixtureComponent * result;
 	if (typeid(*this)
 			!= typeid(*secondarg))
 		throw stochastic::IncompatibleComponentsException();
-	result = new Gaussian;
 
+	double a = std::max<double>(getLeftMargin(), secondarg->getLeftMargin());
+	double b = std::max<double>(getRightMargin(), secondarg->getRightMargin());
+	double var = pow((b - a) / 8, 2);
+	double m = (a + b) / 2;
+	result = new Gaussian(m, var);
 	return result;
 }
 
