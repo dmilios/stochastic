@@ -34,8 +34,9 @@ const char * Exponential::getName()
 {
 	std::stringstream lambda_s;
 	lambda_s << this->lambda;
-	std::string name("exp_l");
+	std::string name("Exp(");
 	name.append(lambda_s.str());
+	name.append(")");
 	return name.c_str();
 }
 

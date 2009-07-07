@@ -50,10 +50,11 @@ const char * Gaussian::getName()
 	mean_s << this->mean;
 	var_s << this->variance;
 
-	std::string name("norm_m");
+	std::string name("N(");
 	name.append(mean_s.str());
-	name.append("_var");
+	name.append(",");
 	name.append(var_s.str());
+	name.append(")");
 	return name.c_str();
 }
 

@@ -57,12 +57,10 @@ const char * MixtureModel::getName()
 {
 	std::stringstream numberOfComponents_s;
 	numberOfComponents_s << this->components.size();
-	std::string firstComponent(components[0]->getName());
 
-	std::string name("mm");
+	std::string name("mixture k=");
 	name.append(numberOfComponents_s.str());
-	name.append("_");
-	name.append(firstComponent);
+	name.append(" ");
 	return name.c_str();
 }
 

@@ -43,30 +43,31 @@ int main(int argc, char *argv[])
 //	Exponential e;
 //	EmpiricalDistribution emp("pLin.txt");
 
-	std::vector <MixtureComponent *> c;
-	std::vector <double> w;
-	c.push_back(new Gaussian(0, 1));
-	w.push_back(1);
-	c.push_back(new Gaussian(4, 2));
-	w.push_back(1);
-	MixtureModel m(c, w);
+//	std::vector <MixtureComponent *> c;
+//	std::vector <double> w;
+//	c.push_back(new Gaussian(0, 1));
+//	w.push_back(1);
+//	c.push_back(new Gaussian(4, 2));
+//	w.push_back(1);
+//	MixtureModel m(c, w);
 
-	RandomVariable r1 = &m;
-	RandomVariable r2 = new Uniform(-1, 1);
-	RandomVariable r3 = max(r1, r2);
+	RandomVariable r1 = new Exponential;
+	RandomVariable r2 = new Uniform;
+	RandomVariable r3 = r1 + r2;
 
 	RandomVariable r4;
-	r4 = MonteCarloOperations::max(r1, r2);
+//	r4 = MonteCarloOperations::max(r1, r2);
 
-//	plot.addRV(r1);
-//	plot.addRV(r2);
+	plot.addRV(r1);
+	plot.addRV(r2);
 	plot.addRV(r3);
-	plot.addRV(r4);
+//	plot.addRV(r4);
 
 //	std::cout << r4.getDistribution()->kolmogorovDistance(r3.getDistribution()) << "\n";
 
 	std::cout << "Time: " << clock() << "\n";
-	plot.plotCurves();
+	plot.plotBuffered(PDF);
+	plot.plotBuffered(CDF);
 
 	return printArguments(argc, argv);
 }

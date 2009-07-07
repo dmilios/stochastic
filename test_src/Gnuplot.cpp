@@ -38,29 +38,30 @@ void Gnuplot::addRV(stochastic::RandomVariable rv)
 	rv.pdfOutline(accuracy, vx, vy);
 	curveName = "PDF ";
 	curveName.append(rvName.c_str());
-	addCurve(curveName.c_str(), vx, vy);
+	addCurve(PDF, curveName.c_str(), vx, vy);
 
 	vx.clear();
 	vy.clear();
 	rv.cdfOutline(accuracy, vx, vy);
 	curveName = "CDF ";
 	curveName.append(rvName.c_str());
-	addCurve(curveName.c_str(), vx, vy);
+	addCurve(CDF, curveName.c_str(), vx, vy);
 
-//	vx.clear();
-//	vy.clear();
-//	rv.quantileOutline(accuracy, vx, vy);
-//	curveName = "InverseCDF ";
-//	curveName.append(rvName.c_str());
-//	addCurve(curveName.c_str(), vx, vy);
+	vx.clear();
+	vy.clear();
+	rv.quantileOutline(accuracy, vx, vy);
+	curveName = "InverseCDF ";
+	curveName.append(rvName.c_str());
+	addCurve(INVERSE_CDF, curveName.c_str(), vx, vy);
 }
 
-void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy)
+void Gnuplot::addCurve(CurveTypes type, string name, vector <double> vx, vector <double> vy)
 {
 	FILE * curve;
 	stringstream counter;
 	string tmpFile = "tmp";
 
+	types.push_back(type);
 	names.push_back(name);
 	counter << names.size();
 	tmpFile.append(counter.str());
@@ -77,21 +78,32 @@ void Gnuplot::addCurve(string name, vector <double> vx, vector <double> vy)
 	fclose(curve);
 }
 
-void Gnuplot::plotCurves()
+void Gnuplot::plotBuffered(CurveTypes type)
 {
 	FILE * gnuplot;
 	unsigned int i;
+	int first_entered_flag = 0;
 
 	gnuplot = popen("gnuplot", "w");
 
 	fprintf(gnuplot, "plot ");
 	fflush(gnuplot);
-	for (i = 0; i < names.size() - 1; i++)
+	for (i = 0; i < names.size(); i++)
 	{
-		fprintf(gnuplot, "'%s' title '%s' %s, ", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
-		fflush(gnuplot);
+		if (type == types[i])
+		{
+			if (first_entered_flag)
+			{
+				fprintf(gnuplot, ", ");
+				fflush(gnuplot);
+			}
+			else
+				first_entered_flag = 1;
+			fprintf(gnuplot, "'%s' title '%s' %s", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
+			fflush(gnuplot);
+		}
 	}
-	fprintf(gnuplot, "'%s' title '%s' %s \n", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
+	fprintf(gnuplot, "\n");
 	fflush(gnuplot);
 
 	printf("Press enter to continue...");
@@ -100,4 +112,11 @@ void Gnuplot::plotCurves()
 
 	fputs("exit \n", gnuplot);
 	pclose(gnuplot);
+}
+
+void Gnuplot::clearBuffer()
+{
+	names.clear();
+	tmpFiles.clear();
+	types.clear();
 }

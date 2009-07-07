@@ -14,12 +14,20 @@
 
 using namespace std;
 
+enum CurveTypes
+{
+	PDF,
+	CDF,
+	INVERSE_CDF
+};
+
 class Gnuplot
 {
 private:
 	static int accuracy;
 	vector <string> names;
 	vector <string> tmpFiles;
+	vector <CurveTypes> types;
 	string options;
 
 public:
@@ -29,8 +37,9 @@ public:
 	static void setAccuracy(int);
 
 	void addRV(stochastic::RandomVariable);
-	void addCurve(string, vector <double>, vector <double>);
-	void plotCurves();
+	void addCurve(CurveTypes, string, vector <double>, vector <double>);
+	void plotBuffered(CurveTypes);
+	void clearBuffer();
 };
 
 #endif /* GNUPLOT_H_ */

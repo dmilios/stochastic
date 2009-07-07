@@ -42,10 +42,11 @@ const char * Uniform::getName()
 	alpha_s << this->alpha;
 	beta_s << this->beta;
 
-	std::string name("uni_a");
+	std::string name("U(");
 	name.append(alpha_s.str());
-	name.append("_b");
+	name.append(",");
 	name.append(beta_s.str());
+	name.append(")");
 	return name.c_str();
 }
 
