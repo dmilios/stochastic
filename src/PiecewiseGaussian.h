@@ -18,13 +18,10 @@ class PiecewiseGaussian : public stochastic::PiecewiseBase
 {
 public:
 	PiecewiseGaussian();
-	PiecewiseGaussian(const char *);
 	PiecewiseGaussian(Distribution *);
 	virtual ~PiecewiseGaussian();
 
-	PiecewiseBase * fit(std::vector <double>);
 	PiecewiseBase * fit(Distribution *);
-
 	const char * getName();
 };
 

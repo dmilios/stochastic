@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 {
 	using namespace stochastic;
 	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
@@ -51,15 +51,15 @@ int main(int argc, char *argv[])
 //	w.push_back(1);
 //	MixtureModel m(c, w);
 
-	RandomVariable r1 = new Exponential;
-	RandomVariable r2 = new Uniform;
-	RandomVariable r3 = r1 + r2;
+	RandomVariable r1 = new Gaussian(9);
+	RandomVariable r2 = new Gaussian;
+	RandomVariable r3 = r1 / r2;
 
 	RandomVariable r4;
-//	r4 = MonteCarloOperations::max(r1, r2);
+//	r4 = MonteCarloOperations::ratio(r1, r2);
 
-	plot.addRV(r1);
-	plot.addRV(r2);
+//	plot.addRV(r1);
+//	plot.addRV(r2);
 	plot.addRV(r3);
 //	plot.addRV(r4);
 

@@ -13,17 +13,6 @@ PiecewiseUniform::PiecewiseUniform()
 {
 }
 
-PiecewiseUniform::PiecewiseUniform(const char * fileName)
-{
-	std::vector <double> data;
-	data = parser.parseDataFile(fileName);
-
-	PiecewiseUniform temp = * (PiecewiseUniform *)fit(data);
-	this->weights = temp.weights;
-	this->components = temp.components;
-	this->cumulativeWeights = temp.cumulativeWeights;
-}
-
 PiecewiseUniform::PiecewiseUniform(Distribution * distribution)
 {
 	if (!distribution)
@@ -42,11 +31,6 @@ PiecewiseUniform::~PiecewiseUniform()
 const char * PiecewiseUniform::getName()
 {
 	return "pUni";
-}
-
-PiecewiseBase * PiecewiseUniform::fit(std::vector <double> data)
-{
-	return 0;
 }
 
 PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)

@@ -18,17 +18,14 @@ class PiecewiseUniform : public stochastic::PiecewiseBase
 {
 public:
 	PiecewiseUniform();
-	PiecewiseUniform(const char *);
 	PiecewiseUniform(Distribution *);
 	virtual ~PiecewiseUniform();
 
-	PiecewiseBase * fit(std::vector <double>);
 	PiecewiseBase * fit(Distribution *);
+	const char * getName();
 
 	// NOTE: alternative fit using quantile
 	PiecewiseBase * fit2(Distribution * distribution);
-
-	const char * getName();
 };
 
 } // namespace stochastic

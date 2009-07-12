@@ -13,6 +13,7 @@
 #include <sstream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 namespace stochastic {
 
@@ -121,11 +122,15 @@ MixtureComponent * Uniform::product(PiecewiseComponent * rightarg)
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
+	double lmargin2 = rightarg->getLeftMargin();
+	double rmargin2 = rightarg->getRightMargin();
+
 	std::vector<double> margins;
-	margins.push_back(alpha * rightarg->getLeftMargin());
-	margins.push_back(alpha * rightarg->getRightMargin());
-	margins.push_back(beta * rightarg->getLeftMargin());
-	margins.push_back(beta * rightarg->getRightMargin());
+	margins.push_back(alpha * lmargin2);
+	margins.push_back(alpha * rmargin2);
+	margins.push_back(beta * lmargin2);
+	margins.push_back(beta * rmargin2);
+
 	std::vector<double>::iterator a = std::min_element(
 									margins.begin(), margins.end());
 	std::vector<double>::iterator b = std::max_element(
@@ -140,11 +145,20 @@ MixtureComponent * Uniform::ratio(PiecewiseComponent * rightarg)
 	if (typeid(* this) != typeid(* rightarg))
 		throw stochastic::IncompatibleComponentsException();
 
+	double lmargin2 = rightarg->getLeftMargin();
+	double rmargin2 = rightarg->getRightMargin();
+
+	if (std::abs(lmargin2) < 0.001)
+		return 0;
+	if (std::abs(rmargin2) < 0.001)
+		return 0;
+
 	std::vector<double> margins;
-	margins.push_back(alpha / rightarg->getLeftMargin());
-	margins.push_back(alpha / rightarg->getRightMargin());
-	margins.push_back(beta / rightarg->getLeftMargin());
-	margins.push_back(beta / rightarg->getRightMargin());
+	margins.push_back(alpha / lmargin2);
+	margins.push_back(alpha / rmargin2);
+	margins.push_back(beta / lmargin2);
+	margins.push_back(beta / rmargin2);
+
 	std::vector<double>::iterator a = std::min_element(
 									margins.begin(), margins.end());
 	std::vector<double>::iterator b = std::max_element(

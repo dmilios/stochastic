@@ -31,7 +31,6 @@ protected:
 	static int fixedNumberOfComponents;
 
 public:
-	virtual PiecewiseBase * fit(std::vector <double>) = 0;
 	virtual PiecewiseBase * fit(Distribution *) = 0;
 
 	virtual const char * getName() = 0;

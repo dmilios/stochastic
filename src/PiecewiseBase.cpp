@@ -115,8 +115,12 @@ MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
 			right = (PiecewiseComponent *)arg->components[j];
 			currentResult = (MixtureComponent *)left->ratio(right);
 
-			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+			// discard null results
+			if (currentResult)
+			{
+				resultComponents.push_back(currentResult);
+				resultWeights.push_back(this->weights[i] * arg->weights[j]);
+			}
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
