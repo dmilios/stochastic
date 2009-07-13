@@ -15,8 +15,6 @@
 
 namespace stochastic {
 
-FileParser PiecewiseBase::parser;
-
 int PiecewiseBase::fixedNumberOfComponents = 10;
 
 // Static Method: sets the wanted number of components
@@ -33,15 +31,15 @@ MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->sum(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = sumOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
@@ -57,15 +55,15 @@ MixtureModel * PiecewiseBase::difference(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->difference(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = differenceOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
@@ -81,15 +79,15 @@ MixtureModel * PiecewiseBase::product(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->product(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = productOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
@@ -105,15 +103,15 @@ MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->ratio(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = ratioOfComponents(left, right);
 
 			// discard null results
 			if (currentResult)
@@ -133,15 +131,15 @@ MixtureModel *PiecewiseBase:: min(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->min(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = minOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);
@@ -157,15 +155,15 @@ MixtureModel * PiecewiseBase::max(PiecewiseBase * arg)
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
-	PiecewiseComponent * left;
-	PiecewiseComponent * right;
+	MixtureComponent * left;
+	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
-			left = (PiecewiseComponent *)this->components[i];
-			right = (PiecewiseComponent *)arg->components[j];
-			currentResult = (MixtureComponent *)left->max(right);
+			left = this->components[i];
+			right = arg->components[j];
+			currentResult = maxOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
 			resultWeights.push_back(this->weights[i] * arg->weights[j]);

@@ -26,7 +26,18 @@ Uniform::Uniform()
 Uniform::Uniform(double alpha, double beta)
 {
 	if (alpha >= beta)
-		throw InvalidParametersException();
+	{
+		std::stringstream alpha_s;
+		std::stringstream beta_s;
+		alpha_s << alpha;
+		beta_s << beta;
+		std::string message = "alpha = ";
+		message.append(alpha_s.str());
+		message.append(", beta = ");
+		message.append(beta_s.str());
+		message.append(" : alpha >= beta in a Uniform");
+		throw InvalidParametersException(message);
+	}
 
 	this->alpha = alpha;
 	this->beta = beta;
@@ -84,117 +95,6 @@ double Uniform::getRightMargin()
 double Uniform::nextSample()
 {
 	return generator.nextDouble(alpha, beta);
-}
-
-/*
- *
- * --- Implement Binary Operators: '+', '-', '*', '/'
- * --- for Uniform Approximation Component
- */
-
-MixtureComponent * Uniform::sum(PiecewiseComponent * rightarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double a = this->alpha + rightarg->getLeftMargin();
-	double b = this->beta + rightarg->getRightMargin();
-	result = new Uniform(a, b);
-	return result;
-}
-
-MixtureComponent * Uniform::difference(PiecewiseComponent * rightarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double a = this->alpha - rightarg->getRightMargin();
-	double b = this->beta - rightarg->getLeftMargin();
-	result = new Uniform(a, b);
-	return result;
-}
-
-MixtureComponent * Uniform::product(PiecewiseComponent * rightarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double lmargin2 = rightarg->getLeftMargin();
-	double rmargin2 = rightarg->getRightMargin();
-
-	std::vector<double> margins;
-	margins.push_back(alpha * lmargin2);
-	margins.push_back(alpha * rmargin2);
-	margins.push_back(beta * lmargin2);
-	margins.push_back(beta * rmargin2);
-
-	std::vector<double>::iterator a = std::min_element(
-									margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-									margins.begin(), margins.end());
-	result = new Uniform(* a, * b);
-	return result;
-}
-
-MixtureComponent * Uniform::ratio(PiecewiseComponent * rightarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* rightarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double lmargin2 = rightarg->getLeftMargin();
-	double rmargin2 = rightarg->getRightMargin();
-
-	if (std::abs(lmargin2) < 0.001)
-		return 0;
-	if (std::abs(rmargin2) < 0.001)
-		return 0;
-
-	std::vector<double> margins;
-	margins.push_back(alpha / lmargin2);
-	margins.push_back(alpha / rmargin2);
-	margins.push_back(beta / lmargin2);
-	margins.push_back(beta / rmargin2);
-
-	std::vector<double>::iterator a = std::min_element(
-									margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-									margins.begin(), margins.end());
-	result = new Uniform(* a, * b);
-	return result;
-}
-
-/*
- *
- * --- Implement Binary Operators: min, max
- * --- for Uniform Approximation Component
- */
-
-MixtureComponent * Uniform::min(PiecewiseComponent * secondarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double a = std::min<double>(alpha, secondarg->getLeftMargin());
-	double b = std::min<double>(beta, secondarg->getRightMargin());
-	result = new Uniform(a, b);
-	return result;
-}
-
-MixtureComponent * Uniform::max(PiecewiseComponent * secondarg)
-{
-	MixtureComponent * result;
-	if (typeid(* this) != typeid(* secondarg))
-		throw stochastic::IncompatibleComponentsException();
-
-	double a = std::max<double>(alpha, secondarg->getLeftMargin());
-	double b = std::max<double>(beta, secondarg->getRightMargin());
-	result = new Uniform(a, b);
-	return result;
 }
 
 } // namespace stochastic

@@ -9,6 +9,8 @@
 #define EXCEPTIONS_H_
 
 #include <iostream> // for std::exception
+#include <string>
+
 namespace stochastic {
 
 class IncompatibleComponentsException : public std::exception
@@ -23,6 +25,15 @@ public:
 class InvalidParametersException : public std::exception
 {
 public:
+	InvalidParametersException()
+	{
+	}
+
+	InvalidParametersException(std::string message)
+	{
+		std::cerr << message.c_str() << std::endl;
+	}
+
 	virtual const char *what() const throw()
 	{
 		return "InvalidParametersException";

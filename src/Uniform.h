@@ -8,12 +8,11 @@
 #ifndef UNIFORM_H_
 #define UNIFORM_H_
 
-#include "Distribution.h"
-#include "PiecewiseComponent.h"
+#include "MixtureComponent.h"
 
 namespace stochastic {
 
-class Uniform : public stochastic::PiecewiseComponent
+class Uniform : public stochastic::MixtureComponent
 {
 private:
 	double alpha;
@@ -31,14 +30,6 @@ public:
 	double nextSample();
 	double getLeftMargin();
 	double getRightMargin();
-
-	// overload virtual methods of PiecewiseComponent
-	MixtureComponent * sum(PiecewiseComponent *);
-	MixtureComponent * difference(PiecewiseComponent *);
-	MixtureComponent * product(PiecewiseComponent *);
-	MixtureComponent * ratio(PiecewiseComponent *);
-	MixtureComponent * min(PiecewiseComponent *);
-	MixtureComponent * max(PiecewiseComponent *);
 };
 
 } // namespace stochastic

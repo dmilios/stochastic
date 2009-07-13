@@ -8,12 +8,11 @@
 #ifndef GAUSSIAN_H_
 #define GAUSSIAN_H_
 
-#include "Distribution.h"
-#include "PiecewiseComponent.h"
+#include "MixtureComponent.h"
 
 namespace stochastic {
 
-class Gaussian : public stochastic::PiecewiseComponent
+class Gaussian : public stochastic::MixtureComponent
 {
 private:
 	double mean;
@@ -26,6 +25,9 @@ public:
 	Gaussian(double, double);
 	virtual ~Gaussian();
 
+	double getMean();
+	double getVariance();
+
 	// overload virtual methods of Distribution
 	const char * getName();
 	double pdf(double);
@@ -33,14 +35,6 @@ public:
 	double nextSample();
 	double getLeftMargin();
 	double getRightMargin();
-
-	// overload virtual methods of PiecewiseComponent
-	MixtureComponent * sum(PiecewiseComponent *);
-	MixtureComponent * difference(PiecewiseComponent *);
-	MixtureComponent * product(PiecewiseComponent *);
-	MixtureComponent * ratio(PiecewiseComponent *);
-	MixtureComponent * min(PiecewiseComponent *);
-	MixtureComponent * max(PiecewiseComponent *);
 };
 
 } // namespace stochastic

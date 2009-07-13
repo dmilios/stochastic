@@ -16,6 +16,17 @@ namespace stochastic {
 
 class PiecewiseUniform : public stochastic::PiecewiseBase
 {
+private:
+	MixtureComponent * sumOfComponents(MixtureComponent *, MixtureComponent *);
+	MixtureComponent * differenceOfComponents(MixtureComponent *,
+			MixtureComponent *);
+	MixtureComponent * productOfComponents(MixtureComponent *,
+			MixtureComponent *);
+	MixtureComponent * ratioOfComponents(MixtureComponent *,
+			MixtureComponent *);
+	MixtureComponent * minOfComponents(MixtureComponent *, MixtureComponent *);
+	MixtureComponent * maxOfComponents(MixtureComponent *, MixtureComponent *);
+
 public:
 	PiecewiseUniform();
 	PiecewiseUniform(Distribution *);

@@ -10,7 +10,6 @@
 
 #include "Distribution.h"
 #include "MixtureModel.h"
-#include "PiecewiseComponent.h"
 #include "FileParser.h"
 #include <vector>
 
@@ -27,24 +26,35 @@ namespace stochastic {
 class PiecewiseBase : public stochastic::MixtureModel
 {
 protected:
-	static FileParser parser;
 	static int fixedNumberOfComponents;
+
+	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
+	virtual MixtureComponent * differenceOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
+	virtual MixtureComponent * productOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
+	virtual MixtureComponent * ratioOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
+	virtual MixtureComponent * minOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
+	virtual MixtureComponent * maxOfComponents(MixtureComponent *,
+			MixtureComponent *) = 0;
 
 public:
 	virtual PiecewiseBase * fit(Distribution *) = 0;
-
 	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents
-    static void setFixedNumberOfComponents(int);
+	static void setFixedNumberOfComponents(int);
 
-    MixtureModel * sum(PiecewiseBase *);
-    MixtureModel * difference(PiecewiseBase *);
-    MixtureModel * product(PiecewiseBase *);
-    MixtureModel * ratio(PiecewiseBase *);
+	MixtureModel * sum(PiecewiseBase *);
+	MixtureModel * difference(PiecewiseBase *);
+	MixtureModel * product(PiecewiseBase *);
+	MixtureModel * ratio(PiecewiseBase *);
 
-    MixtureModel * min(PiecewiseBase *);
-    MixtureModel * max(PiecewiseBase *);
+	MixtureModel * min(PiecewiseBase *);
+	MixtureModel * max(PiecewiseBase *);
 };
 
 } // namespace stochastic
