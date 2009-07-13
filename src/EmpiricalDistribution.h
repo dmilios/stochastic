@@ -11,6 +11,7 @@
 #include "Distribution.h"
 #include <string>
 #include <vector>
+#include <fstream>
 
 namespace stochastic {
 

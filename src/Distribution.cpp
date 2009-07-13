@@ -29,7 +29,10 @@ Distribution::~Distribution()
 double Distribution::quantile(double p)
 {
 	if (p > 1 || p < 0)
-		throw InvalidParametersException();
+	{
+		std::string message = "Input out of domain of quantile function";
+		throw InvalidParametersException(message);
+	}
 	if (p < 1e-4)
 		return this->getLeftMargin();
 	if (p > 1 - 1e-4)

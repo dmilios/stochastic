@@ -9,6 +9,7 @@
 
 #include "FileParser.h"
 #include <algorithm>
+#include <cmath>
 
 namespace stochastic {
 
@@ -70,9 +71,20 @@ double EmpiricalDistribution::pdf(double x)
 	if (x < getLeftMargin() || x > getRightMargin())
 		return 0;
 
-	int accuracy = 100;
-	double dx = (getRightMargin() - getLeftMargin()) / accuracy;
-	return (cdf(x + dx) - cdf(x)) / dx;
+
+//	int accuracy = 100;
+//	double dx = (getRightMargin() - getLeftMargin()) / accuracy;
+//	return (cdf(x + dx) - cdf(x)) / dx;
+
+
+	double h = 0.1;
+	unsigned int n = this->data.size();
+
+	double sum = 0;
+	unsigned int i;
+	for (i = 0; i < n; i++)
+		sum += (1 / sqrt(2 * 3.14)) * exp(-pow(x - data[i], 2) / (2 * pow(h, 2)));
+	return sum / (n * h);
 }
 
 double EmpiricalDistribution::cdf(double x)
@@ -86,11 +98,37 @@ double EmpiricalDistribution::cdf(double x)
 
 double EmpiricalDistribution::getLeftMargin()
 {
+	static int * buffer = 0;
+	if (buffer)
+		return data[* buffer];
+
+	// discard the first 1%
+	unsigned int i = 0;
+	for (i = 0; i < data.size(); i++)
+		if (cdf(data[i]) > 0.01)
+		{
+			buffer = new int;
+			* buffer = i;
+			return data[i];
+		}
 	return data[0]; // data is sorted in ascending order
 }
 
 double EmpiricalDistribution::getRightMargin()
 {
+	static int * buffer = 0;
+	if (buffer)
+		return data[* buffer];
+
+	// discard the last 1%
+	unsigned int i = 0;
+	for (i = data.size() - 1; i > 0; i--)
+		if (cdf(data[i]) < 0.99)
+		{
+			buffer = new int;
+			* buffer = i;
+			return data[i];
+		}
 	return data[data.size() - 1]; // data is sorted in ascending order
 }
 

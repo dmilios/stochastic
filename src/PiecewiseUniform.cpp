@@ -79,7 +79,7 @@ PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 // alternative fit using quantile
 PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
 {
-	PiecewiseUniform * result;
+	PiecewiseUniform * result = new PiecewiseUniform;
 
 	MixtureComponent * component;
 	double weight;

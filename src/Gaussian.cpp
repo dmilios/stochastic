@@ -33,7 +33,14 @@ Gaussian::Gaussian(double mean)
 Gaussian::Gaussian(double mean, double variance)
 {
 	if (variance <= 0)
-		throw InvalidParametersException();
+	{
+		std::stringstream var_s;
+		var_s << variance;
+		std::string message = "variance = ";
+		message.append(var_s.str());
+		message.append(" : variance <= 0 in a Gaussian");
+		throw InvalidParametersException(message);
+	}
 
 	this->mean = mean;
 	this->variance = variance;

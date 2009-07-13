@@ -150,6 +150,11 @@ MixtureComponent * PiecewiseGaussian::ratioOfComponents(
 	margins.push_back(b1 / a2);
 	margins.push_back(b1 / b2);
 
+	if (std::abs(a2) < 0.001)
+		return 0;
+	if (std::abs(b2) < 0.001)
+		return 0;
+
 	std::vector<double>::iterator a = std::min_element(
 			margins.begin(), margins.end());
 	std::vector<double>::iterator b = std::max_element(

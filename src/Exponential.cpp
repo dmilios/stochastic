@@ -22,7 +22,14 @@ Exponential::Exponential()
 Exponential::Exponential(double lambda)
 {
 	if (lambda <= 0)
-		throw InvalidParametersException();
+	{
+		std::stringstream lambda_s;
+		lambda_s << lambda;
+		std::string message = "lambda = ";
+		message.append(lambda_s.str());
+		message.append(" : lambda <= 0 in a Exponential");
+		throw InvalidParametersException(message);
+	}
 	this->lambda = lambda;
 }
 
