@@ -234,23 +234,47 @@ MixtureComponent * PiecewiseGaussian::maxOfComponents(
  * */
 
 MixtureComponent * PiecewiseGaussian::sumOfComponents(
-		MixtureComponent * dist_arg, double c_arg)
+		MixtureComponent * distr_arg, double c_arg)
 {
+	double m = ((Gaussian *) distr_arg)->getMean();
+	double var = ((Gaussian *) distr_arg)->getVariance();
+	return new Gaussian(m + c_arg, var);
 }
 
 MixtureComponent * PiecewiseGaussian::differenceOfComponents(double c_arg,
-		MixtureComponent * dist_arg)
+		MixtureComponent * distr_arg)
 {
+	double m = ((Gaussian *) distr_arg)->getMean();
+	double var = ((Gaussian *) distr_arg)->getVariance();
+	return new Gaussian(c_arg - m, var);
 }
 
 MixtureComponent * PiecewiseGaussian::productOfComponents(
-		MixtureComponent * dist_arg, double c_arg)
+		MixtureComponent * distr_arg, double c_arg)
 {
+	double m = ((Gaussian *) distr_arg)->getMean();
+	double var = ((Gaussian *) distr_arg)->getVariance();
+	return new Gaussian(m * c_arg, var * pow(c_arg, 2));
 }
 
 MixtureComponent * PiecewiseGaussian::ratioOfComponents(double c_arg,
-		MixtureComponent * dist_arg)
+		MixtureComponent * distr_arg)
 {
+	double a = distr_arg->getLeftMargin();
+	double b = distr_arg->getRightMargin();
+
+	if (std::abs(a) < 0.001)
+		return 0;
+	if (std::abs(b) < 0.001)
+		return 0;
+
+	a = c_arg / a;
+	b = c_arg / b;
+	double lmargin = std::min<double>(a,b);
+	double rmargin = std::max<double>(a,b);
+	double var = pow((rmargin - lmargin) / 8, 2);
+	double m = (lmargin + rmargin) / 2;
+	return new Gaussian(m, var);
 }
 
 MixtureComponent * PiecewiseGaussian::minOfComponents(

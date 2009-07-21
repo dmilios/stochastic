@@ -332,6 +332,9 @@ RandomVariable operator -(double c_arg, RandomVariable rv_arg)
 
 RandomVariable RandomVariable::operator *(double c_arg)
 {
+	if (!c_arg)
+		return RandomVariable();
+
 	PiecewiseBase * leftDistribution;
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->fit(this->distribution);
@@ -350,6 +353,9 @@ RandomVariable operator *(double c_arg, RandomVariable rv_arg)
 
 RandomVariable RandomVariable::operator /(double c_arg)
 {
+	if (!c_arg)
+		return RandomVariable();
+
 	PiecewiseBase * leftDistribution;
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->fit(this->distribution);
@@ -364,6 +370,9 @@ RandomVariable RandomVariable::operator /(double c_arg)
 
 RandomVariable operator /(double c_arg, RandomVariable rv_arg)
 {
+	if (!c_arg)
+		return RandomVariable();
+
 	PiecewiseBase * distr_arg;
 	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
 		distr_arg = rv_arg.approximator->fit(rv_arg.distribution);

@@ -236,8 +236,15 @@ MixtureComponent * PiecewiseUniform::productOfComponents(
 MixtureComponent * PiecewiseUniform::ratioOfComponents(double c_arg,
 		MixtureComponent * distr_arg)
 {
-	double a = c_arg / distr_arg->getLeftMargin();
-	double b = c_arg / distr_arg->getRightMargin();
+	double a = distr_arg->getLeftMargin();
+	double b = distr_arg->getRightMargin();
+	if (std::abs(a) < 0.001)
+		return 0;
+	if (std::abs(b) < 0.001)
+		return 0;
+
+	a = c_arg / a;
+	b = c_arg / b;
 	return new Uniform(std::min<double>(a, b), std::max<double>(a, b));
 }
 

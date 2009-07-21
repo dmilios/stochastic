@@ -227,6 +227,7 @@ MixtureModel * PiecewiseBase::product(double c_arg)
 MixtureModel * PiecewiseBase::denominatorOf(double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;
+	std::vector<double> resultWeights;
 	int i;
 	MixtureComponent * distr_arg;
 	MixtureComponent * currentResult;
@@ -234,9 +235,14 @@ MixtureModel * PiecewiseBase::denominatorOf(double c_arg)
 	{
 		distr_arg = this->components[i];
 		currentResult = ratioOfComponents(c_arg, distr_arg);
-		resultComponents.push_back(currentResult);
+		// discard null results
+		if (currentResult)
+		{
+			resultComponents.push_back(currentResult);
+			resultWeights.push_back(this->weights[i]);
+		}
 	}
-	return new MixtureModel(resultComponents, this->weights);
+	return new MixtureModel(resultComponents, resultWeights);
 }
 
 MixtureModel * PiecewiseBase::min(double c_arg)
