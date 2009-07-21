@@ -38,8 +38,48 @@ const char * PiecewiseGaussian::getName()
 	return "pNorm";
 }
 
+// FIXME: possibly discard this
+// seems more reasonable to use 68% rule, when (initially) gaussians are not overlapping
+PiecewiseBase * PiecewiseGaussian::experiment(Distribution * distribution)
+{
+	PiecewiseGaussian * result = new PiecewiseGaussian;
+
+	MixtureComponent * component;
+	double weight;
+	double start = distribution->getLeftMargin();
+	double end = distribution->getRightMargin();
+	double support = end - start;
+	double step = support / (double) fixedNumberOfComponents;
+	int i;
+
+	double stadardDeviation = support / (8 * fixedNumberOfComponents);
+	double range = 4 * stadardDeviation;
+	double x = start + range;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
+		double pdf_c = distribution->pdf(x) / weight;
+		double var = 1 / (2 * 3.14 * pow(pdf_c, 2));
+		if (weight)
+		{
+			component = new Gaussian(x, var * 1.4);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
+		}
+		x += step;
+	}
+	result->cumulativeWeights = result->constructCumulativeWeights(result->weights);
+
+	return result;
+}
+
+
 PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 {
+	return experiment(distribution);
+
+
+
 	PiecewiseGaussian * result = new PiecewiseGaussian;
 
 	MixtureComponent * component;
@@ -183,6 +223,44 @@ MixtureComponent * PiecewiseGaussian::maxOfComponents(
 	double var = pow((b - a) / 8, 2);
 	double m = (a + b) / 2;
 	return new Gaussian(m, var);
+}
+
+
+/*
+ *
+ *
+ * for functions of ONE random variable
+ *
+ * */
+
+MixtureComponent * PiecewiseGaussian::sumOfComponents(
+		MixtureComponent * dist_arg, double c_arg)
+{
+}
+
+MixtureComponent * PiecewiseGaussian::differenceOfComponents(double c_arg,
+		MixtureComponent * dist_arg)
+{
+}
+
+MixtureComponent * PiecewiseGaussian::productOfComponents(
+		MixtureComponent * dist_arg, double c_arg)
+{
+}
+
+MixtureComponent * PiecewiseGaussian::ratioOfComponents(double c_arg,
+		MixtureComponent * dist_arg)
+{
+}
+
+MixtureComponent * PiecewiseGaussian::minOfComponents(
+		MixtureComponent * dist_arg, double c_arg)
+{
+}
+
+MixtureComponent * PiecewiseGaussian::maxOfComponents(
+		MixtureComponent * dist_arg, double c_arg)
+{
 }
 
 } // namespace stochastic

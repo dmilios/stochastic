@@ -27,6 +27,14 @@ private:
 	MixtureComponent * minOfComponents(MixtureComponent *, MixtureComponent *);
 	MixtureComponent * maxOfComponents(MixtureComponent *, MixtureComponent *);
 
+	MixtureComponent * sumOfComponents(MixtureComponent *, double);
+	MixtureComponent * differenceOfComponents(double, MixtureComponent *);
+	MixtureComponent * productOfComponents(MixtureComponent *, double);
+	MixtureComponent * ratioOfComponents(double, MixtureComponent *);
+	MixtureComponent * minOfComponents(MixtureComponent *, double);
+	MixtureComponent * maxOfComponents(MixtureComponent *, double);
+
+
 public:
 	PiecewiseUniform();
 	PiecewiseUniform(Distribution *);

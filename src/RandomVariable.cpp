@@ -175,6 +175,12 @@ RandomVariable RandomVariable::operator -(RandomVariable rightarg)
 	return RandomVariable(result);
 }
 
+// Implementation of the negative sign for a RV
+RandomVariable operator -(RandomVariable rv_arg)
+{
+	return rv_arg * (-1);
+}
+
 RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 {
 	if (!distribution || !rightarg.distribution)
@@ -266,6 +272,141 @@ RandomVariable RandomVariable::max(RandomVariable secondarg)
 	return RandomVariable(result);
 }
 
+
+/*
+ *
+ *
+ * Functions of ONE random variable
+ *
+ * */
+
+RandomVariable RandomVariable::operator +(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	Distribution * raw = leftDistribution->sum(c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable operator +(double c_arg, RandomVariable rv_arg)
+{
+	return rv_arg + c_arg;
+}
+
+RandomVariable RandomVariable::operator -(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	// just use the sum with negative sign
+	Distribution * raw = leftDistribution->sum(-c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable operator -(double c_arg, RandomVariable rv_arg)
+{
+	PiecewiseBase * distr_arg;
+	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
+		distr_arg = rv_arg.approximator->fit(rv_arg.distribution);
+	else
+		distr_arg = (PiecewiseBase *) rv_arg.distribution;
+
+	/* a change of sign for a RV would require:
+	   1. multiplication with '-1'
+	   2. sum with the 'c_arg'
+	   So, more efficient to implement
+		   the difference from constant directly */
+	Distribution * raw = distr_arg->differenceFrom(c_arg);
+	PiecewiseBase * result = rv_arg.approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable RandomVariable::operator *(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	Distribution * raw = leftDistribution->product(c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable operator *(double c_arg, RandomVariable rv_arg)
+{
+	return rv_arg * c_arg;
+}
+
+RandomVariable RandomVariable::operator /(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	// just multiply with the inverse
+	Distribution * raw = leftDistribution->product(1 / c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable operator /(double c_arg, RandomVariable rv_arg)
+{
+	PiecewiseBase * distr_arg;
+	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
+		distr_arg = rv_arg.approximator->fit(rv_arg.distribution);
+	else
+		distr_arg = (PiecewiseBase *) rv_arg.distribution;
+
+	/*
+	 * Need to implement this, so as to define the inverse
+	 * of a random variable
+	 * */
+	Distribution * raw = distr_arg->denominatorOf(c_arg);
+	PiecewiseBase * result = rv_arg.approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable RandomVariable::min(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	Distribution * raw = leftDistribution->min(c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+RandomVariable RandomVariable::max(double c_arg)
+{
+	PiecewiseBase * leftDistribution;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
+
+	Distribution * raw = leftDistribution->max(c_arg);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
+}
+
+
+
 // the very same implementation as in RandomVariable::min,
 // but this is called in a more intuitive way
 RandomVariable min(RandomVariable firstarg, RandomVariable secondarg)
@@ -278,6 +419,26 @@ RandomVariable min(RandomVariable firstarg, RandomVariable secondarg)
 RandomVariable max(RandomVariable firstarg, RandomVariable secondarg)
 {
 	return firstarg.max(secondarg);
+}
+
+RandomVariable min(RandomVariable rv_arg, double c_arg)
+{
+	return rv_arg.min(c_arg);
+}
+
+RandomVariable max(RandomVariable rv_arg, double c_arg)
+{
+	return rv_arg.max(c_arg);
+}
+
+RandomVariable min(double c_arg, RandomVariable rv_arg)
+{
+	return rv_arg.min(c_arg);
+}
+
+RandomVariable max(double c_arg, RandomVariable rv_arg)
+{
+	return rv_arg.max(c_arg);
 }
 
 } // namespace stochastic

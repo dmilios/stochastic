@@ -106,4 +106,139 @@ RandomVariable MonteCarloOperations::max(RandomVariable arg1,
 	return RandomVariable(new EmpiricalDistribution(produced_data));
 }
 
+/*
+ *
+ *
+ *
+ * Functions of ONE random variable
+ *
+ *
+ * */
+
+RandomVariable MonteCarloOperations::sum(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(c_arg + s[i]);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::difference(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(c_arg - s[i]);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::product(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(c_arg * s[i]);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::ratio(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+	{
+		if (!s[i])
+			s[i] = 0.0000001;
+		produced_data.push_back(c_arg / s[i]);
+	}
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::min(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(std::min<double>(c_arg, s[i]));
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::max(double c_arg, RandomVariable rv_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(std::max<double>(c_arg, s[i]));
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::sum(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(c_arg + s[i]);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::difference(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(s[i] - c_arg);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::product(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(c_arg * s[i]);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::ratio(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	if (!c_arg)
+		c_arg = 0.0000001;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(s[i] / c_arg);
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::min(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(std::min<double>(c_arg, s[i]));
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
+RandomVariable MonteCarloOperations::max(RandomVariable rv_arg, double c_arg)
+{
+	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamples);
+	int i;
+	std::vector<double> produced_data;
+	for (i = 0; i < numberOfSamples; i++)
+		produced_data.push_back(std::max<double>(c_arg, s[i]));
+	return RandomVariable(new EmpiricalDistribution(produced_data));
+}
+
 } // namespace stochastic

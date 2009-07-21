@@ -98,36 +98,36 @@ double EmpiricalDistribution::cdf(double x)
 
 double EmpiricalDistribution::getLeftMargin()
 {
-	static int * buffer = 0;
-	if (buffer)
-		return data[* buffer];
+	static double * cachedMargin = 0;
+	if (cachedMargin)
+		return * cachedMargin;
 
-	// discard the first 1%
+	// discard the first 0.1%
 	unsigned int i = 0;
 	for (i = 0; i < data.size(); i++)
-		if (cdf(data[i]) > 0.01)
+		if (cdf(data[i]) > 0.001)
 		{
-			buffer = new int;
-			* buffer = i;
-			return data[i];
+			cachedMargin = new double;
+			* cachedMargin = data[i];
+			return * cachedMargin;
 		}
 	return data[0]; // data is sorted in ascending order
 }
 
 double EmpiricalDistribution::getRightMargin()
 {
-	static int * buffer = 0;
-	if (buffer)
-		return data[* buffer];
+	static double * cachedMargin = 0;
+	if (cachedMargin)
+		return * cachedMargin;
 
-	// discard the last 1%
+	// discard the last 0.1%
 	unsigned int i = 0;
 	for (i = data.size() - 1; i > 0; i--)
-		if (cdf(data[i]) < 0.99)
+		if (cdf(data[i]) < 0.999)
 		{
-			buffer = new int;
-			* buffer = i;
-			return data[i];
+			cachedMargin = new double;
+			* cachedMargin = data[i];
+			return * cachedMargin;
 		}
 	return data[data.size() - 1]; // data is sorted in ascending order
 }

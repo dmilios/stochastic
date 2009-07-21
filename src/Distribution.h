@@ -31,9 +31,6 @@ public:
 	virtual double nextSample() = 0;
 
 	double quantile(double);
-	double kolmogorovDistance(Distribution *);
-	double KL_Divergence(Distribution *);
-	double hellingerDistance(Distribution *);
 	std::vector <double> sample(int);
 };
 

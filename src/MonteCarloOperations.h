@@ -27,6 +27,22 @@ public:
 
 	static RandomVariable min(RandomVariable, RandomVariable);
 	static RandomVariable max(RandomVariable, RandomVariable);
+
+
+	static RandomVariable sum(double, RandomVariable);
+	static RandomVariable difference(double, RandomVariable);
+	static RandomVariable product(double, RandomVariable);
+	static RandomVariable ratio(double, RandomVariable);
+	static RandomVariable min(double, RandomVariable);
+	static RandomVariable max(double, RandomVariable);
+	static RandomVariable sum(RandomVariable, double);
+	static RandomVariable difference(RandomVariable, double);
+	static RandomVariable product(RandomVariable, double);
+	static RandomVariable ratio(RandomVariable, double);
+	static RandomVariable min(RandomVariable, double);
+	static RandomVariable max(RandomVariable, double);
+
+
 };
 
 } // namespace stochastic

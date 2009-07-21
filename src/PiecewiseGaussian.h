@@ -27,6 +27,15 @@ private:
 	MixtureComponent * minOfComponents(MixtureComponent *, MixtureComponent *);
 	MixtureComponent * maxOfComponents(MixtureComponent *, MixtureComponent *);
 
+
+	MixtureComponent * sumOfComponents(MixtureComponent *, double);
+	MixtureComponent * differenceOfComponents(double, MixtureComponent *);
+	MixtureComponent * productOfComponents(MixtureComponent *, double);
+	MixtureComponent * ratioOfComponents(double, MixtureComponent *);
+	MixtureComponent * minOfComponents(MixtureComponent *, double);
+	MixtureComponent * maxOfComponents(MixtureComponent *, double);
+
+
 public:
 	PiecewiseGaussian();
 	PiecewiseGaussian(Distribution *);
@@ -34,6 +43,8 @@ public:
 
 	PiecewiseBase * fit(Distribution *);
 	const char * getName();
+
+	PiecewiseBase * experiment(Distribution *);
 };
 
 } // namespace stochastic
