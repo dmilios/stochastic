@@ -112,13 +112,10 @@ PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
 		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
-		if (weight)
-		{
-			double var = pow(range, 2);
-			component = new Gaussian(x, var);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
-		}
+		double var = pow(range, 2);
+		component = new Gaussian(x, var);
+		result->components.push_back(component);
+		result->weights.push_back(weight);
 		x += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);

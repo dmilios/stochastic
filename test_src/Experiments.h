@@ -10,16 +10,23 @@
 
 #include "../src/stochastic.h"
 
-namespace stochastic {
+using namespace stochastic;
 
 class Experiments
 {
-public:
+private:
 	static double kolmogorovDistance(Distribution *, Distribution *);
 	static double KL_Divergence(Distribution *, Distribution *);
 	static double hellingerDistance(Distribution *, Distribution *);
-};
 
-} // namespace stochastic
+public:
+	static void current();
+	static void comparePUwithMC();
+	static void computationsPU();
+
+	static void sumOfUniforms();
+	static void minmaxOfUniforms();
+	static void minmaxOfGaussians();
+};
 
 #endif /* EXPERIMENTS_H_ */

@@ -19,7 +19,7 @@ MixtureModel::MixtureModel(std::vector<MixtureComponent *> components,
 	if (components.size() <= 0)
 		throw UndefinedDistributionException();
 	if (components.size() != weights.size())
-		throw InvalidWeightsException();
+		throw InvalidWeightsException("\nComponent with no weight assigned");
 
 	this->components = components;
 	this->weights = weights;
@@ -40,7 +40,14 @@ std::vector<double> MixtureModel::constructCumulativeWeights(
 	for (i = 0; i < w.size(); i++)
 	{
 		if (w[i] < 0)
-			throw InvalidWeightsException();
+		{
+			std::stringstream weight_s;
+			weight_s << w[i];
+			std::string message = "weight = ";
+			message.append(weight_s.str());
+			message.append(" : Negative weight");
+			throw InvalidWeightsException(message);
+		}
 
 		sum += w[i];
 	}

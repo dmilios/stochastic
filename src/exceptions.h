@@ -66,6 +66,11 @@ public:
 class InvalidWeightsException : public std::exception
 {
 public:
+	InvalidWeightsException(std::string message)
+	{
+		std::cerr << message.c_str() << std::endl;
+	}
+
 	virtual const char *what() const throw()
 	{
 		return "InvalidWeightsException";

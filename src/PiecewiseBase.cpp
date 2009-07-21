@@ -30,12 +30,12 @@ MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
 
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
-	int i, j;
+	unsigned int i, j;
 	MixtureComponent * left;
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
+	for (i = 0; i < this->components.size(); i++)
+		for (j = 0; j < arg->components.size(); j++)
 		{
 			left = this->components[i];
 			right = arg->components[j];

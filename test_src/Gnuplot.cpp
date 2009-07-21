@@ -110,7 +110,8 @@ void Gnuplot::plotBuffered(CurveTypes type)
 	fflush(stdout);
 	getchar();
 
-	fputs("exit \n", gnuplot);
+	fprintf(gnuplot, "exit\n");
+	fflush(stdout);
 	pclose(gnuplot);
 }
 

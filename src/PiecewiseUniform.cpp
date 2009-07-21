@@ -64,12 +64,9 @@ PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
 		weight = distribution->cdf(x + step) - distribution->cdf(x);
-		if (weight)
-		{
-			component = new Uniform(x, x + step);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
-		}
+		component = new Uniform(x, x + step);
+		result->components.push_back(component);
+		result->weights.push_back(weight);
 		x += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);

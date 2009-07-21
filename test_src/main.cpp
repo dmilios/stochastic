@@ -15,7 +15,6 @@
 // load "stochastic" library
 #include "../src/stochastic.h"
 
-#include "Gnuplot.h"
 #include "Experiments.h"
 #include <cstdio>
 #include <iostream>
@@ -32,45 +31,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	using namespace stochastic;
-	MonteCarloOperations::setNumberOfSamples(10000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
-	Gnuplot::setAccuracy(1000);
-
-	Gnuplot plot;
-
-//	Gaussian g, g1(1);
-//	Uniform u(-4, 4);
-//	Exponential e;
-//	EmpiricalDistribution emp("pLin.txt");
-
-//	std::vector <MixtureComponent *> c;
-//	std::vector <double> w;
-//	c.push_back(new Gaussian(0, 1));
-//	w.push_back(1);
-//	c.push_back(new Gaussian(4, 2));
-//	w.push_back(1);
-//	MixtureModel m(c, w);
-
-	RandomVariable r1 = new Gaussian;
-	RandomVariable r2 = new Gaussian;
-//	RandomVariable r3 = 100 / r1;
-
-	RandomVariable r4;
-	r4 = MonteCarloOperations::min(1, r1);
-
-	plot.addRV(r1);
-//	plot.addRV(r2);
-//	plot.addRV(r3);
-	plot.addRV(r4);
-
-
-//	std::cout << Experiments::kolmogorovDistance(r1.getDistribution(), r2.getDistribution()) << "\n";
-
-	std::cout << "Time: " << clock() << "\n";
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
+	Experiments::computationsPU();
 
 	return printArguments(argc, argv);
 }
