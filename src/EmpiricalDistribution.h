@@ -20,7 +20,9 @@ class EmpiricalDistribution : public stochastic::Distribution
 private:
 	std::string name;
 	std::vector<double> data;
-	double maxProbability;  // helps to construct an envelope distribution
+
+	double * cacheLeftMargin;
+	double * cacheRightMargin;
 
 public:
 	EmpiricalDistribution(const char *);

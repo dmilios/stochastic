@@ -18,14 +18,34 @@ namespace stochastic {
 class RandomVariable
 {
 private:
-	Distribution * distribution;
+	static int monteCarloFlag;
+	static int numberOfSamplesMC;
 	static PiecewiseBase * approximator;
+
+	Distribution * distribution;
+
+
+	// Definitions of MonteCarlo versions of operators
+	static RandomVariable MC_sum(RandomVariable, RandomVariable);
+	static RandomVariable MC_difference(RandomVariable, RandomVariable);
+	static RandomVariable MC_product(RandomVariable, RandomVariable);
+	static RandomVariable MC_ratio(RandomVariable, RandomVariable);
+	static RandomVariable MC_min(RandomVariable, RandomVariable);
+	static RandomVariable MC_max(RandomVariable, RandomVariable);
+	static RandomVariable MC_sum(double, RandomVariable);
+	static RandomVariable MC_difference(double, RandomVariable);
+	static RandomVariable MC_product(double, RandomVariable);
+	static RandomVariable MC_ratio(double, RandomVariable);
+	static RandomVariable MC_min(double, RandomVariable);
+	static RandomVariable MC_max(double, RandomVariable);
 
 public:
 	RandomVariable();
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
 
+	static void setNumberOfSamplesMC(int);
+	static void setMonteCarloFlag(int);
 	static void setApproximatorType(PiecewiseBase *);
 
 	Distribution * getDistribution();

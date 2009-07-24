@@ -40,34 +40,32 @@ const char * PiecewiseUniform::getName()
 PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 {
 	PiecewiseUniform * result = new PiecewiseUniform;
-
 	MixtureComponent * component;
-	double weight;
-	double start = distribution->getLeftMargin();
-	double end = distribution->getRightMargin();
-	double support = end - start;
-	double step = support / (double) fixedNumberOfComponents;
-	int i;
-	double x = start;
 
-	// check for support so as to revise the step
+	std::vector<double> supportInterval_lmargins;
+	std::vector<double> supportInterval_rmargins;
+
+	// margin vectors are called by reference
+	double support = retrieveSupport(distribution, supportInterval_lmargins,
+			supportInterval_rmargins);
+	double step = support / (double) fixedNumberOfComponents;
+
+	int margin_counter = 0;
+	double x = supportInterval_lmargins[margin_counter];
+
+	double weight;
+	int i;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
 		weight = distribution->cdf(x + step) - distribution->cdf(x);
-		if (weight == 0)
-			support -= step;
-		x += step;
-	}
-	// revise the step
-	step = support / (double) fixedNumberOfComponents;
-	x = start;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		weight = distribution->cdf(x + step) - distribution->cdf(x);
+		if (weight < 0) // negative results are just close to zero
+			weight = 0;
 		component = new Uniform(x, x + step);
 		result->components.push_back(component);
 		result->weights.push_back(weight);
 		x += step;
+		if (x > supportInterval_rmargins[margin_counter])
+			x = supportInterval_lmargins[++margin_counter];
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);
 	return result;
@@ -91,15 +89,14 @@ PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
 			x_step = distribution->quantile(1);
 		else
 			x_step = distribution->quantile(p + step);
+
 		weight = distribution->cdf(x_step) - distribution->cdf(x);
-		if (weight)
-		{
-			component = new Uniform(x, x_step);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
-		}
-		else
-			printf("zero weight\n");
+		if (weight < 0) // negative results are just close to zero
+			weight = 0;
+
+		component = new Uniform(x, x_step);
+		result->components.push_back(component);
+		result->weights.push_back(1);
 		p += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);

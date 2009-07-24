@@ -16,18 +16,26 @@
 
 namespace stochastic {
 
-const double Gaussian::pi = 3.14159265;
-
 Gaussian::Gaussian()
 {
 	mean = 0;
 	variance = 1;
+
+	cache_varX2 = variance * 2;
+	cache_one_over_sqrt_var2PI = 1 / sqrt(PI * cache_varX2);
+	cache_leftMargin = mean - 4 * sqrt(variance);
+	cache_rightMargin = mean + 4 * sqrt(variance);
 }
 
 Gaussian::Gaussian(double mean)
 {
 	this->mean = mean;
 	variance = 1;
+
+	cache_varX2 = variance * 2;
+	cache_one_over_sqrt_var2PI = 1 / sqrt(PI * cache_varX2);
+	cache_leftMargin = mean - 4 * sqrt(variance);
+	cache_rightMargin = mean + 4 * sqrt(variance);
 }
 
 Gaussian::Gaussian(double mean, double variance)
@@ -44,6 +52,11 @@ Gaussian::Gaussian(double mean, double variance)
 
 	this->mean = mean;
 	this->variance = variance;
+
+	cache_varX2 = variance * 2;
+	cache_one_over_sqrt_var2PI = 1 / sqrt(PI * cache_varX2);
+	cache_leftMargin = mean - 4 * sqrt(variance);
+	cache_rightMargin = mean + 4 * sqrt(variance);
 }
 
 Gaussian::~Gaussian()
@@ -77,43 +90,34 @@ const char * Gaussian::getName()
 
 double Gaussian::pdf(double x)
 {
-	return (1 / sqrt(2 * pi * variance) * exp(-pow(x - mean, 2)
-			/ (2 * variance)));
+	if (x < cache_leftMargin)
+		return 0;
+	if (x > cache_rightMargin)
+		return 0;
+
+	double x_mean = x - mean;
+	return cache_one_over_sqrt_var2PI * exp(-x_mean * x_mean
+			/ cache_varX2);
 }
 
 double Gaussian::cdf(double x)
 {
+	if (x <= cache_leftMargin)
+		return 0;
+	if (x >= cache_rightMargin)
+		return 1;
+
 	return 0.5 * (1 + erf((x - mean) / sqrt(2 * variance)));
-
-	//NOTE: Abromowitz and Stegun approximation for Gaussian CDF
-	const double b1 =  0.319381530;
-	const double b2 = -0.356563782;
-	const double b3 =  1.781477937;
-	const double b4 = -1.821255978;
-	const double b5 =  1.330274429;
-	const double p  =  0.2316419;
-	const double c  =  0.39894228;
-
-	if(x >= 0.0) {
-		double t = 1.0 / ( 1.0 + p * x );
-		return (1.0 - c * exp( -x * x / 2.0 ) * t *
-				( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
-	}
-	else {
-		double t = 1.0 / ( 1.0 - p * x );
-		return ( c * exp( -x * x / 2.0 ) * t *
-				( t *( t * ( t * ( t * b5 + b4 ) + b3 ) + b2 ) + b1 ));
-	}
 }
 
 double Gaussian::getLeftMargin()
 {
-	return mean - 4 * sqrt(variance);
+	return cache_leftMargin;
 }
 
 double Gaussian::getRightMargin()
 {
-	return mean + 4 * sqrt(variance);
+	return cache_rightMargin;
 }
 
 double Gaussian::nextSample()

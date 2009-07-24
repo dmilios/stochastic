@@ -10,6 +10,7 @@
 #include "FileParser.h"
 #include <algorithm>
 #include <cmath>
+#include "mathFunctions.h"
 
 namespace stochastic {
 
@@ -22,18 +23,9 @@ EmpiricalDistribution::EmpiricalDistribution(const char * fileName)
 	this->name = "emp_";
 	this->name.append(fileName);
 
-	// compute maxProbability which will be used in rejection sampling
-	int accuracy = 100, i;
-	double currProbability;
-	double dx = (getRightMargin() - getLeftMargin()) / accuracy;
-	double x = getLeftMargin();
-	for (i = 0; i < accuracy; i++)
-	{
-		currProbability = (cdf(x + dx) - cdf(x)) / dx;
-		if (currProbability > maxProbability)
-			maxProbability = currProbability;
-		x += dx;
-	}
+	// initially: no cached margins
+	cacheLeftMargin = 0;
+	cacheRightMargin = 0;
 }
 
 EmpiricalDistribution::EmpiricalDistribution(std::vector<double> inputData)
@@ -43,18 +35,9 @@ EmpiricalDistribution::EmpiricalDistribution(std::vector<double> inputData)
 
 	this->name = "emp";
 
-	// compute maxProbability which will be used in rejection sampling
-	int accuracy = 100, i;
-	double currProbability;
-	double dx = (getRightMargin() - getLeftMargin()) / accuracy;
-	double x = getLeftMargin();
-	for (i = 0; i < accuracy; i++)
-	{
-		currProbability = (cdf(x + dx) - cdf(x)) / dx;
-		if (currProbability > maxProbability)
-			maxProbability = currProbability;
-		x += dx;
-	}
+	// initially: no cached margins
+	cacheLeftMargin = 0;
+	cacheRightMargin = 0;
 }
 
 EmpiricalDistribution::~EmpiricalDistribution()
@@ -83,7 +66,7 @@ double EmpiricalDistribution::pdf(double x)
 	double sum = 0;
 	unsigned int i;
 	for (i = 0; i < n; i++)
-		sum += (1 / sqrt(2 * 3.14)) * exp(-pow(x - data[i], 2) / (2 * pow(h, 2)));
+		sum += (1 / sqrt(2 * PI)) * exp(-pow(x - data[i], 2) / (2 * pow(h, 2)));
 	return sum / (n * h);
 }
 
@@ -98,43 +81,41 @@ double EmpiricalDistribution::cdf(double x)
 
 double EmpiricalDistribution::getLeftMargin()
 {
-	static double * cachedMargin = 0;
-	if (cachedMargin)
-		return * cachedMargin;
+	if (cacheLeftMargin)
+		return * cacheLeftMargin;
 
 	// discard the first 0.1%
 	unsigned int i = 0;
 	for (i = 0; i < data.size(); i++)
 		if (cdf(data[i]) > 0.001)
 		{
-			cachedMargin = new double;
-			* cachedMargin = data[i];
-			return * cachedMargin;
+			cacheLeftMargin = new double;
+			* cacheLeftMargin = data[i];
+			return * cacheLeftMargin;
 		}
 	return data[0]; // data is sorted in ascending order
 }
 
 double EmpiricalDistribution::getRightMargin()
 {
-	static double * cachedMargin = 0;
-	if (cachedMargin)
-		return * cachedMargin;
+	if (cacheRightMargin)
+		return * cacheRightMargin;
 
 	// discard the last 0.1%
 	unsigned int i = 0;
 	for (i = data.size() - 1; i > 0; i--)
 		if (cdf(data[i]) < 0.999)
 		{
-			cachedMargin = new double;
-			* cachedMargin = data[i];
-			return * cachedMargin;
+			cacheRightMargin = new double;
+			* cacheRightMargin = data[i];
+			return * cacheRightMargin;
 		}
 	return data[data.size() - 1]; // data is sorted in ascending order
 }
 
 double EmpiricalDistribution::nextSample()
 {
-	return rejectionSampling(maxProbability, getLeftMargin(), getRightMargin());
+	return quantile(this->generator.nextDouble());
 }
 
 } // namespace stochastic

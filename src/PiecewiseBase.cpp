@@ -23,6 +23,54 @@ void PiecewiseBase::setFixedNumberOfComponents(int n)
 	fixedNumberOfComponents = n;
 }
 
+/*
+ * returns two vectors that define the intervals
+ * containing the support of input distribution
+ * and the support itself
+ *
+ * It will be needed for the approximations
+ */
+double PiecewiseBase::retrieveSupport(Distribution * distribution,
+		std::vector<double> & supportInterval_lmargins,
+		std::vector<double> & supportInterval_rmargins)
+{
+	double weight;
+	double start = distribution->getLeftMargin();
+	double end = distribution->getRightMargin();
+	double support = end - start;
+	double step = support / (double) fixedNumberOfComponents;
+	int i;
+	double x = start;
+
+	// check for support so as to revise the step
+	int flag_inSupport = 0;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		weight = distribution->pdf(x);
+		if (weight)
+		{
+			if (!flag_inSupport)
+			{
+				flag_inSupport = 1;
+				supportInterval_lmargins.push_back(x);
+			}
+		}
+		else
+		{
+			if (flag_inSupport)
+			{
+				flag_inSupport = 0;
+				supportInterval_rmargins.push_back(x);
+			}
+			support -= step;
+		}
+		x += step;
+	}
+	if (supportInterval_lmargins.size() > supportInterval_rmargins.size())
+		supportInterval_rmargins.push_back(distribution->getRightMargin());
+	return support;
+}
+
 MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
 {
 	if (typeid(* this) != typeid(* arg))

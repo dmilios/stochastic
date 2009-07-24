@@ -23,6 +23,4 @@
 #include "Exponential.h"
 #include "EmpiricalDistribution.h"
 
-#include "MonteCarloOperations.h"
-
 #endif /* STOCHASTIC_H_ */

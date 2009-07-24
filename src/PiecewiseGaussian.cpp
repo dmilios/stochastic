@@ -11,6 +11,7 @@
 #include <limits>
 #include <cmath>
 #include "exceptions.h"
+#include "mathFunctions.h"
 
 namespace stochastic {
 
@@ -38,48 +39,101 @@ const char * PiecewiseGaussian::getName()
 	return "pNorm";
 }
 
-// FIXME: possibly discard this
-// seems more reasonable to use 68% rule, when (initially) gaussians are not overlapping
-PiecewiseBase * PiecewiseGaussian::experiment(Distribution * distribution)
+PiecewiseGaussian PiecewiseGaussian::optimiseFit(Distribution * original,
+		PiecewiseGaussian approx)
 {
-	PiecewiseGaussian * result = new PiecewiseGaussian;
+	std::vector<double> weights = approx.weights;
+	unsigned int i, n = approx.components.size();
 
-	MixtureComponent * component;
-	double weight;
-	double start = distribution->getLeftMargin();
-	double end = distribution->getRightMargin();
-	double support = end - start;
-	double step = support / (double) fixedNumberOfComponents;
-	int i;
-
-	double stadardDeviation = support / (8 * fixedNumberOfComponents);
-	double range = 4 * stadardDeviation;
-	double x = start + range;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	int tries = 0;
+	double old_distance = distancePDF(original, &approx);
+	double new_distance;
+	for (i = 0; tries < 1000 ; i++)
 	{
-		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
-		double pdf_c = distribution->pdf(x) / weight;
-		double var = 1 / (2 * 3.14 * pow(pdf_c, 2));
-		if (weight)
-		{
-			component = new Gaussian(x, var * 1.4);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
-		}
-		x += step;
-	}
-	result->cumulativeWeights = result->constructCumulativeWeights(result->weights);
+		if (i == n)
+			i = 0;
 
-	return result;
+		double step = 10e-2;
+		int failures = 0;
+		while (failures < 3)
+		{
+			((Gaussian *)approx.components[i])->mean += step;
+			if (((Gaussian *)approx.components[i])->mean > 0)
+			{
+				new_distance = distancePDF(original, &approx);
+
+				printf("old: %f -- new: %f\n", old_distance, new_distance);
+
+				if (new_distance < old_distance)  // accept step
+				{
+					old_distance = new_distance;
+					step *= 2;
+				}
+				else
+				{
+					// undo step
+					((Gaussian *)approx.components[i])->mean -+ step;
+					step *= 0.2;
+					failures++;
+				}
+			}
+			else
+			{
+				// undo step
+				((Gaussian *)approx.components[i])->mean -+ step;
+				step = -step;
+				failures++;
+			}
+		}
+		tries++;
+	}
+
+	return approx;
 }
 
 
 PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 {
-	return experiment(distribution);
+	PiecewiseGaussian * result = new PiecewiseGaussian;
+	MixtureComponent * component;
 
+	std::vector<double> supportInterval_lmargins;
+	std::vector<double> supportInterval_rmargins;
 
+	// margin vectors are called by reference
+	double support = retrieveSupport(distribution, supportInterval_lmargins,
+			supportInterval_rmargins);
+	double step = support / (double) fixedNumberOfComponents;
 
+	int margin_counter = 0;
+	double x = supportInterval_lmargins[margin_counter];
+	double var = step * step;
+
+	double weight;
+	int i;
+	for (i = 0; i < fixedNumberOfComponents; i++)
+	{
+		// approximate the area, because CDF is inefficient
+		weight = distribution->pdf(x);
+		if (weight < 0) // negative results are just close to zero
+			weight = 0;
+		component = new Gaussian(x, var);
+		result->components.push_back(component);
+		result->weights.push_back(weight);
+		x += step;
+		if (x > supportInterval_rmargins[margin_counter])
+			x = supportInterval_lmargins[++margin_counter];
+	}
+
+//	* result = optimiseFit(distribution, * result);
+
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
+}
+
+// alternative fit using quantile function
+PiecewiseBase * PiecewiseGaussian::fit2(Distribution * distribution)
+{
 	PiecewiseGaussian * result = new PiecewiseGaussian;
 
 	MixtureComponent * component;
@@ -89,34 +143,27 @@ PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 	double support = end - start;
 	double step = support / (double) fixedNumberOfComponents;
 	int i;
-	double stadardDeviation = support / (8 * fixedNumberOfComponents);
-	double range = 4 * stadardDeviation;
-	double x = start + range;
+	double x = start;
 
-
-	// check for support so as to revise the step
+	double p = 0;
+	step = 1 / (double) fixedNumberOfComponents;
+	double var;
+	double x_prev = distribution->quantile(0) - 10e-5;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
-		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
-		if (weight == 0)
-			support -= step;
-		x += step;
-	}
-	// revise the step
-	step = support / (double) fixedNumberOfComponents;
-	stadardDeviation = support / (8 * fixedNumberOfComponents);
-	range = 4 * stadardDeviation;
-	x = start + range;
+		x = distribution->quantile(p);
 
+		// approximate the area, because CDF is inefficient
+		weight = distribution->pdf(x);
+		if (weight < 0) // negative results are just close to zero
+			weight = 0;
 
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		weight = distribution->cdf(x + range) - distribution->cdf(x - range);
-		double var = pow(range, 2);
+		var = (x - x_prev) * (x - x_prev);
 		component = new Gaussian(x, var);
 		result->components.push_back(component);
 		result->weights.push_back(weight);
-		x += step;
+		x_prev = x;
+		p += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);
 	return result;

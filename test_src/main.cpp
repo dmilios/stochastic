@@ -31,7 +31,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	Experiments::computationsPU();
+	Experiments::depedencyMC();
 
 	return printArguments(argc, argv);
 }

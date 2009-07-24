@@ -28,6 +28,12 @@ class PiecewiseBase : public stochastic::MixtureModel
 protected:
 	static int fixedNumberOfComponents;
 
+	// returns two vectors that define the intervals
+	// containing the support of input distribution
+	// and the support itself
+	double retrieveSupport(Distribution *, std::vector<double> &,
+			std::vector<double> &);
+
 	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
 			MixtureComponent *) = 0;
 	virtual MixtureComponent * differenceOfComponents(MixtureComponent *,

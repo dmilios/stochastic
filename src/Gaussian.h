@@ -9,15 +9,24 @@
 #define GAUSSIAN_H_
 
 #include "MixtureComponent.h"
+#include "mathFunctions.h"
+
+#include "PiecewiseGaussian.h"
 
 namespace stochastic {
 
 class Gaussian : public stochastic::MixtureComponent
 {
+friend class PiecewiseGaussian; // FIXME: may discard this
+
 private:
 	double mean;
 	double variance;
-	static const double pi;
+
+	double cache_varX2;
+	double cache_one_over_sqrt_var2PI;
+	double cache_leftMargin;
+	double cache_rightMargin;
 
 public:
 	Gaussian();
