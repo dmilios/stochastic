@@ -17,7 +17,7 @@ namespace stochastic {
 
 class Gaussian : public stochastic::MixtureComponent
 {
-friend class PiecewiseGaussian; // FIXME: may discard this
+friend class PiecewiseGaussian; // FIXME: this wanted for the "approximation"
 
 private:
 	double mean;

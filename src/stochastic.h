@@ -21,6 +21,7 @@
 #include "Gaussian.h"
 #include "Uniform.h"
 #include "Exponential.h"
+#include "SumUniform.h"
 #include "EmpiricalDistribution.h"
 
 #endif /* STOCHASTIC_H_ */

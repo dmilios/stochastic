@@ -8,6 +8,7 @@
 #include "PiecewiseUniform.h"
 
 #include "exceptions.h"
+#include "SumUniform.h"
 #include <algorithm>
 #include <cmath>
 
@@ -115,20 +116,38 @@ PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
  *
  * */
 
+int PiecewiseUniform::useold = 0;
+
 MixtureComponent * PiecewiseUniform::sumOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-	double a = arg1->getLeftMargin() + arg2->getLeftMargin();
-	double b = arg1->getRightMargin() + arg2->getRightMargin();
-	return new Uniform(a, b);
+	if (useold)
+	{
+		double a = arg1->getLeftMargin() + arg2->getLeftMargin();
+		double b = arg1->getRightMargin() + arg2->getRightMargin();
+		return new Uniform(a, b);
+	}
+
+	double a1 = arg1->getLeftMargin();
+	double b1 = arg1->getRightMargin();
+	double a2 = arg2->getLeftMargin();
+	double b2 = arg2->getRightMargin();
+	return new SumUniform(a1, b1, a2, b2);
 }
 
 MixtureComponent * PiecewiseUniform::differenceOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-	double a = arg1->getLeftMargin() - arg2->getRightMargin();
-	double b = arg1->getRightMargin() - arg2->getLeftMargin();
-	return new Uniform(a, b);
+//	double a = arg1->getLeftMargin() - arg2->getRightMargin();
+//	double b = arg1->getRightMargin() - arg2->getLeftMargin();
+//	return new Uniform(a, b);
+
+	double a1 = arg1->getLeftMargin();
+	double b1 = arg1->getRightMargin();
+	// multiply the second argument by -1
+	double a2 = - arg2->getRightMargin();
+	double b2 = - arg2->getLeftMargin();
+	return new SumUniform(a1, b1, a2, b2);
 }
 
 MixtureComponent * PiecewiseUniform::productOfComponents(

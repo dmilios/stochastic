@@ -18,7 +18,8 @@ enum CurveTypes
 {
 	PDF,
 	CDF,
-	INVERSE_CDF
+	INVERSE_CDF,
+	OTHER
 };
 
 class Gnuplot

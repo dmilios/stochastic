@@ -13,6 +13,37 @@
 
 void Experiments::current()
 {
+	RandomVariable::setNumberOfSamplesMC(1000);
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+
+	Gnuplot::setAccuracy(1000);
+	Gnuplot plot;
+
+
+
+	RandomVariable r1 = new Gaussian(2, 0.5);
+	RandomVariable r2 = new Gaussian(1, 0.5);
+//	RandomVariable r3 = new SumUniform(-8, -3, 2, 4);
+
+	RandomVariable::setMonteCarloFlag(0);
+	RandomVariable r4 = r1 - r2;
+
+//	plot.addRV(r1);
+//	plot.addRV(r2);
+//	plot.addRV(r3);
+	plot.addRV(r4);
+
+
+	//	std::cout << Experiments::kolmogorovDistance(r1.getDistribution(), r2.getDistribution()) << "\n";
+
+	std::cout << "Time: " << clock() << "\n";
+	plot.plotBuffered(PDF);
+	plot.plotBuffered(CDF);
+}
+
+void Experiments::pgApproxExample()
+{
 	RandomVariable::setNumberOfSamplesMC(10000);
 	PiecewiseBase::setFixedNumberOfComponents(100);
 	RandomVariable::setApproximatorType(new PiecewiseGaussian);
@@ -236,26 +267,31 @@ void Experiments::compareApproximations()
 
 // conduct a series of computations with known results
 // to see how PU approximation is affected
-void Experiments::computationsPU()
+void Experiments::computationsPU(std::vector<double> & counters, std::vector<
+		double> & errors)
 {
 	PiecewiseBase::setFixedNumberOfComponents(100);
 
 	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
-	Gnuplot plot;
+//	Gnuplot plot;
 	long int timer;
+	counters.clear();
+	errors.clear();
 
 	RandomVariable rv = new Gaussian;
 	PiecewiseUniform pu(new Gaussian);
 
-	Gaussian * original = (Gaussian *)rv.getDistribution();
+	Gaussian * original = (Gaussian *) rv.getDistribution();
 	std::cout << "\n0: Kolmogorov Distance between PU and original: ";
-	std::cout << kolmogorovDistance(& pu, original);
+	errors.push_back(kolmogorovDistance(&pu, original));
+	counters.push_back(0);
+	std::cout << errors[0];
 	std::cout << std::endl << std::endl;
 
 	RandomGenerator random;
 	int i;
-	for(i = 0; i < 100; i++)
+	for (i = 0; i < 100; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -265,22 +301,24 @@ void Experiments::computationsPU()
 		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
 
 		timer = clock();
-		rv = rv + (* new RandomVariable(new Gaussian(mean_added, var_added)));
+		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PU time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
 		std::cout << "Kolmogorov Distance between PU and original: ";
-		std::cout << kolmogorovDistance(rv.getDistribution(), original);
+		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
+		counters.push_back(i + 1);
+		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-	plot.addRV(* new RandomVariable(original)); // plot the last only
-	plot.addRV(rv);
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
+//	plot.addRV(*new RandomVariable(original)); // plot the last only
+//	plot.addRV(rv);
+//	plot.plotBuffered(PDF);
 }
 
 // conduct a series of computations with known results
 // to see how PG approximation is affected
-void Experiments::computationsPG()
+void Experiments::computationsPG(std::vector<double> & counters, std::vector<
+		double> & errors)
 {
 	PiecewiseBase::setFixedNumberOfComponents(100);
 
@@ -288,18 +326,22 @@ void Experiments::computationsPG()
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
+	counters.clear();
+	errors.clear();
 
 	RandomVariable rv = new Gaussian;
 	PiecewiseGaussian pg(new Gaussian);
 
-	Gaussian * original = (Gaussian *)rv.getDistribution();
+	Gaussian * original = (Gaussian *) rv.getDistribution();
 	std::cout << "\n0: Kolmogorov Distance between PG and original: ";
-	std::cout << kolmogorovDistance(& pg, original);
+	errors.push_back(kolmogorovDistance(&pg, original));
+	counters.push_back(0);
+	std::cout << errors[0];
 	std::cout << std::endl << std::endl;
 
 	RandomGenerator random;
 	int i;
-	for(i = 0; i < 1; i++)
+	for (i = 0; i < 1; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -309,14 +351,16 @@ void Experiments::computationsPG()
 		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
 
 		timer = clock();
-		rv = rv + (* new RandomVariable(new Gaussian(mean_added, var_added)));
+		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PG time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
 		std::cout << "Kolmogorov Distance between PG and original: ";
-		std::cout << kolmogorovDistance(rv.getDistribution(), original);
+		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
+		counters.push_back(i + 1);
+		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-	plot.addRV(* new RandomVariable(original)); // plot the last only
+	plot.addRV(*new RandomVariable(original)); // plot the last only
 	plot.addRV(rv);
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
@@ -324,7 +368,8 @@ void Experiments::computationsPG()
 
 // conduct a series of computations with known results
 // to see how MC is affected
-void Experiments::computationsMC()
+void Experiments::computationsMC(std::vector<double> & counters, std::vector<
+		double> & errors)
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
 	RandomVariable::setMonteCarloFlag(1);
@@ -332,6 +377,8 @@ void Experiments::computationsMC()
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
+	counters.clear();
+	errors.clear();
 
 	RandomVariable rv = new Gaussian;
 	Gaussian * original = new Gaussian;
@@ -339,7 +386,7 @@ void Experiments::computationsMC()
 	std::cout << std::endl;
 	RandomGenerator random;
 	int i;
-	for(i = 0; i < 3; i++)
+	for (i = 0; i < 3; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -349,14 +396,16 @@ void Experiments::computationsMC()
 		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
 
 		timer = clock();
-		rv = rv + (* new RandomVariable(new Gaussian(mean_added, var_added)));
+		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PU time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
 		std::cout << "Kolmogorov Distance between MC and original: ";
-		std::cout << kolmogorovDistance(rv.getDistribution(), original);
+		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
+		counters.push_back(i + 1);
+		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-	plot.addRV(* new RandomVariable(original)); // plot the last only
+	plot.addRV(*new RandomVariable(original)); // plot the last only
 	plot.addRV(rv);
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);

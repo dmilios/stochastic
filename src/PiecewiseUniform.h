@@ -45,6 +45,10 @@ public:
 
 	// NOTE: alternative fit using quantile
 	PiecewiseBase * fit2(Distribution * distribution);
+
+
+
+	static int useold; // TO BE DISCARDED, just for the experiment
 };
 
 } // namespace stochastic
