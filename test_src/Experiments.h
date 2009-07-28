@@ -30,6 +30,7 @@ public:
 	static void comparePGwithMC();
 	static void compareApproximations();
 
+	static void plotComputationsEvolution();
 	static void computationsPU(std::vector <double> &, std::vector <double> &);
 	static void computationsPG(std::vector <double> &, std::vector <double> &);
 	static void computationsMC(std::vector <double> &, std::vector <double> &);

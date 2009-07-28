@@ -12,8 +12,18 @@
 #include "PiecewiseBase.h"
 
 #include <vector>
+#include <map>
 
 namespace stochastic {
+
+enum OperationType
+{
+	NONE,
+	SUM,
+	DIFFERENCE,
+	PRODUCT,
+	RATIO
+};
 
 class RandomVariable
 {
@@ -22,11 +32,21 @@ private:
 	static int numberOfSamplesMC;
 	static PiecewiseBase * approximator;
 
+	static std::map <RandomVariable *, double> samplesCollection;
+
 	Distribution * distribution;
 
+	OperationType precededOperation;
+	RandomVariable * parrent1;
+	RandomVariable * parrent2;
+
+	static RandomVariable recursive(OperationType, RandomVariable *,
+			RandomVariable *);
+	static double recursiveSample(OperationType, RandomVariable *,
+			RandomVariable *);
 
 	// Definitions of MonteCarlo versions of operators
-	static RandomVariable MC_sum(RandomVariable, RandomVariable);
+	static RandomVariable MC_sum(RandomVariable *, RandomVariable *);
 	static RandomVariable MC_difference(RandomVariable, RandomVariable);
 	static RandomVariable MC_product(RandomVariable, RandomVariable);
 	static RandomVariable MC_ratio(RandomVariable, RandomVariable);
@@ -55,7 +75,7 @@ public:
 	void quantileOutline(int, std::vector <double> &, std::vector <double> &);
 	void produceFileOfSamples(int);
 
-	RandomVariable operator +(RandomVariable);
+	RandomVariable operator +(RandomVariable &);
 	RandomVariable operator -(RandomVariable);
 	RandomVariable operator *(RandomVariable);
 	RandomVariable operator /(RandomVariable);

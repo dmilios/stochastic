@@ -5,14 +5,14 @@
  *      Author: Dimitrios Milios
  */
 
-#ifndef SUMUNIFORM_H_
-#define SUMUNIFORM_H_
+#ifndef SUMOFUNIFORMS_H_
+#define SUMOFUNIFORMS_H_
 
 #include "MixtureComponent.h"
 
 namespace stochastic {
 
-class SumUniform : public stochastic::MixtureComponent
+class SumOfUniforms : public stochastic::MixtureComponent
 {
 private:
 	double a1, b1;
@@ -29,8 +29,8 @@ private:
 	int case_flag; // possible values 0, 1, 2
 
 public:
-	SumUniform(double, double, double, double);
-	virtual ~SumUniform();
+	SumOfUniforms(double, double, double, double);
+	virtual ~SumOfUniforms();
 
 	const char * getName();
 	double pdf(double);
@@ -42,4 +42,4 @@ public:
 
 } // end stochastic
 
-#endif /* SUMUNIFORM_H_ */
+#endif /* SUMOFUNIFORMS_H_ */

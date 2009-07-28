@@ -5,7 +5,7 @@
  *      Author: Dimitrios Milios
  */
 
-#include "SumUniform.h"
+#include "SumOfUniforms.h"
 
 #include "exceptions.h"
 #include <sstream>
@@ -13,7 +13,7 @@
 namespace stochastic {
 
 // Initialise with U[a1,b1] and U[a2, b2]
-SumUniform::SumUniform(double a1, double b1, double a2, double b2)
+SumOfUniforms::SumOfUniforms(double a1, double b1, double a2, double b2)
 {
 	this->a1 = a1;
 	this->b1 = b1;
@@ -24,8 +24,8 @@ SumUniform::SumUniform(double a1, double b1, double a2, double b2)
 	range2 = b2 - a2;
 	a12  = a1 + a2;
 	b12 = b1 + b2;
-	c1 = (-(a12 * a12) + 2 * a12 * a12) / (2 * range1 * range2);
-	c3 = (b12 * b12 - 2 * b12 * b12) / (2 * range1 * range2) + 1;
+	c1 = (a12 * a12) / (2 * range1 * range2);
+	c3 = -(b12 * b12) / (2 * range1 * range2) + 1;
 
 	if (range1 <= 0 || range2 <= 0)
 		throw InvalidParametersException("Invalid ranges in sum of uniforms");
@@ -46,11 +46,11 @@ SumUniform::SumUniform(double a1, double b1, double a2, double b2)
 		case_flag = 2;
 }
 
-SumUniform::~SumUniform()
+SumOfUniforms::~SumOfUniforms()
 {
 }
 
-const char *SumUniform::getName()
+const char *SumOfUniforms::getName()
 {
 	std::stringstream alpha1_s;
 	std::stringstream beta1_s;
@@ -73,7 +73,7 @@ const char *SumUniform::getName()
 	return message.c_str();
 }
 
-double SumUniform::pdf(double x)
+double SumOfUniforms::pdf(double x)
 {
 	if (x <= getLeftMargin())
 		return 0;
@@ -110,7 +110,7 @@ double SumUniform::pdf(double x)
 	throw 0; // this should never happen
 }
 
-double SumUniform::cdf(double x)
+double SumOfUniforms::cdf(double x)
 {
 	if (x <= getLeftMargin())
 		return 0;
@@ -148,17 +148,17 @@ double SumUniform::cdf(double x)
 	throw 0; // this should never happen
 }
 
-double SumUniform::getLeftMargin()
+double SumOfUniforms::getLeftMargin()
 {
 	return a1 + a2;
 }
 
-double SumUniform::getRightMargin()
+double SumOfUniforms::getRightMargin()
 {
 	return b1 + b2;
 }
 
-double SumUniform::nextSample()
+double SumOfUniforms::nextSample()
 {
 	double maxprob;
 	switch(case_flag)

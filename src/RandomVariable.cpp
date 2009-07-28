@@ -13,6 +13,7 @@
 #include <fstream>
 #include <string>
 #include <typeinfo>
+#include <stdexcept>
 
 namespace stochastic {
 
@@ -20,8 +21,11 @@ PiecewiseBase * RandomVariable::approximator = new PiecewiseUniform;
 int RandomVariable::monteCarloFlag = 0;
 int RandomVariable::numberOfSamplesMC = 10000;
 
+std::map <RandomVariable *, double> RandomVariable::samplesCollection;
 
-// static method
+/*
+ * static methods
+ */
 void RandomVariable::setApproximatorType(PiecewiseBase * type)
 {
 	RandomVariable::approximator = type;
@@ -38,19 +42,31 @@ void RandomVariable::setNumberOfSamplesMC(int n)
 	numberOfSamplesMC = n;
 }
 
+/*
+ *
+ * Constructors
+ *
+ * */
+
 RandomVariable::RandomVariable()
 {
 	this->distribution = 0;
+	precededOperation = NONE;
 }
 
 RandomVariable::RandomVariable(Distribution * distribution)
 {
 	this->setDistribution(distribution);
+	precededOperation = NONE;
 }
 
 RandomVariable::~RandomVariable()
 {
 }
+
+/*
+ * methods
+ * */
 
 void RandomVariable::setDistribution(Distribution * distribution)
 {
@@ -145,16 +161,18 @@ void RandomVariable::produceFileOfSamples(int n)
 
 /*
  *
+ *
  * --- Overload Binary Operators: '+', '-', '*', '/'
+ *
  */
 
-RandomVariable RandomVariable::operator +(RandomVariable rightarg)
+RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_sum(* this, rightarg);
+		return MC_sum(this, & rightarg);
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
@@ -519,23 +537,101 @@ RandomVariable max(double c_arg, RandomVariable rv_arg)
  * ====================================================================
  * */
 
+RandomVariable RandomVariable::recursive(OperationType op,
+		RandomVariable * arg1, RandomVariable * arg2)
+{
+	std::vector<double> produced_data;
+	int i;
 
+	for (i = 0; i < numberOfSamplesMC; i++)
+	{
+		samplesCollection.clear();
+		produced_data.push_back(recursiveSample(op, arg1, arg2));
+	}
+
+	RandomVariable result = new EmpiricalDistribution(produced_data);
+	result.precededOperation = op;
+	result.parrent1 = arg1;
+	result.parrent2 = arg2;
+	return result;
+}
+
+double RandomVariable::recursiveSample(OperationType op,
+		RandomVariable * arg1, RandomVariable * arg2)
+{
+	double sample1;
+	double sample2;
+	try
+	{
+		sample1 = samplesCollection.at(arg1);
+	}
+	catch(std::out_of_range ex)
+	{
+		if (!arg1->precededOperation)
+			sample1 = arg1->getDistribution()->nextSample();
+		else
+			sample1 = recursiveSample(arg1->precededOperation,
+					arg1->parrent1, arg1->parrent2);
+		samplesCollection[arg1] = sample1;
+	}
+	try
+	{
+		sample2 = samplesCollection.at(arg2);
+	}
+	catch(std::out_of_range ex)
+	{
+		if (!arg2->precededOperation)
+			sample2 = arg2->getDistribution()->nextSample();
+		else
+			sample2 = recursiveSample(arg2->precededOperation,
+					arg2->parrent1, arg2->parrent2);
+		samplesCollection[arg2] = sample2;
+	}
+
+	switch(op)
+	{
+		case SUM:
+			return sample1 + sample2;
+			break;
+		case DIFFERENCE:
+			return sample1 - sample2;
+			break;
+		case PRODUCT:
+			return sample1 * sample2;
+			break;
+		case RATIO:
+			if (sample2 == 0)
+				sample2 = 0.0001;
+			return sample1 / sample2;
+			break;
+		default:
+			break;
+	}
+	throw 0; // this should never happen
+}
 
 /*
  *
  * --- Standard Binary Operations: '+', '-', '*', '/'
  */
 
-RandomVariable RandomVariable::MC_sum(RandomVariable arg1,
-		RandomVariable arg2)
+RandomVariable RandomVariable::MC_sum(RandomVariable * arg1,
+		RandomVariable * arg2)
 {
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
+	return recursive(SUM, arg1, arg2);
+
+	std::vector<double> s1 = arg1->getDistribution()->sample(numberOfSamplesMC);
+	std::vector<double> s2 = arg2->getDistribution()->sample(numberOfSamplesMC);
 	int i;
 	std::vector<double> produced_data;
 	for (i = 0; i < numberOfSamplesMC; i++)
 		produced_data.push_back(s1[i] + s2[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+
+	RandomVariable result = new EmpiricalDistribution(produced_data);
+	result.precededOperation = SUM;
+	result.parrent1 = arg1;
+	result.parrent2 = arg2;
+	return result;
 }
 
 RandomVariable RandomVariable::MC_difference(RandomVariable arg1,
@@ -547,7 +643,12 @@ RandomVariable RandomVariable::MC_difference(RandomVariable arg1,
 	std::vector<double> produced_data;
 	for (i = 0; i < numberOfSamplesMC; i++)
 		produced_data.push_back(s1[i] - s2[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+
+	RandomVariable result = new EmpiricalDistribution(produced_data);
+	result.precededOperation = DIFFERENCE;
+	result.parrent1 = & arg1;
+	result.parrent2 = & arg2;
+	return result;
 }
 
 RandomVariable RandomVariable::MC_product(RandomVariable arg1,
@@ -559,7 +660,12 @@ RandomVariable RandomVariable::MC_product(RandomVariable arg1,
 	std::vector<double> produced_data;
 	for (i = 0; i < numberOfSamplesMC; i++)
 		produced_data.push_back(s1[i] * s2[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+
+	RandomVariable result = new EmpiricalDistribution(produced_data);
+	result.precededOperation = PRODUCT;
+	result.parrent1 = & arg1;
+	result.parrent2 = & arg2;
+	return result;
 }
 
 RandomVariable RandomVariable::MC_ratio(RandomVariable arg1,
@@ -575,7 +681,12 @@ RandomVariable RandomVariable::MC_ratio(RandomVariable arg1,
 			s2[i] = 0.0000001;
 		produced_data.push_back(s1[i] / s2[i]);
 	}
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+
+	RandomVariable result = new EmpiricalDistribution(produced_data);
+	result.precededOperation = RATIO;
+	result.parrent1 = & arg1;
+	result.parrent2 = & arg2;
+	return result;
 }
 
 /*

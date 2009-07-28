@@ -8,7 +8,7 @@
 #include "PiecewiseUniform.h"
 
 #include "exceptions.h"
-#include "SumUniform.h"
+#include "SumOfUniforms.h"
 #include <algorithm>
 #include <cmath>
 
@@ -132,7 +132,7 @@ MixtureComponent * PiecewiseUniform::sumOfComponents(
 	double b1 = arg1->getRightMargin();
 	double a2 = arg2->getLeftMargin();
 	double b2 = arg2->getRightMargin();
-	return new SumUniform(a1, b1, a2, b2);
+	return new SumOfUniforms(a1, b1, a2, b2);
 }
 
 MixtureComponent * PiecewiseUniform::differenceOfComponents(
@@ -147,7 +147,7 @@ MixtureComponent * PiecewiseUniform::differenceOfComponents(
 	// multiply the second argument by -1
 	double a2 = - arg2->getRightMargin();
 	double b2 = - arg2->getLeftMargin();
-	return new SumUniform(a1, b1, a2, b2);
+	return new SumOfUniforms(a1, b1, a2, b2);
 }
 
 MixtureComponent * PiecewiseUniform::productOfComponents(

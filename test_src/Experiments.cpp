@@ -22,16 +22,16 @@ void Experiments::current()
 
 
 
-	RandomVariable r1 = new Gaussian(2, 0.5);
-	RandomVariable r2 = new Gaussian(1, 0.5);
-//	RandomVariable r3 = new SumUniform(-8, -3, 2, 4);
+	RandomVariable r1 = new Uniform(2, 3.5);
+	RandomVariable r2 = new Uniform(1, 4.5);
+	RandomVariable r3 = new SumOfUniforms(2, 3.5, 1, 4.5);
 
-	RandomVariable::setMonteCarloFlag(0);
-	RandomVariable r4 = r1 - r2;
+	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable r4 = r1 + r2;
 
 //	plot.addRV(r1);
 //	plot.addRV(r2);
-//	plot.addRV(r3);
+	plot.addRV(r3);
 	plot.addRV(r4);
 
 
@@ -265,6 +265,22 @@ void Experiments::compareApproximations()
 	plot.plotBuffered(CDF);
 }
 
+void Experiments::plotComputationsEvolution()
+{
+	Gnuplot plot;
+	std::vector <double> iteration_numbers;
+	std::vector <double> errors;
+
+	Experiments::computationsPU(iteration_numbers, errors);
+	plot.addCurve(OTHER, "Kolmogorov Distance Evolution for New", iteration_numbers, errors);
+
+	PiecewiseUniform::useold = 1;
+	Experiments::computationsPU(iteration_numbers, errors);
+	plot.addCurve(OTHER, "Kolmogorov Distance Evolution for Old", iteration_numbers, errors);
+
+	plot.plotBuffered(OTHER);
+}
+
 // conduct a series of computations with known results
 // to see how PU approximation is affected
 void Experiments::computationsPU(std::vector<double> & counters, std::vector<
@@ -414,7 +430,7 @@ void Experiments::computationsMC(std::vector<double> & counters, std::vector<
 void Experiments::depedencyMC()
 {
 	RandomVariable::setMonteCarloFlag(1);
-	RandomVariable::setNumberOfSamplesMC(10000);
+	RandomVariable::setNumberOfSamplesMC(1000);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 
@@ -498,21 +514,21 @@ void Experiments::minmaxOfUniforms()
 void Experiments::minmaxOfGaussians()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(1);
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
 
-	RandomVariable r1 = new Gaussian(2, 4);
+	RandomVariable r1 = new Gaussian(-2, 4);
 	RandomVariable r2 = new Gaussian(3, 6);
-	RandomVariable r3 = min(r1, r2);
+	RandomVariable r3 = new MaxOfGaussians(Gaussian(-2, 4), Gaussian(3, 6));
 
 	RandomVariable::setMonteCarloFlag(1);
-	RandomVariable r4 = min(r1, r2);
+	RandomVariable r4 = max(r1, r2);
 
-	plot.addRV(r1);
-	plot.addRV(r2);
+//	plot.addRV(r1);
+//	plot.addRV(r2);
 	plot.addRV(r3);
 	plot.addRV(r4);
 
