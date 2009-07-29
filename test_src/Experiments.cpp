@@ -387,7 +387,7 @@ void Experiments::computationsPG(std::vector<double> & counters, std::vector<
 void Experiments::computationsMC(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setNumberOfSamplesMC(10000);
+	RandomVariable::setNumberOfSamplesMC(1000);
 	RandomVariable::setMonteCarloFlag(1);
 
 	Gnuplot::setAccuracy(1000);
@@ -396,13 +396,15 @@ void Experiments::computationsMC(std::vector<double> & counters, std::vector<
 	counters.clear();
 	errors.clear();
 
-	RandomVariable rv = new Gaussian;
+	int N = 50;
+	RandomVariable rv[N];
+	rv[0] = new Gaussian;
 	Gaussian * original = new Gaussian;
 
 	std::cout << std::endl;
 	RandomGenerator random;
 	int i;
-	for (i = 0; i < 3; i++)
+	for (i = 1; i < N; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -412,22 +414,22 @@ void Experiments::computationsMC(std::vector<double> & counters, std::vector<
 		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
 
 		timer = clock();
-		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
+		rv[i] = rv[i - 1] + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PU time: " << clock() - timer << "\n";
-		std::cout << i + 1 << ": ";
+		std::cout << i << ": ";
 		std::cout << "Kolmogorov Distance between MC and original: ";
-		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
-		counters.push_back(i + 1);
-		std::cout << errors[i + 1];
+		errors.push_back(kolmogorovDistance(rv[i].getDistribution(), original));
+		counters.push_back(i);
+		std::cout << errors[i];
 		std::cout << std::endl << std::endl;
 	}
 	plot.addRV(*new RandomVariable(original)); // plot the last only
-	plot.addRV(rv);
+	plot.addRV(rv[N - 1]);
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
 }
 
-void Experiments::depedencyMC()
+void Experiments::dependencyMC()
 {
 	RandomVariable::setMonteCarloFlag(1);
 	RandomVariable::setNumberOfSamplesMC(1000);
@@ -437,10 +439,10 @@ void Experiments::depedencyMC()
 	RandomVariable a = new Gaussian, b = new Gaussian;
 	RandomVariable c, d;
 
-	c = a + a;
-	d = 2 * a;
+	a = a + b;
+	d = a + b;
 
-	plot.addRV(c);
+	plot.addRV(a);
 	plot.addRV(d);
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
@@ -485,47 +487,22 @@ void Experiments::sumOfUniforms()
 	plot.plotBuffered(PDF);
 }
 
-void Experiments::minmaxOfUniforms()
-{
-	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(1);
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
-	Gnuplot::setAccuracy(1000);
-
-	Gnuplot plot;
-
-	RandomVariable r1 = new Uniform(2, 4);
-	RandomVariable r2 = new Uniform(3, 6);
-	RandomVariable r3 = min(r1, r2);
-
-	RandomVariable::setMonteCarloFlag(1);
-	RandomVariable r4 = min(r1, r2);
-
-	plot.addRV(r1);
-	plot.addRV(r2);
-	plot.addRV(r3);
-	plot.addRV(r4);
-
-	std::cout << "Time: " << clock() << "\n";
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
-}
-
-void Experiments::minmaxOfGaussians()
+void Experiments::minmaxTests()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
 	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
 
-	RandomVariable r1 = new Gaussian(-2, 4);
-	RandomVariable r2 = new Gaussian(3, 6);
-	RandomVariable r3 = new MaxOfGaussians(Gaussian(-2, 4), Gaussian(3, 6));
+	RandomVariable r1 = new Gaussian(0, 1);
+	RandomVariable r2 = new Uniform(-2, 1);
+	RandomVariable r3 = new MinOfDistributions(r1.getDistribution(),
+			r2.getDistribution());
 
-	RandomVariable::setMonteCarloFlag(1);
-	RandomVariable r4 = max(r1, r2);
+	RandomVariable::setMonteCarloFlag(0);
+	RandomVariable r4 = min(r1, r2);
 
 //	plot.addRV(r1);
 //	plot.addRV(r2);

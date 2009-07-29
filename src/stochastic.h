@@ -23,8 +23,9 @@
 #include "Exponential.h"
 #include "EmpiricalDistribution.h"
 
-#include "MinOfGaussians.h"
-#include "MaxOfGaussians.h"
+#include "DeltaDistribution.h"
+#include "MinOfDistributions.h"
+#include "MaxOfDistributions.h"
 #include "SumOfUniforms.h"
 
 #endif /* STOCHASTIC_H_ */

@@ -17,8 +17,6 @@ namespace stochastic {
 class PiecewiseGaussian : public stochastic::PiecewiseBase
 {
 private:
-	PiecewiseGaussian optimiseFit(Distribution *, PiecewiseGaussian);
-
 	MixtureComponent * sumOfComponents(MixtureComponent *, MixtureComponent *);
 	MixtureComponent * differenceOfComponents(MixtureComponent *,
 			MixtureComponent *);
@@ -26,17 +24,11 @@ private:
 			MixtureComponent *);
 	MixtureComponent * ratioOfComponents(MixtureComponent *,
 			MixtureComponent *);
-	MixtureComponent * minOfComponents(MixtureComponent *, MixtureComponent *);
-	MixtureComponent * maxOfComponents(MixtureComponent *, MixtureComponent *);
-
 
 	MixtureComponent * sumOfComponents(MixtureComponent *, double);
 	MixtureComponent * differenceOfComponents(double, MixtureComponent *);
 	MixtureComponent * productOfComponents(MixtureComponent *, double);
 	MixtureComponent * ratioOfComponents(double, MixtureComponent *);
-	MixtureComponent * minOfComponents(MixtureComponent *, double);
-	MixtureComponent * maxOfComponents(MixtureComponent *, double);
-
 
 public:
 	PiecewiseGaussian();
@@ -45,9 +37,6 @@ public:
 
 	PiecewiseBase * fit(Distribution *);
 	const char * getName();
-
-	// NOTE: alternative fit using quantile
-	PiecewiseBase * fit2(Distribution *);
 };
 
 } // namespace stochastic

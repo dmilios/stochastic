@@ -39,59 +39,6 @@ const char * PiecewiseGaussian::getName()
 	return "pNorm";
 }
 
-PiecewiseGaussian PiecewiseGaussian::optimiseFit(Distribution * original,
-		PiecewiseGaussian approx)
-{
-	std::vector<double> weights = approx.weights;
-	unsigned int i, n = approx.components.size();
-
-	int tries = 0;
-	double old_distance = distancePDF(original, &approx);
-	double new_distance;
-	for (i = 0; tries < 1000 ; i++)
-	{
-		if (i == n)
-			i = 0;
-
-		double step = 10e-2;
-		int failures = 0;
-		while (failures < 3)
-		{
-			((Gaussian *)approx.components[i])->mean += step;
-			if (((Gaussian *)approx.components[i])->mean > 0)
-			{
-				new_distance = distancePDF(original, &approx);
-
-				printf("old: %f -- new: %f\n", old_distance, new_distance);
-
-				if (new_distance < old_distance)  // accept step
-				{
-					old_distance = new_distance;
-					step *= 2;
-				}
-				else
-				{
-					// undo step
-					((Gaussian *)approx.components[i])->mean -+ step;
-					step *= 0.2;
-					failures++;
-				}
-			}
-			else
-			{
-				// undo step
-				((Gaussian *)approx.components[i])->mean -+ step;
-				step = -step;
-				failures++;
-			}
-		}
-		tries++;
-	}
-
-	return approx;
-}
-
-
 PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 {
 	PiecewiseGaussian * result = new PiecewiseGaussian;
@@ -123,47 +70,6 @@ PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 		x += step;
 		if (x > supportInterval_rmargins[margin_counter])
 			x = supportInterval_lmargins[++margin_counter];
-	}
-
-//	* result = optimiseFit(distribution, * result);
-
-	result->cumulativeWeights = constructCumulativeWeights(result->weights);
-	return result;
-}
-
-// alternative fit using quantile function
-PiecewiseBase * PiecewiseGaussian::fit2(Distribution * distribution)
-{
-	PiecewiseGaussian * result = new PiecewiseGaussian;
-
-	MixtureComponent * component;
-	double weight;
-	double start = distribution->getLeftMargin();
-	double end = distribution->getRightMargin();
-	double support = end - start;
-	double step = support / (double) fixedNumberOfComponents;
-	int i;
-	double x = start;
-
-	double p = 0;
-	step = 1 / (double) fixedNumberOfComponents;
-	double var;
-	double x_prev = distribution->quantile(0) - 10e-5;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		x = distribution->quantile(p);
-
-		// approximate the area, because CDF is inefficient
-		weight = distribution->pdf(x);
-		if (weight < 0) // negative results are just close to zero
-			weight = 0;
-
-		var = (x - x_prev) * (x - x_prev);
-		component = new Gaussian(x, var);
-		result->components.push_back(component);
-		result->weights.push_back(weight);
-		x_prev = x;
-		p += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);
 	return result;
@@ -249,27 +155,6 @@ MixtureComponent * PiecewiseGaussian::ratioOfComponents(
 	return new Gaussian(m, var);
 }
 
-MixtureComponent * PiecewiseGaussian::minOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
-{
-	double a = std::min<double>(arg1->getLeftMargin(), arg2->getLeftMargin());
-	double b = std::min<double>(arg1->getRightMargin(), arg2->getRightMargin());
-	double var = pow((b - a) / 8, 2);
-	double m = (a + b) / 2;
-	return new Gaussian(m, var);
-}
-
-MixtureComponent * PiecewiseGaussian::maxOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
-{
-	double a = std::max<double>(arg1->getLeftMargin(), arg2->getLeftMargin());
-	double b = std::max<double>(arg1->getRightMargin(), arg2->getRightMargin());
-	double var = pow((b - a) / 8, 2);
-	double m = (a + b) / 2;
-	return new Gaussian(m, var);
-}
-
-
 /*
  *
  *
@@ -319,16 +204,6 @@ MixtureComponent * PiecewiseGaussian::ratioOfComponents(double c_arg,
 	double var = pow((rmargin - lmargin) / 8, 2);
 	double m = (lmargin + rmargin) / 2;
 	return new Gaussian(m, var);
-}
-
-MixtureComponent * PiecewiseGaussian::minOfComponents(
-		MixtureComponent * dist_arg, double c_arg)
-{
-}
-
-MixtureComponent * PiecewiseGaussian::maxOfComponents(
-		MixtureComponent * dist_arg, double c_arg)
-{
 }
 
 } // namespace stochastic

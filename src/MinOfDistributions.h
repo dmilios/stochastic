@@ -1,30 +1,29 @@
 /*
- * MinOfGaussians.h
+ * MinOfDistributions.h
  *
  *  Created on: 27-Jul-2009
  *      Author: Dimitrios Milios
  */
 
-#ifndef MINOFGAUSSIANS_H_
-#define MINOFGAUSSIANS_H_
+#ifndef MINOFDISTRIBUTIONS_H_
+#define MINOFDISTRIBUTIONS_H_
 
 #include "MixtureComponent.h"
-#include "Gaussian.h"
 
 namespace stochastic {
 
-class MinOfGaussians : public stochastic::MixtureComponent
+class MinOfDistributions : public stochastic::MixtureComponent
 {
 private:
-	Gaussian arg1;
-	Gaussian arg2;
+	Distribution * arg1;
+	Distribution * arg2;
 
 	double cache_leftMargin;
 	double cache_rightMargin;
 
 public:
-	MinOfGaussians(Gaussian, Gaussian);
-	virtual ~MinOfGaussians();
+	MinOfDistributions(Distribution *, Distribution *);
+	virtual ~MinOfDistributions();
 
 	const char * getName();
 	double pdf(double);
@@ -36,4 +35,4 @@ public:
 
 } // namespace stochastic
 
-#endif /* MINOFGAUSSIANS_H_ */
+#endif /* MINOFDISTRIBUTIONS_H_ */

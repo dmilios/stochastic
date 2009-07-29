@@ -171,55 +171,6 @@ MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-MixtureModel *PiecewiseBase::min(PiecewiseBase * arg)
-{
-	if (typeid(* this) != typeid(* arg))
-		throw stochastic::IncompatibleComponentsException();
-
-	std::vector<MixtureComponent *> resultComponents;
-	std::vector<double> resultWeights;
-	int i, j;
-	MixtureComponent * left;
-	MixtureComponent * right;
-	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
-		{
-			left = this->components[i];
-			right = arg->components[j];
-			currentResult = minOfComponents(left, right);
-
-			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
-		}
-	return new MixtureModel(resultComponents, resultWeights);
-}
-
-MixtureModel * PiecewiseBase::max(PiecewiseBase * arg)
-{
-	if (typeid(* this) != typeid(* arg))
-		throw stochastic::IncompatibleComponentsException();
-
-	std::vector<MixtureComponent *> resultComponents;
-	std::vector<double> resultWeights;
-	int i, j;
-	MixtureComponent * left;
-	MixtureComponent * right;
-	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
-		{
-			left = this->components[i];
-			right = arg->components[j];
-			currentResult = maxOfComponents(left, right);
-
-			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
-		}
-	return new MixtureModel(resultComponents, resultWeights);
-}
-
-
 /*
  *
  *
@@ -291,36 +242,6 @@ MixtureModel * PiecewiseBase::denominatorOf(double c_arg)
 		}
 	}
 	return new MixtureModel(resultComponents, resultWeights);
-}
-
-MixtureModel * PiecewiseBase::min(double c_arg)
-{
-	std::vector<MixtureComponent *> resultComponents;
-	int i;
-	MixtureComponent * distr_arg;
-	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		distr_arg = this->components[i];
-		currentResult = minOfComponents(distr_arg, c_arg);
-		resultComponents.push_back(currentResult);
-	}
-	return new MixtureModel(resultComponents, this->weights);
-}
-
-MixtureModel * PiecewiseBase::max(double c_arg)
-{
-	std::vector<MixtureComponent *> resultComponents;
-	int i;
-	MixtureComponent * distr_arg;
-	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		distr_arg = this->components[i];
-		currentResult = maxOfComponents(distr_arg, c_arg);
-		resultComponents.push_back(currentResult);
-	}
-	return new MixtureModel(resultComponents, this->weights);
 }
 
 } // namespace stochastic

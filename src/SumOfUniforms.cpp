@@ -1,5 +1,5 @@
 /*
- * SumUniform.cpp
+ * SumOfUniforms.cpp
  *
  *  Created on: 26-Jul-2009
  *      Author: Dimitrios Milios

@@ -10,6 +10,9 @@
 #include "exceptions.h"
 #include "PiecewiseUniform.h"
 #include "EmpiricalDistribution.h"
+#include "MinOfDistributions.h"
+#include "MaxOfDistributions.h"
+#include "DeltaDistribution.h"
 #include <fstream>
 #include <string>
 #include <typeinfo>
@@ -52,12 +55,16 @@ RandomVariable::RandomVariable()
 {
 	this->distribution = 0;
 	precededOperation = NONE;
+	parrent1 = 0;
+	parrent2 = 0;
 }
 
 RandomVariable::RandomVariable(Distribution * distribution)
 {
 	this->setDistribution(distribution);
 	precededOperation = NONE;
+	parrent1 = 0;
+	parrent2 = 0;
 }
 
 RandomVariable::~RandomVariable()
@@ -65,7 +72,9 @@ RandomVariable::~RandomVariable()
 }
 
 /*
+ *
  * methods
+ *
  * */
 
 void RandomVariable::setDistribution(Distribution * distribution)
@@ -164,6 +173,7 @@ void RandomVariable::produceFileOfSamples(int n)
  *
  * --- Overload Binary Operators: '+', '-', '*', '/'
  *
+ *
  */
 
 RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
@@ -172,7 +182,7 @@ RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_sum(this, & rightarg);
+		return monteCarlo(SUM, this, & rightarg);
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
@@ -190,13 +200,13 @@ RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 	return RandomVariable(result);
 }
 
-RandomVariable RandomVariable::operator -(RandomVariable rightarg)
+RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_difference(* this, rightarg);
+		return monteCarlo(DIFFERENCE, this, & rightarg);
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
@@ -220,13 +230,13 @@ RandomVariable operator -(RandomVariable rv_arg)
 	return rv_arg * (-1);
 }
 
-RandomVariable RandomVariable::operator *(RandomVariable rightarg)
+RandomVariable RandomVariable::operator *(RandomVariable & rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_product(* this, rightarg);
+		return monteCarlo(PRODUCT, this, & rightarg);
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
@@ -244,13 +254,13 @@ RandomVariable RandomVariable::operator *(RandomVariable rightarg)
 	return RandomVariable(result);
 }
 
-RandomVariable RandomVariable::operator /(RandomVariable rightarg)
+RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_ratio(* this, rightarg);
+		return monteCarlo(RATIO, this, & rightarg);
 
 	PiecewiseBase * leftDistribution;
 	PiecewiseBase * rightDistribution;
@@ -274,51 +284,31 @@ RandomVariable RandomVariable::operator /(RandomVariable rightarg)
  */
 
 // The first argument is 'this' object
-RandomVariable RandomVariable::min(RandomVariable secondarg)
+RandomVariable RandomVariable::min(RandomVariable & secondarg)
 {
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_min(* this, secondarg);
+		return monteCarlo(MIN, this, & secondarg);
 
-	PiecewiseBase * leftDistribution;
-	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->fit(this->distribution);
-	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
-	if (typeid(* secondarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->fit(secondarg.distribution);
-	else
-		rightDistribution = (PiecewiseBase *) secondarg.distribution;
-
-	Distribution * raw = leftDistribution->min(rightDistribution);
+	Distribution * raw = new MinOfDistributions(this->distribution,
+			secondarg.distribution);
 	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
 // The first argument is 'this' object
-RandomVariable RandomVariable::max(RandomVariable secondarg)
+RandomVariable RandomVariable::max(RandomVariable & secondarg)
 {
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
 	if (monteCarloFlag)
-		return MC_max(* this, secondarg);
+		return monteCarlo(MAX, this, & secondarg);
 
-	PiecewiseBase * leftDistribution;
-	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->fit(this->distribution);
-	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
-	if (typeid(* secondarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->fit(secondarg.distribution);
-	else
-		rightDistribution = (PiecewiseBase *) secondarg.distribution;
-
-	Distribution * raw = leftDistribution->max(rightDistribution);
+	Distribution * raw = new MaxOfDistributions(this->distribution,
+			secondarg.distribution);
 	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
@@ -327,14 +317,19 @@ RandomVariable RandomVariable::max(RandomVariable secondarg)
 /*
  *
  *
+ *
  * Functions of ONE random variable
+ *
  *
  * */
 
 RandomVariable RandomVariable::operator +(double c_arg)
 {
 	if (monteCarloFlag)
-		return MC_sum(c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(SUM, this, delta);
+	}
 
 	PiecewiseBase * leftDistribution;
 	if (typeid(* this->distribution) != typeid(* approximator))
@@ -347,7 +342,7 @@ RandomVariable RandomVariable::operator +(double c_arg)
 	return RandomVariable(result);
 }
 
-RandomVariable operator +(double c_arg, RandomVariable rv_arg)
+RandomVariable operator +(double c_arg, RandomVariable & rv_arg)
 {
 	return rv_arg + c_arg;
 }
@@ -355,7 +350,10 @@ RandomVariable operator +(double c_arg, RandomVariable rv_arg)
 RandomVariable RandomVariable::operator -(double c_arg)
 {
 	if (monteCarloFlag)
-		return MC_sum(-c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(DIFFERENCE, this, delta);
+	}
 
 	PiecewiseBase * leftDistribution;
 	if (typeid(* this->distribution) != typeid(* approximator))
@@ -369,10 +367,13 @@ RandomVariable RandomVariable::operator -(double c_arg)
 	return RandomVariable(result);
 }
 
-RandomVariable operator -(double c_arg, RandomVariable rv_arg)
+RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 {
 	if (RandomVariable::monteCarloFlag)
-		return RandomVariable::MC_difference(c_arg, rv_arg);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return RandomVariable::monteCarlo(DIFFERENCE, delta, & rv_arg);
+	}
 
 	PiecewiseBase * distr_arg;
 	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
@@ -393,7 +394,10 @@ RandomVariable operator -(double c_arg, RandomVariable rv_arg)
 RandomVariable RandomVariable::operator *(double c_arg)
 {
 	if (monteCarloFlag)
-		return MC_product(c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(PRODUCT, this, delta);
+	}
 
 	if (!c_arg)
 		return RandomVariable();
@@ -409,7 +413,7 @@ RandomVariable RandomVariable::operator *(double c_arg)
 	return RandomVariable(result);
 }
 
-RandomVariable operator *(double c_arg, RandomVariable rv_arg)
+RandomVariable operator *(double c_arg, RandomVariable & rv_arg)
 {
 	return rv_arg * c_arg;
 }
@@ -420,7 +424,10 @@ RandomVariable RandomVariable::operator /(double c_arg)
 		return RandomVariable();
 
 	if (monteCarloFlag)
-		return MC_product(1 / c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(RATIO, this, delta);
+	}
 
 	PiecewiseBase * leftDistribution;
 	if (typeid(* this->distribution) != typeid(* approximator))
@@ -434,10 +441,13 @@ RandomVariable RandomVariable::operator /(double c_arg)
 	return RandomVariable(result);
 }
 
-RandomVariable operator /(double c_arg, RandomVariable rv_arg)
+RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 {
 	if (RandomVariable::monteCarloFlag)
-		return RandomVariable::MC_ratio(c_arg, rv_arg);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return RandomVariable::monteCarlo(RATIO, delta, & rv_arg);
+	}
 
 	if (!c_arg)
 		return RandomVariable();
@@ -460,15 +470,13 @@ RandomVariable operator /(double c_arg, RandomVariable rv_arg)
 RandomVariable RandomVariable::min(double c_arg)
 {
 	if (monteCarloFlag)
-		return MC_min(c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(MIN, this, delta);
+	}
 
-	PiecewiseBase * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->fit(this->distribution);
-	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
-
-	Distribution * raw = leftDistribution->min(c_arg);
+	Distribution * raw = new MinOfDistributions(
+			this->distribution,	new DeltaDistribution(c_arg));
 	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
@@ -476,68 +484,30 @@ RandomVariable RandomVariable::min(double c_arg)
 RandomVariable RandomVariable::max(double c_arg)
 {
 	if (monteCarloFlag)
-		return MC_max(c_arg, * this);
+	{
+		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
+		return monteCarlo(MAX, this, delta);
+	}
 
-	PiecewiseBase * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->fit(this->distribution);
-	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
-
-	Distribution * raw = leftDistribution->max(c_arg);
+	Distribution * raw = new MinOfDistributions(
+			this->distribution,	new DeltaDistribution(c_arg));
 	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);
 }
 
-
-
-// the very same implementation as in RandomVariable::min,
-// but this is called in a more intuitive way
-RandomVariable min(RandomVariable firstarg, RandomVariable secondarg)
-{
-	return firstarg.min(secondarg);
-}
-
-// the very same implementation as in RandomVariable::max,
-// but this is called in a more intuitive way
-RandomVariable max(RandomVariable firstarg, RandomVariable secondarg)
-{
-	return firstarg.max(secondarg);
-}
-
-RandomVariable min(RandomVariable rv_arg, double c_arg)
-{
-	return rv_arg.min(c_arg);
-}
-
-RandomVariable max(RandomVariable rv_arg, double c_arg)
-{
-	return rv_arg.max(c_arg);
-}
-
-RandomVariable min(double c_arg, RandomVariable rv_arg)
-{
-	return rv_arg.min(c_arg);
-}
-
-RandomVariable max(double c_arg, RandomVariable rv_arg)
-{
-	return rv_arg.max(c_arg);
-}
-
-
-
 /* ====================================================================
+ *
  *
  *
  *
  * Implementation of MonteCarlo
  *
  *
+ *
  * ====================================================================
  * */
 
-RandomVariable RandomVariable::recursive(OperationType op,
+RandomVariable RandomVariable::monteCarlo(OperationType op,
 		RandomVariable * arg1, RandomVariable * arg2)
 {
 	std::vector<double> produced_data;
@@ -546,7 +516,7 @@ RandomVariable RandomVariable::recursive(OperationType op,
 	for (i = 0; i < numberOfSamplesMC; i++)
 	{
 		samplesCollection.clear();
-		produced_data.push_back(recursiveSample(op, arg1, arg2));
+		produced_data.push_back(recursiveSampling(op, arg1, arg2));
 	}
 
 	RandomVariable result = new EmpiricalDistribution(produced_data);
@@ -556,7 +526,7 @@ RandomVariable RandomVariable::recursive(OperationType op,
 	return result;
 }
 
-double RandomVariable::recursiveSample(OperationType op,
+double RandomVariable::recursiveSampling(OperationType op,
 		RandomVariable * arg1, RandomVariable * arg2)
 {
 	double sample1;
@@ -567,10 +537,12 @@ double RandomVariable::recursiveSample(OperationType op,
 	}
 	catch(std::out_of_range ex)
 	{
-		if (!arg1->precededOperation)
+		if (typeid(* arg1) == typeid(DeltaDistribution))
+			sample1 = arg1->getDistribution()->nextSample();
+		else if (!arg1->precededOperation)
 			sample1 = arg1->getDistribution()->nextSample();
 		else
-			sample1 = recursiveSample(arg1->precededOperation,
+			sample1 = recursiveSampling(arg1->precededOperation,
 					arg1->parrent1, arg1->parrent2);
 		samplesCollection[arg1] = sample1;
 	}
@@ -580,10 +552,12 @@ double RandomVariable::recursiveSample(OperationType op,
 	}
 	catch(std::out_of_range ex)
 	{
-		if (!arg2->precededOperation)
+		if (typeid(* arg2) == typeid(DeltaDistribution))
+			sample2 = arg2->getDistribution()->nextSample();
+		else if (!arg2->precededOperation)
 			sample2 = arg2->getDistribution()->nextSample();
 		else
-			sample2 = recursiveSample(arg2->precededOperation,
+			sample2 = recursiveSampling(arg2->precededOperation,
 					arg2->parrent1, arg2->parrent2);
 		samplesCollection[arg2] = sample2;
 	}
@@ -604,6 +578,12 @@ double RandomVariable::recursiveSample(OperationType op,
 				sample2 = 0.0001;
 			return sample1 / sample2;
 			break;
+		case MIN:
+			return std::min<double>(sample1, sample2);
+			break;
+		case MAX:
+			return std::max<double>(sample1, sample2);
+			break;
 		default:
 			break;
 	}
@@ -612,183 +592,48 @@ double RandomVariable::recursiveSample(OperationType op,
 
 /*
  *
- * --- Standard Binary Operations: '+', '-', '*', '/'
- */
-
-RandomVariable RandomVariable::MC_sum(RandomVariable * arg1,
-		RandomVariable * arg2)
-{
-	return recursive(SUM, arg1, arg2);
-
-	std::vector<double> s1 = arg1->getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2->getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(s1[i] + s2[i]);
-
-	RandomVariable result = new EmpiricalDistribution(produced_data);
-	result.precededOperation = SUM;
-	result.parrent1 = arg1;
-	result.parrent2 = arg2;
-	return result;
-}
-
-RandomVariable RandomVariable::MC_difference(RandomVariable arg1,
-		RandomVariable arg2)
-{
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(s1[i] - s2[i]);
-
-	RandomVariable result = new EmpiricalDistribution(produced_data);
-	result.precededOperation = DIFFERENCE;
-	result.parrent1 = & arg1;
-	result.parrent2 = & arg2;
-	return result;
-}
-
-RandomVariable RandomVariable::MC_product(RandomVariable arg1,
-		RandomVariable arg2)
-{
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(s1[i] * s2[i]);
-
-	RandomVariable result = new EmpiricalDistribution(produced_data);
-	result.precededOperation = PRODUCT;
-	result.parrent1 = & arg1;
-	result.parrent2 = & arg2;
-	return result;
-}
-
-RandomVariable RandomVariable::MC_ratio(RandomVariable arg1,
-		RandomVariable arg2)
-{
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-	{
-		if (!s2[i])
-			s2[i] = 0.0000001;
-		produced_data.push_back(s1[i] / s2[i]);
-	}
-
-	RandomVariable result = new EmpiricalDistribution(produced_data);
-	result.precededOperation = RATIO;
-	result.parrent1 = & arg1;
-	result.parrent2 = & arg2;
-	return result;
-}
-
-/*
- *
- * --- Binary Operations: min, max
- */
-
-RandomVariable RandomVariable::MC_min(RandomVariable arg1,
-		RandomVariable arg2)
-{
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(std::min<double>(s1[i], s2[i]));
-	return RandomVariable(new EmpiricalDistribution(produced_data));
-}
-
-RandomVariable RandomVariable::MC_max(RandomVariable arg1,
-		RandomVariable arg2)
-{
-	std::vector<double> s1 = arg1.getDistribution()->sample(numberOfSamplesMC);
-	std::vector<double> s2 = arg2.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(std::max<double>(s1[i], s2[i]));
-	return RandomVariable(new EmpiricalDistribution(produced_data));
-}
-
-/*
  *
  *
+ * MINMAX alternative implementations
  *
- * Functions of ONE random variable
+ * so as to be more intuitive
  *
  *
  * */
 
-RandomVariable RandomVariable::MC_sum(double c_arg, RandomVariable rv_arg)
+// the very same implementation as in RandomVariable::min,
+// but this is called in a more intuitive way
+RandomVariable min(RandomVariable & firstarg, RandomVariable & secondarg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(c_arg + s[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return firstarg.min(secondarg);
 }
 
-RandomVariable RandomVariable::MC_difference(double c_arg, RandomVariable rv_arg)
+RandomVariable min(RandomVariable & rv_arg, double c_arg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(c_arg - s[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return rv_arg.min(c_arg);
 }
 
-RandomVariable RandomVariable::MC_product(double c_arg, RandomVariable rv_arg)
+RandomVariable min(double c_arg, RandomVariable & rv_arg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(c_arg * s[i]);
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return rv_arg.min(c_arg);
 }
 
-RandomVariable RandomVariable::MC_ratio(double c_arg, RandomVariable rv_arg)
+
+// the very same implementation as in RandomVariable::max,
+// but this is called in a more intuitive way
+RandomVariable max(RandomVariable & firstarg, RandomVariable & secondarg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-	{
-		if (!s[i])
-			s[i] = 0.0000001;
-		produced_data.push_back(c_arg / s[i]);
-	}
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return firstarg.max(secondarg);
 }
 
-RandomVariable RandomVariable::MC_min(double c_arg, RandomVariable rv_arg)
+RandomVariable max(RandomVariable & rv_arg, double c_arg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(std::min<double>(c_arg, s[i]));
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return rv_arg.max(c_arg);
 }
 
-RandomVariable RandomVariable::MC_max(double c_arg, RandomVariable rv_arg)
+RandomVariable max(double c_arg, RandomVariable & rv_arg)
 {
-	std::vector<double> s = rv_arg.getDistribution()->sample(numberOfSamplesMC);
-	int i;
-	std::vector<double> produced_data;
-	for (i = 0; i < numberOfSamplesMC; i++)
-		produced_data.push_back(std::max<double>(c_arg, s[i]));
-	return RandomVariable(new EmpiricalDistribution(produced_data));
+	return rv_arg.max(c_arg);
 }
 
 } // namespace stochastic

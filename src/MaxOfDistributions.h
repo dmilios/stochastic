@@ -1,31 +1,30 @@
 /*
- * MaxOfGaussians.h
+ * MaxOfDistributions.h
  *
  *  Created on: 27-Jul-2009
  *      Author: Dimitrios Milios
  */
 
-#ifndef MAXOFGAUSSIANS_H_
-#define MAXOFGAUSSIANS_H_
+#ifndef MAXOFDISTRIBUTIONS_H_
+#define MAXOFDISTRIBUTIONS_H_
 
 #include "MixtureComponent.h"
-#include "Gaussian.h"
 
 namespace stochastic {
 
-class MaxOfGaussians : public stochastic::MixtureComponent
+class MaxOfDistributions : public stochastic::MixtureComponent
 {
 public:
 private:
-	Gaussian arg1;
-	Gaussian arg2;
+	Distribution * arg1;
+	Distribution * arg2;
 
 	double cache_leftMargin;
 	double cache_rightMargin;
 
 public:
-	MaxOfGaussians(Gaussian, Gaussian);
-	virtual ~MaxOfGaussians();
+	MaxOfDistributions(Distribution *, Distribution *);
+	virtual ~MaxOfDistributions();
 
 	const char * getName();
 	double pdf(double);
@@ -37,4 +36,4 @@ public:
 
 } // namespace stochastic
 
-#endif /* MAXOFGAUSSIANS_H_ */
+#endif /* MAXOFDISTRIBUTIONS_H_ */

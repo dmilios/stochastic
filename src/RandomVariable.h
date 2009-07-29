@@ -22,7 +22,9 @@ enum OperationType
 	SUM,
 	DIFFERENCE,
 	PRODUCT,
-	RATIO
+	RATIO,
+	MIN,
+	MAX
 };
 
 class RandomVariable
@@ -40,24 +42,10 @@ private:
 	RandomVariable * parrent1;
 	RandomVariable * parrent2;
 
-	static RandomVariable recursive(OperationType, RandomVariable *,
+	static RandomVariable monteCarlo(OperationType, RandomVariable *,
 			RandomVariable *);
-	static double recursiveSample(OperationType, RandomVariable *,
+	static double recursiveSampling(OperationType, RandomVariable *,
 			RandomVariable *);
-
-	// Definitions of MonteCarlo versions of operators
-	static RandomVariable MC_sum(RandomVariable *, RandomVariable *);
-	static RandomVariable MC_difference(RandomVariable, RandomVariable);
-	static RandomVariable MC_product(RandomVariable, RandomVariable);
-	static RandomVariable MC_ratio(RandomVariable, RandomVariable);
-	static RandomVariable MC_min(RandomVariable, RandomVariable);
-	static RandomVariable MC_max(RandomVariable, RandomVariable);
-	static RandomVariable MC_sum(double, RandomVariable);
-	static RandomVariable MC_difference(double, RandomVariable);
-	static RandomVariable MC_product(double, RandomVariable);
-	static RandomVariable MC_ratio(double, RandomVariable);
-	static RandomVariable MC_min(double, RandomVariable);
-	static RandomVariable MC_max(double, RandomVariable);
 
 public:
 	RandomVariable();
@@ -76,11 +64,11 @@ public:
 	void produceFileOfSamples(int);
 
 	RandomVariable operator +(RandomVariable &);
-	RandomVariable operator -(RandomVariable);
-	RandomVariable operator *(RandomVariable);
-	RandomVariable operator /(RandomVariable);
-	RandomVariable min(RandomVariable);
-	RandomVariable max(RandomVariable);
+	RandomVariable operator -(RandomVariable &);
+	RandomVariable operator *(RandomVariable &);
+	RandomVariable operator /(RandomVariable &);
+	RandomVariable min(RandomVariable &);
+	RandomVariable max(RandomVariable &);
 
 	// the negative sign
 	friend RandomVariable operator -(RandomVariable);
@@ -94,10 +82,10 @@ public:
 	RandomVariable max(double);
 
 	// overload the same operator for the doubles
-	friend RandomVariable operator +(double, RandomVariable);
-	friend RandomVariable operator -(double, RandomVariable);
-	friend RandomVariable operator *(double, RandomVariable);
-	friend RandomVariable operator /(double, RandomVariable);
+	friend RandomVariable operator +(double, RandomVariable &);
+	friend RandomVariable operator -(double, RandomVariable &);
+	friend RandomVariable operator *(double, RandomVariable &);
+	friend RandomVariable operator /(double, RandomVariable &);
 };
 
 /*
@@ -105,13 +93,13 @@ public:
  * as in RandomVariable::min and RandomVariable::max,
  * but these are called in a more intuitive way
  */
-RandomVariable min(RandomVariable, RandomVariable);
-RandomVariable max(RandomVariable, RandomVariable);
+RandomVariable min(RandomVariable &, RandomVariable &);
+RandomVariable max(RandomVariable &, RandomVariable &);
 
-RandomVariable min(RandomVariable, double);
-RandomVariable max(RandomVariable, double);
-RandomVariable min(double, RandomVariable);
-RandomVariable max(double, RandomVariable);
+RandomVariable min(RandomVariable &, double);
+RandomVariable max(RandomVariable &, double);
+RandomVariable min(double, RandomVariable &);
+RandomVariable max(double, RandomVariable &);
 
 } // namespace stochastic
 

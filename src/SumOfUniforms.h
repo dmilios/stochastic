@@ -1,5 +1,5 @@
 /*
- * SumUniform.h
+ * SumOfUniforms.h
  *
  *  Created on: 26-Jul-2009
  *      Author: Dimitrios Milios

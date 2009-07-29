@@ -35,13 +35,12 @@ public:
 	static void computationsPG(std::vector <double> &, std::vector <double> &);
 	static void computationsMC(std::vector <double> &, std::vector <double> &);
 
-	static void depedencyMC();
+	static void dependencyMC();
 
 	static void pgApproxExample();
 
 	static void sumOfUniforms();
-	static void minmaxOfUniforms();
-	static void minmaxOfGaussians();
+	static void minmaxTests();
 	static void ratio();
 };
 

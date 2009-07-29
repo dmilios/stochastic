@@ -72,38 +72,6 @@ PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 	return result;
 }
 
-// alternative fit using quantile
-PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
-{
-	PiecewiseUniform * result = new PiecewiseUniform;
-
-	MixtureComponent * component;
-	double weight;
-	double step = 1 / (double) fixedNumberOfComponents;
-	int i;
-	double p = 0;
-	double x, x_step;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-	{
-		x = distribution->quantile(p);
-		if (p + step > 1)
-			x_step = distribution->quantile(1);
-		else
-			x_step = distribution->quantile(p + step);
-
-		weight = distribution->cdf(x_step) - distribution->cdf(x);
-		if (weight < 0) // negative results are just close to zero
-			weight = 0;
-
-		component = new Uniform(x, x_step);
-		result->components.push_back(component);
-		result->weights.push_back(1);
-		p += step;
-	}
-	result->cumulativeWeights = constructCumulativeWeights(result->weights);
-	return result;
-}
-
 /*
  *
  * Private methods
@@ -197,23 +165,6 @@ MixtureComponent * PiecewiseUniform::ratioOfComponents(
 	return new Uniform(* a, * b);
 }
 
-MixtureComponent * PiecewiseUniform::minOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
-{
-	double a = std::min<double>(arg1->getLeftMargin(), arg2->getLeftMargin());
-	double b = std::min<double>(arg1->getRightMargin(), arg2->getRightMargin());
-	return new Uniform(a, b);
-}
-
-MixtureComponent * PiecewiseUniform::maxOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
-{
-	double a = std::max<double>(arg1->getLeftMargin(), arg2->getLeftMargin());
-	double b = std::max<double>(arg1->getRightMargin(), arg2->getRightMargin());
-	return new Uniform(a, b);
-}
-
-
 /*
  *
  *
@@ -259,34 +210,6 @@ MixtureComponent * PiecewiseUniform::ratioOfComponents(double c_arg,
 	a = c_arg / a;
 	b = c_arg / b;
 	return new Uniform(std::min<double>(a, b), std::max<double>(a, b));
-}
-
-MixtureComponent * PiecewiseUniform::minOfComponents(
-		MixtureComponent * distr_arg, double c_arg)
-{
-	double a = std::min<double>(distr_arg->getLeftMargin(), c_arg);
-	double b = std::min<double>(distr_arg->getRightMargin(), c_arg);
-	if (a == b)
-	{
-		// FIXME: Are min and max valid?
-		double width = distr_arg->getRightMargin() - distr_arg->getLeftMargin();
-		return new Uniform(a - width, b);
-	}
-	return new Uniform(a, b);
-}
-
-MixtureComponent * PiecewiseUniform::maxOfComponents(
-		MixtureComponent * distr_arg, double c_arg)
-{
-	double a = std::max<double>(distr_arg->getLeftMargin(), c_arg);
-	double b = std::max<double>(distr_arg->getRightMargin(), c_arg);
-	if (a == b)
-	{
-		// FIXME: Are min and max valid?
-		double width = distr_arg->getRightMargin() - distr_arg->getLeftMargin();
-		return new Uniform(a, b + width);
-	}
-	return new Uniform(a, b);
 }
 
 } // namespace stochastic

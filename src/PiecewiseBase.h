@@ -42,10 +42,6 @@ protected:
 			MixtureComponent *) = 0;
 	virtual MixtureComponent * ratioOfComponents(MixtureComponent *,
 			MixtureComponent *) = 0;
-	virtual MixtureComponent * minOfComponents(MixtureComponent *,
-			MixtureComponent *) = 0;
-	virtual MixtureComponent * maxOfComponents(MixtureComponent *,
-			MixtureComponent *) = 0;
 
 	// for functions of ONE random variable
 	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
@@ -56,10 +52,6 @@ protected:
 			double) = 0;
 	virtual MixtureComponent * ratioOfComponents(double,
 			MixtureComponent *) = 0;
-	virtual MixtureComponent * minOfComponents(MixtureComponent *,
-			double) = 0;
-	virtual MixtureComponent * maxOfComponents(MixtureComponent *,
-			double) = 0;
 
 
 public:
@@ -73,8 +65,6 @@ public:
 	MixtureModel * difference(PiecewiseBase *);
 	MixtureModel * product(PiecewiseBase *);
 	MixtureModel * ratio(PiecewiseBase *);
-	MixtureModel * min(PiecewiseBase *);
-	MixtureModel * max(PiecewiseBase *);
 
 
 	// for functions of ONE random variable
@@ -82,8 +72,6 @@ public:
 	MixtureModel * differenceFrom(double);
 	MixtureModel * product(double);
 	MixtureModel * denominatorOf(double);
-	MixtureModel * min(double);
-	MixtureModel * max(double);
 };
 
 } // namespace stochastic
