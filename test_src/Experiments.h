@@ -30,7 +30,7 @@ public:
 	static void comparePGwithMC();
 	static void compareApproximations();
 
-	static void plotComputationsEvolution();
+	static void computationsEvolution();
 	static void computationsPU(std::vector <double> &, std::vector <double> &);
 	static void computationsPG(std::vector <double> &, std::vector <double> &);
 	static void computationsMC(std::vector <double> &, std::vector <double> &);
@@ -41,7 +41,8 @@ public:
 
 	static void sumOfUniforms();
 	static void minmaxTests();
-	static void ratio();
+	static void productTests();
+	static void ratioTests();
 };
 
 #endif /* EXPERIMENTS_H_ */

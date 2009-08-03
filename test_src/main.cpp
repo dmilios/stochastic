@@ -33,7 +33,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	Experiments::minmaxTests();
+	Experiments::productTests();
 
 	return printArguments(argc, argv);
 }

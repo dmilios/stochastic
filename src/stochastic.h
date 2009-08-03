@@ -27,5 +27,6 @@
 #include "MinOfDistributions.h"
 #include "MaxOfDistributions.h"
 #include "SumOfUniforms.h"
+#include "InverseRV_Distribution.h"
 
 #endif /* STOCHASTIC_H_ */

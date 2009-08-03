@@ -105,24 +105,13 @@ MixtureComponent * PiecewiseGaussian::differenceOfComponents(
 MixtureComponent * PiecewiseGaussian::productOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-	double a1 = arg1->getLeftMargin();
-	double b1 = arg1->getRightMargin();
-	double a2 = arg2->getLeftMargin();
-	double b2 = arg2->getRightMargin();
+	double m1 = ((Gaussian *) arg1)->getMean();
+	double v1 = ((Gaussian *) arg1)->getVariance();
+	double m2 = ((Gaussian *) arg2)->getMean();
+	double v2 = ((Gaussian *) arg2)->getVariance();
 
-	std::vector<double> margins;
-	margins.push_back(a1 * a2);
-	margins.push_back(a1 * b2);
-	margins.push_back(b1 * a2);
-	margins.push_back(b1 * b2);
-
-	std::vector<double>::iterator a = std::min_element(
-			margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-			margins.begin(), margins.end());
-
-	double var = pow((* b - * a) / 8, 2);
-	double m = (* a + * b) / 2;
+	double m = m1 * m2;
+	double var = v1 * v2 + v1 * m2 * m2 + v2 * m1 * m1;
 	return new Gaussian(m, var);
 }
 

@@ -137,7 +137,7 @@ void Experiments::comparePUwithMC()
 	plot.plotBuffered(CDF);
 }
 
-void Experiments::ratio()
+void Experiments::ratioTests()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
 	PiecewiseBase::setFixedNumberOfComponents(100);
@@ -265,7 +265,7 @@ void Experiments::compareApproximations()
 	plot.plotBuffered(CDF);
 }
 
-void Experiments::plotComputationsEvolution()
+void Experiments::computationsEvolution()
 {
 	Gnuplot plot;
 	std::vector <double> iteration_numbers;
@@ -514,10 +514,47 @@ void Experiments::minmaxTests()
 	plot.plotBuffered(CDF);
 }
 
+void Experiments::productTests()
+{
+	RandomVariable::setNumberOfSamplesMC(10000);
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	Gnuplot::setAccuracy(1000);
+
+	Gnuplot plot;
+
+	double m1 = 5, v1 = 4.9;
+
+	double m2 = 0;
+	double v2 = 0.1;
+	RandomVariable r1 = new Gaussian(m1, v1);
+	RandomVariable r2 = new Gaussian(m2, v2);
+	RandomVariable r3 = r1 / r2;
+
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+//	RandomVariable r4 = r1 / r2;
+
+	RandomVariable r4 = new InverseRV_Distribution(r2.getDistribution());
+//	RandomVariable r4 = new Gaussian(m2/m1 + v1*m2/(m1*m1*m1),v1*m2*m2 / (m1*m1*m1*m1) + v2 / (m1*m1));
+
+//	plot.addRV(r1);
+//	plot.addRV(r2);
+//	plot.addRV(r3);
+	plot.addRV(r4);
+
+	std::cout << "Time: " << clock() << "\n";
+	plot.plotBuffered(PDF);
+	plot.plotBuffered(CDF);
+}
+
 /*
  *
  *
+ *
+ *
  * Distance metrics
+ *
+ *
  *
  * */
 
