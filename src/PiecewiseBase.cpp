@@ -13,6 +13,8 @@
 #include <vector>
 #include <typeinfo>
 
+#include "InverseRV_Distribution.h"
+
 namespace stochastic {
 
 int PiecewiseBase::fixedNumberOfComponents = 10;
@@ -223,6 +225,7 @@ MixtureModel * PiecewiseBase::product(double c_arg)
 	return new MixtureModel(resultComponents, this->weights);
 }
 
+// deprecated: needed for comparison
 MixtureModel * PiecewiseBase::denominatorOf(double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;

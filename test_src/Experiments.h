@@ -41,8 +41,7 @@ public:
 
 	static void sumOfUniforms();
 	static void minmaxTests();
-	static void productTests();
-	static void ratioTests();
+	static void testProduct();
 };
 
 #endif /* EXPERIMENTS_H_ */

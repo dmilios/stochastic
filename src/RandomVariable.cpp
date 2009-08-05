@@ -13,6 +13,7 @@
 #include "MinOfDistributions.h"
 #include "MaxOfDistributions.h"
 #include "DeltaDistribution.h"
+#include "InverseRV_Distribution.h"
 #include <fstream>
 #include <string>
 #include <typeinfo>
@@ -171,7 +172,11 @@ void RandomVariable::produceFileOfSamples(int n)
 /*
  *
  *
+ *
+ *
+ *
  * --- Overload Binary Operators: '+', '-', '*', '/'
+ *
  *
  *
  */
@@ -262,20 +267,40 @@ RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(RATIO, this, & rightarg);
 
-	PiecewiseBase * leftDistribution;
-	PiecewiseBase * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->fit(this->distribution);
-	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
-	if (typeid(* rightarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->fit(rightarg.distribution);
-	else
-		rightDistribution = (PiecewiseBase *) rightarg.distribution;
+	if (1)
+	{
+		PiecewiseBase * leftDistribution;
+		PiecewiseBase * rightDistribution;
+		Distribution * inverseRight;
+		if (typeid(* this->distribution) != typeid(* approximator))
+			leftDistribution = approximator->fit(this->distribution);
+		else
+			leftDistribution = (PiecewiseBase *) this->distribution;
 
-	Distribution * raw = leftDistribution->ratio(rightDistribution);
-	PiecewiseBase * result = approximator->fit(raw);
-	return RandomVariable(result);
+
+		inverseRight = new InverseRV_Distribution(rightarg.distribution);
+		rightDistribution = approximator->fit(inverseRight);
+
+		Distribution * raw = leftDistribution->product(rightDistribution);
+		PiecewiseBase * result = approximator->fit(raw);
+		return RandomVariable(result);
+	}
+	{
+		PiecewiseBase * leftDistribution;
+		PiecewiseBase * rightDistribution;
+		if (typeid(* this->distribution) != typeid(* approximator))
+			leftDistribution = approximator->fit(this->distribution);
+		else
+			leftDistribution = (PiecewiseBase *) this->distribution;
+		if (typeid(* rightarg.distribution) != typeid(* approximator))
+			rightDistribution = approximator->fit(rightarg.distribution);
+		else
+			rightDistribution = (PiecewiseBase *) rightarg.distribution;
+
+		Distribution * raw = leftDistribution->ratio(rightDistribution);
+		PiecewiseBase * result = approximator->fit(raw);
+		return RandomVariable(result);
+	}
 }
 
 /*
@@ -452,19 +477,33 @@ RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 	if (!c_arg)
 		return RandomVariable();
 
-	PiecewiseBase * distr_arg;
-	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
-		distr_arg = rv_arg.approximator->fit(rv_arg.distribution);
-	else
-		distr_arg = (PiecewiseBase *) rv_arg.distribution;
+	if (true)
+	{
+		// construct an approximation of the inverse RV
+		// and multiply by the constant
+		PiecewiseBase * distr_arg = rv_arg.approximator->fit(
+				new InverseRV_Distribution(rv_arg.distribution));
 
-	/*
-	 * Need to implement this, so as to define the inverse
-	 * of a random variable
-	 * */
-	Distribution * raw = distr_arg->denominatorOf(c_arg);
-	PiecewiseBase * result = rv_arg.approximator->fit(raw);
-	return RandomVariable(result);
+		Distribution * raw = distr_arg->product(c_arg);
+		PiecewiseBase * result = rv_arg.approximator->fit(raw);
+		return RandomVariable(result);
+	}
+	else
+	{
+		PiecewiseBase * distr_arg;
+		if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
+			distr_arg = rv_arg.approximator->fit(rv_arg.distribution);
+		else
+			distr_arg = (PiecewiseBase *) rv_arg.distribution;
+
+		/*
+		 * Need to implement this, so as to define the inverse
+		 * of a random variable
+		 * */
+		Distribution * raw = distr_arg->denominatorOf(c_arg);
+		PiecewiseBase * result = rv_arg.approximator->fit(raw);
+		return RandomVariable(result);
+	}
 }
 
 RandomVariable RandomVariable::min(double c_arg)

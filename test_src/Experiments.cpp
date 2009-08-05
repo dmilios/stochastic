@@ -99,7 +99,7 @@ void Experiments::pgApproxExample()
 void Experiments::comparePUwithMC()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(50);
+	PiecewiseBase::setFixedNumberOfComponents(100);
 
 	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
@@ -137,47 +137,6 @@ void Experiments::comparePUwithMC()
 	plot.plotBuffered(CDF);
 }
 
-void Experiments::ratioTests()
-{
-	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
-	Gnuplot::setAccuracy(1000);
-	Gnuplot plot;
-	long int timer;
-
-	RandomVariable r1 = new Gaussian;
-	RandomVariable r2 = new Gaussian;
-
-	timer = clock();
-	RandomVariable r3 = r1 / r2;
-	std::cout << "PU time: " << clock() - timer << "\n";
-
-	RandomVariable::setMonteCarloFlag(1);
-	timer = clock();
-	RandomVariable r4 = r1 / r2;
-	std::cout << "MC time: " << clock() - timer << "\n\n";
-
-	Distribution * original = new Gaussian(4, 4); //  needed cauchy here
-	std::cout << "Kolmogorov Distance between PU and MC: ";
-	std::cout << kolmogorovDistance(r3.getDistribution(), r4.getDistribution());
-	std::cout << std::endl;
-	std::cout << "Kolmogorov Distance between PU and original: ";
-	std::cout << kolmogorovDistance(r3.getDistribution(), original);
-	std::cout << std::endl;
-	std::cout << "Kolmogorov Distance between original and MC: ";
-	std::cout << kolmogorovDistance(original, r4.getDistribution());
-	std::cout << std::endl << std::endl;
-
-//	plot.addRV(r1);
-//	plot.addRV(r2);
-	plot.addRV(r3);
-//	plot.addRV(r4);
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
-}
-
 void Experiments::comparePGwithMC()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
@@ -193,7 +152,7 @@ void Experiments::comparePGwithMC()
 
 	timer = clock();
 	RandomVariable r3 = r1 + r2;
-	std::cout << "PU time: " << clock() - timer << "\n";
+	std::cout << "PG time: " << clock() - timer << "\n";
 
 	RandomVariable::setMonteCarloFlag(1);
 	timer = clock();
@@ -230,11 +189,16 @@ void Experiments::compareApproximations()
 	std::vector <double> w;
 	c.push_back(new Gaussian(-2, 1));
 	w.push_back(1);
-	c.push_back(new Gaussian(24, 1));
+	c.push_back(new Gaussian(4, 1.5));
+	w.push_back(1);
+	c.push_back(new Gaussian(24, 2));
 	w.push_back(1);
 	MixtureModel mm(c, w); // to test MM
 
-	RandomVariable rv = new Gaussian;
+	InverseRV_Distribution inv(new Gaussian); // to test long tailed
+
+
+	RandomVariable rv = & inv;
 
 	timer = clock();
 	RandomVariable pu = new PiecewiseUniform(rv.getDistribution());
@@ -514,37 +478,58 @@ void Experiments::minmaxTests()
 	plot.plotBuffered(CDF);
 }
 
-void Experiments::productTests()
+void Experiments::testProduct()
 {
 	RandomVariable::setNumberOfSamplesMC(10000);
 	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
+	long int timer;
 
-	double m1 = 5, v1 = 4.9;
+	RandomVariable r1 = new Gaussian(6, 0.3);
+	RandomVariable r2 = new Gaussian(-5, 1);
 
-	double m2 = 0;
-	double v2 = 0.1;
-	RandomVariable r1 = new Gaussian(m1, v1);
-	RandomVariable r2 = new Gaussian(m2, v2);
-	RandomVariable r3 = r1 / r2;
+
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	timer = clock();
+	RandomVariable r3 = r1 + r2;
+	std::cout << "PU time: " << clock() - timer << "\n\n";
 
 	RandomVariable::setApproximatorType(new PiecewiseGaussian);
-//	RandomVariable r4 = r1 / r2;
+	timer = clock();
+	RandomVariable r4 = r1 + r2;
+	std::cout << "PG time: " << clock() - timer << "\n\n";
 
-	RandomVariable r4 = new InverseRV_Distribution(r2.getDistribution());
-//	RandomVariable r4 = new Gaussian(m2/m1 + v1*m2/(m1*m1*m1),v1*m2*m2 / (m1*m1*m1*m1) + v2 / (m1*m1));
+	RandomVariable::setMonteCarloFlag(1);
+	timer = clock();
+	RandomVariable r5 = r1 + r2;
+	std::cout << "MC time: " << clock() - timer << "\n\n";
 
-//	plot.addRV(r1);
-//	plot.addRV(r2);
-//	plot.addRV(r3);
+
+	std::cout << "Kolmogorov Distance between PU and MC: ";
+	std::cout << kolmogorovDistance(r3.getDistribution(), r5.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PG and MC: ";
+	std::cout << kolmogorovDistance(r4.getDistribution(), r5.getDistribution());
+	std::cout << std::endl;
+
+	plot.addRV(r3);
 	plot.addRV(r4);
 
 	std::cout << "Time: " << clock() << "\n";
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
+
+	/*
+	double m1 = 0;
+	double v1 = 1;
+	double m2 = 0;
+	double v2 = 1;
+	RandomVariable r4 = new Gaussian(m2/m1 + v1*m2/(m1*m1*m1),
+							v1*m2*m2 / (m1*m1*m1*m1) + v2 / (m1*m1));
+	*/
 }
 
 /*

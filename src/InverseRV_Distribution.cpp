@@ -16,8 +16,12 @@ InverseRV_Distribution::InverseRV_Distribution(Distribution * original)
 	this->original = original;
 	if (original->getLeftMargin() * original->getRightMargin() <= 0)
 	{
-		cache_leftMargin = original->getLeftMargin() / 0.1;
-		cache_rightMargin = original->getRightMargin() / 0.1;
+		// just initial margins
+		cache_leftMargin = original->getLeftMargin() / 0.001;
+		cache_rightMargin = original->getRightMargin() / 0.001;
+
+		cache_leftMargin = this->quantile(0.02);
+		cache_rightMargin = this->quantile(0.98);
 	}
 	else
 	{

@@ -48,28 +48,51 @@ PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
 	std::vector<double> supportInterval_rmargins;
 
 	// margin vectors are called by reference
-	double support = retrieveSupport(distribution, supportInterval_lmargins,
+	retrieveSupport(distribution, supportInterval_lmargins,
 			supportInterval_rmargins);
-	double step = support / (double) fixedNumberOfComponents;
 
-	int margin_counter = 0;
-	double x = supportInterval_lmargins[margin_counter];
-	double var = step * step;
+	int k; // counter for the support intervals
+	int componentsUsed = 0;
+	int total_support_intervals = supportInterval_lmargins.size();
 
-	double weight;
-	int i;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	// the accuracy for each support interval will be
+	// proportional to its probability mass
+	for (k = 0; k < total_support_intervals; k++)
 	{
-		// approximate the area, because CDF is inefficient
-		weight = distribution->pdf(x);
-		if (weight < 0) // negative results are just close to zero
-			weight = 0;
-		component = new Gaussian(x, var);
-		result->components.push_back(component);
-		result->weights.push_back(weight);
-		x += step;
-		if (x > supportInterval_rmargins[margin_counter])
-			x = supportInterval_lmargins[++margin_counter];
+		int intervalComponents;
+		// (F(b) - F(a)) * totalComponentNumber
+		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
+				- distribution->cdf(supportInterval_lmargins[k]))
+				* fixedNumberOfComponents;
+		if (k == total_support_intervals - 1) // the last one
+			intervalComponents = fixedNumberOfComponents - componentsUsed;
+		else
+			componentsUsed += intervalComponents;
+
+
+		int i;
+		double x = supportInterval_lmargins[k];
+		double weight;
+		double step = (supportInterval_rmargins[k]
+				- supportInterval_lmargins[k]) / intervalComponents;
+		double var = step * step;
+
+		for (i = 0; i < intervalComponents; i++)
+		{
+			weight = distribution->cdf(x + step / 2)
+						- distribution->cdf(x - step / 2);
+
+			if (x + step / 2 >= supportInterval_rmargins[k])
+				weight = 0;
+			if (x - step / 2 <= supportInterval_lmargins[k])
+				weight = 0;
+			if (weight < 0) // negative results are just close to zero
+				weight = 0;
+			component = new Gaussian(x, var);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
+			x += step;
+		}
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);
 	return result;

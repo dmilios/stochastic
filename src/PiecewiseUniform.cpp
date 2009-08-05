@@ -47,26 +47,90 @@ PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 	std::vector<double> supportInterval_rmargins;
 
 	// margin vectors are called by reference
-	double support = retrieveSupport(distribution, supportInterval_lmargins,
-			supportInterval_rmargins);
-	double step = support / (double) fixedNumberOfComponents;
+	retrieveSupport(distribution,
+			supportInterval_lmargins, supportInterval_rmargins);
 
-	int margin_counter = 0;
-	double x = supportInterval_lmargins[margin_counter];
+	int k; // counter for the support intervals
+	int componentsUsed = 0;
+	int total_support_intervals = supportInterval_lmargins.size();
 
+	// the accuracy for each support interval will be
+	// proportional to its probability mass
+	for (k = 0; k < total_support_intervals; k++)
+	{
+		int intervalComponents;
+		// (F(b) - F(a)) * totalComponentNumber
+		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
+				- distribution->cdf(supportInterval_lmargins[k]))
+					* fixedNumberOfComponents;
+		if (k == total_support_intervals - 1) // the last one
+			intervalComponents = fixedNumberOfComponents - componentsUsed;
+		else
+			componentsUsed += intervalComponents;
+
+
+		int i;
+		double x = supportInterval_lmargins[k];
+		double weight;
+		double step = (supportInterval_rmargins[k]
+				- supportInterval_lmargins[k]) / intervalComponents;
+
+		double p = distribution->pdf(x);
+		for (i = 0; i < intervalComponents; i++)
+		{
+			p = distribution->pdf(x + step);
+
+			weight = distribution->cdf(x + step) - distribution->cdf(x);
+
+			if (x + step >= supportInterval_rmargins[k])
+				weight = 0;
+			if (weight < 0) // negative results are just close to zero
+				weight = 0;
+			component = new Uniform(x, x + step);
+			result->components.push_back(component);
+			result->weights.push_back(weight);
+			x += step;
+		}
+	}
+	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	return result;
+}
+
+// alternative fit using quantile
+PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
+{
+	PiecewiseUniform * result = new PiecewiseUniform;
+
+	MixtureComponent * component;
 	double weight;
+	double step = 1 / (double) fixedNumberOfComponents;
 	int i;
+	double p = 0;
+	double x, x_step;
 	for (i = 0; i < fixedNumberOfComponents; i++)
 	{
-		weight = distribution->cdf(x + step) - distribution->cdf(x);
+		x = distribution->quantile(p);
+		if (p + step > 1)
+			x_step = distribution->quantile(1);
+		else
+			x_step = distribution->quantile(p + step);
+
+		weight = distribution->cdf(x_step) - distribution->cdf(x);
 		if (weight < 0) // negative results are just close to zero
 			weight = 0;
-		component = new Uniform(x, x + step);
+
+		try
+		{
+			component = new Uniform(x, x_step);
+		}
+		catch(InvalidParametersException e)
+		{
+			component = new Uniform(0, 1e-5);
+			weight = 0;
+		}
 		result->components.push_back(component);
 		result->weights.push_back(weight);
-		x += step;
-		if (x > supportInterval_rmargins[margin_counter])
-			x = supportInterval_lmargins[++margin_counter];
+		p += step;
 	}
 	result->cumulativeWeights = constructCumulativeWeights(result->weights);
 	return result;

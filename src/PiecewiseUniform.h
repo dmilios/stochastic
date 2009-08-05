@@ -37,6 +37,7 @@ public:
 	virtual ~PiecewiseUniform();
 
 	PiecewiseBase * fit(Distribution *);
+	PiecewiseBase * fit2(Distribution *);
 	const char * getName();
 
 
