@@ -18,9 +18,7 @@ private:
 	static double kolmogorovDistance(Distribution *, Distribution *);
 	static double KL_Divergence(Distribution *, Distribution *);
 	static double hellingerDistance(Distribution *, Distribution *);
-	static double euclideanDistancePDF(Distribution *, Distribution *);
 	static double manhattanDistancePDF(Distribution *, Distribution *);
-	static double euclideanDistanceCDF(Distribution *, Distribution *);
 	static double manhattanDistanceCDF(Distribution *, Distribution *);
 
 public:
@@ -42,6 +40,15 @@ public:
 	static void sumOfUniforms();
 	static void minmaxTests();
 	static void testProduct();
+	static void testDistances();
+
+
+	static void thesis_3_4_1();
+	static void thesis_3_4_2();
+	static void thesis_4_2_1();
+	static void thesis_4_2_2__1();
+	static void thesis_4_2_2__2();
+	static void thesis_4_2_3();
 };
 
 #endif /* EXPERIMENTS_H_ */

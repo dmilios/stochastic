@@ -36,7 +36,7 @@ PiecewiseGaussian::~PiecewiseGaussian()
 
 const char * PiecewiseGaussian::getName()
 {
-	return "pNorm";
+	return "Piecewise Gaussian";
 }
 
 PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)

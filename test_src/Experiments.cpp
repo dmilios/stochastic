@@ -9,6 +9,7 @@
 
 #include "Gnuplot.h"
 #include <cmath>
+#include <ctime>
 #include <algorithm>
 
 void Experiments::current()
@@ -181,7 +182,7 @@ void Experiments::comparePGwithMC()
 void Experiments::compareApproximations()
 {
 	PiecewiseBase::setFixedNumberOfComponents(100);
-	Gnuplot::setAccuracy(1000);
+	Gnuplot::setAccuracy(100);
 	Gnuplot plot;
 	long int timer;
 
@@ -198,29 +199,44 @@ void Experiments::compareApproximations()
 	InverseRV_Distribution inv(new Gaussian); // to test long tailed
 
 
-	RandomVariable rv = & inv;
-
-	timer = clock();
+	RandomVariable rv = new Gaussian;
 	RandomVariable pu = new PiecewiseUniform(rv.getDistribution());
-	std::cout << "PU time: " << clock() - timer << "\n";
+	RandomVariable pg = new PiecewiseGaussian(rv.getDistribution());
+
+
+	RandomVariable a(new Gaussian), b(new Gaussian);
+	timer = clock();
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	a + b;
+	std::cout << "PU sum time (ms): " << 1000 * (double) (clock() - timer)
+			/ CLOCKS_PER_SEC << "\n";
 
 	timer = clock();
-	RandomVariable pg = new PiecewiseGaussian(rv.getDistribution());
-	std::cout << "PG time: " << clock() - timer << "\n";
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	a + b;
+	std::cout << "PG sum time (ms): " << 1000 * (double) (clock() - timer)
+			/ CLOCKS_PER_SEC << "\n\n";
+
+	std::cout << "KL Divergence between PU and original: ";
+	std::cout << KL_Divergence(rv.getDistribution(), pu.getDistribution());
+	std::cout << std::endl;
+	std::cout << "KL Divergence between PG and original: ";
+	std::cout << KL_Divergence(rv.getDistribution(), pg.getDistribution());
+	std::cout << std::endl << std::endl;
 
 	std::cout << "Kolmogorov Distance between PU and original: ";
 	std::cout << kolmogorovDistance(rv.getDistribution(), pu.getDistribution());
 	std::cout << std::endl;
 	std::cout << "Kolmogorov Distance between PG and original: ";
 	std::cout << kolmogorovDistance(rv.getDistribution(), pg.getDistribution());
-	std::cout << std::endl;
+	std::cout << std::endl << std::endl;
 
 	std::cout << "CDF Distance between PU and original: ";
-	std::cout << euclideanDistanceCDF(rv.getDistribution(), pu.getDistribution());
+	std::cout << manhattanDistanceCDF(rv.getDistribution(), pu.getDistribution());
 	std::cout << std::endl;
 	std::cout << "CDF Distance between PG and original: ";
-	std::cout << euclideanDistanceCDF(rv.getDistribution(), pg.getDistribution());
-	std::cout << std::endl;
+	std::cout << manhattanDistanceCDF(rv.getDistribution(), pg.getDistribution());
+	std::cout << std::endl << std::endl;
 
 	plot.addRV(rv);
 	plot.addRV(pu);
@@ -235,12 +251,25 @@ void Experiments::computationsEvolution()
 	std::vector <double> iteration_numbers;
 	std::vector <double> errors;
 
+	PiecewiseBase::setFixedNumberOfComponents(200);
+
+
 	Experiments::computationsPU(iteration_numbers, errors);
-	plot.addCurve(OTHER, "Kolmogorov Distance Evolution for New", iteration_numbers, errors);
+	plot.addCurve(OTHER, "KL_Divergence Evolution for PU New",
+			iteration_numbers, errors);
+
+	std::cout << std::endl << "--------------------------------" << std::endl;
+
+//	Experiments::computationsPG(iteration_numbers, errors);
+//	plot.addCurve(OTHER, "KL_Divergence Evolution for PG", iteration_numbers,
+//			errors);
+
+	std::cout << std::endl << "--------------------------------" << std::endl;
 
 	PiecewiseUniform::useold = 1;
 	Experiments::computationsPU(iteration_numbers, errors);
-	plot.addCurve(OTHER, "Kolmogorov Distance Evolution for Old", iteration_numbers, errors);
+	plot.addCurve(OTHER, "KL_Divergence Evolution for PU Old",
+			iteration_numbers, errors);
 
 	plot.plotBuffered(OTHER);
 }
@@ -250,8 +279,6 @@ void Experiments::computationsEvolution()
 void Experiments::computationsPU(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	PiecewiseBase::setFixedNumberOfComponents(100);
-
 	RandomVariable::setApproximatorType(new PiecewiseUniform);
 	Gnuplot::setAccuracy(1000);
 //	Gnuplot plot;
@@ -263,8 +290,8 @@ void Experiments::computationsPU(std::vector<double> & counters, std::vector<
 	PiecewiseUniform pu(new Gaussian);
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
-	std::cout << "\n0: Kolmogorov Distance between PU and original: ";
-	errors.push_back(kolmogorovDistance(&pu, original));
+	std::cout << "\n0: KL_Divergence between PU and original: ";
+	errors.push_back(KL_Divergence(&pu, original));
 	counters.push_back(0);
 	std::cout << errors[0];
 	std::cout << std::endl << std::endl;
@@ -284,8 +311,8 @@ void Experiments::computationsPU(std::vector<double> & counters, std::vector<
 		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PU time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
-		std::cout << "Kolmogorov Distance between PU and original: ";
-		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
+		std::cout << "KL_Divergence between PU and original: ";
+		errors.push_back(KL_Divergence(rv.getDistribution(), original));
 		counters.push_back(i + 1);
 		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
@@ -300,8 +327,6 @@ void Experiments::computationsPU(std::vector<double> & counters, std::vector<
 void Experiments::computationsPG(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	PiecewiseBase::setFixedNumberOfComponents(100);
-
 	RandomVariable::setApproximatorType(new PiecewiseGaussian);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -313,15 +338,15 @@ void Experiments::computationsPG(std::vector<double> & counters, std::vector<
 	PiecewiseGaussian pg(new Gaussian);
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
-	std::cout << "\n0: Kolmogorov Distance between PG and original: ";
-	errors.push_back(kolmogorovDistance(&pg, original));
+	std::cout << "\n0: KL_Divergence between PG and original: ";
+	errors.push_back(KL_Divergence(&pg, original));
 	counters.push_back(0);
 	std::cout << errors[0];
 	std::cout << std::endl << std::endl;
 
 	RandomGenerator random;
 	int i;
-	for (i = 0; i < 1; i++)
+	for (i = 0; i < 10; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -334,16 +359,16 @@ void Experiments::computationsPG(std::vector<double> & counters, std::vector<
 		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
 		std::cout << "PG time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
-		std::cout << "Kolmogorov Distance between PG and original: ";
-		errors.push_back(kolmogorovDistance(rv.getDistribution(), original));
+		std::cout << "KL_Divergence between PG and original: ";
+		errors.push_back(KL_Divergence(rv.getDistribution(), original));
 		counters.push_back(i + 1);
 		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-	plot.addRV(*new RandomVariable(original)); // plot the last only
-	plot.addRV(rv);
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
+//	plot.addRV(*new RandomVariable(original)); // plot the last only
+//	plot.addRV(rv);
+//	plot.plotBuffered(PDF);
+//	plot.plotBuffered(CDF);
 }
 
 // conduct a series of computations with known results
@@ -403,10 +428,11 @@ void Experiments::dependencyMC()
 	RandomVariable a = new Gaussian, b = new Gaussian;
 	RandomVariable c, d;
 
-	a = a + b;
-	d = a + b;
+	c = a + a;
+//	a = new Uniform(7, 14);
+	d = c + b;
 
-	plot.addRV(a);
+	plot.addRV(c);
 	plot.addRV(d);
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
@@ -563,49 +589,30 @@ double Experiments::kolmogorovDistance(Distribution * arg1, Distribution * arg2)
 	return supremum;
 }
 
-/* @brief Computes KL-Div(P||Q), where P==this, Q==arg
- * Integral is computed by constructing interpolating linear functions */
+/* @brief Computes KL-Div(P||Q) */
 double Experiments::KL_Divergence(Distribution * arg1, Distribution * arg2)
 {
-	double result = 0;
-	int accuracy = 100;
-	double start = arg1->getLeftMargin();
-	double end = arg1->getRightMargin();
-	if (arg2->getLeftMargin() < start)
-		start = arg2->getLeftMargin();
-	if (arg2->getRightMargin() > end)
-		end = arg2->getRightMargin();
-
-	double x = start;
-	double step = (end - start) / accuracy;
-	double fx_a, fx_b;
+	int accuracy = 100000;
 	int i;
-	double px = arg1->pdf(x);
-	double qx = arg2->pdf(x);
-
-	fx_a = px * log(px / qx);
+	double sum = 0;
+	double x;
 	for (i = 0; i < accuracy; i++)
 	{
-		px = arg1->pdf(x + step);
-		qx = arg2->pdf(x + step);
-		if (!px || !qx) // any pdf is zero
-		{
-			x = x + step;
-			continue;
-		}
-		fx_b = px * log(px / qx);
-		result += step * (fx_a + fx_b) / 2;
-
-		fx_a = fx_b;
-		x = x + step;
+		x = arg1->nextSample();
+		double tmp = log(arg1->pdf(x) / arg2->pdf(x));
+		if (tmp != INFINITY)
+			sum += tmp;
 	}
-	return result;
+	return sum / accuracy;
 }
 
 double Experiments::hellingerDistance(Distribution * arg1, Distribution * arg2)
 {
-	double result = 0;
 	int accuracy = 100;
+	int i;
+	double x;
+
+	double result = 0;
 	double start = arg1->getLeftMargin();
 	double end = arg1->getRightMargin();
 	if (arg2->getLeftMargin() < start)
@@ -613,10 +620,9 @@ double Experiments::hellingerDistance(Distribution * arg1, Distribution * arg2)
 	if (arg2->getRightMargin() > end)
 		end = arg2->getRightMargin();
 
-	double x = start;
+	x = start;
 	double step = (end - start) / accuracy;
 	double fx_a, fx_b;
-	int i;
 
 	fx_a = pow(sqrt(arg1->pdf(x)) - sqrt(arg2->pdf(x)), 2);
 	for (i = 0; i < accuracy; i++)
@@ -627,35 +633,6 @@ double Experiments::hellingerDistance(Distribution * arg1, Distribution * arg2)
 		x = x + step;
 	}
 	return (result / 2);
-}
-
-double Experiments::euclideanDistancePDF(Distribution * arg1, Distribution * arg2)
-{
-	double result = 0;
-	int accuracy = 1000;
-	double start = arg1->getLeftMargin();
-	double end = arg1->getRightMargin();
-	if (arg2->getLeftMargin() < start)
-		start = arg2->getLeftMargin();
-	if (arg2->getRightMargin() > end)
-		end = arg2->getRightMargin();
-
-	double x = start;
-	double step = (end - start) / accuracy;
-	double fx_a, fx_b;
-	int i;
-
-	double diff = arg1->pdf(x) - arg2->pdf(x);
-	fx_a = diff * diff;
-	for (i = 0; i < accuracy; i++)
-	{
-		diff = arg1->pdf(x + step) - arg2->pdf(x + step);
-		fx_b = diff * diff;
-		result += step * (fx_a + fx_b) / 2;
-		fx_a = fx_b;
-		x = x + step;
-	}
-	return sqrt(result);
 }
 
 double Experiments::manhattanDistancePDF(Distribution * arg1, Distribution * arg2)
@@ -685,36 +662,6 @@ double Experiments::manhattanDistancePDF(Distribution * arg1, Distribution * arg
 	return result;
 }
 
-
-double Experiments::euclideanDistanceCDF(Distribution * arg1, Distribution * arg2)
-{
-	double result = 0;
-	int accuracy = 1000;
-	double start = arg1->getLeftMargin();
-	double end = arg1->getRightMargin();
-	if (arg2->getLeftMargin() < start)
-		start = arg2->getLeftMargin();
-	if (arg2->getRightMargin() > end)
-		end = arg2->getRightMargin();
-
-	double x = start;
-	double step = (end - start) / accuracy;
-	double fx_a, fx_b;
-	int i;
-
-	double diff = arg1->cdf(x) - arg2->cdf(x);
-	fx_a = diff * diff;
-	for (i = 0; i < accuracy; i++)
-	{
-		diff = arg1->cdf(x + step) - arg2->cdf(x + step);
-		fx_b = diff * diff;
-		result += step * (fx_a + fx_b) / 2;
-		fx_a = fx_b;
-		x = x + step;
-	}
-	return sqrt(result);
-}
-
 double Experiments::manhattanDistanceCDF(Distribution * arg1, Distribution * arg2)
 {
 	double result = 0;
@@ -740,4 +687,439 @@ double Experiments::manhattanDistanceCDF(Distribution * arg1, Distribution * arg
 		x = x + step;
 	}
 	return result;
+}
+
+void Experiments::testDistances()
+{
+	using namespace std;
+
+	Gaussian a;
+	Gaussian b(1);
+
+	cout << hellingerDistance(&a, &b) << endl;
+}
+
+
+
+
+
+/*
+ *
+ *
+ *
+ *  THESIS EXPERIMENTS
+ *
+ * */
+
+void Experiments::thesis_3_4_1()
+{
+	PiecewiseBase::setFixedNumberOfComponents(10);
+	Gnuplot::setAccuracy(100);
+	Gnuplot plot;
+
+	RandomVariable rv_original = new Gaussian;
+	RandomVariable rv_puniform = new PiecewiseUniform(new Gaussian);
+
+	plot.addRV(rv_original);
+	plot.addRV(rv_puniform);
+
+	plot.setTexFile(
+			"/home/dimitrios/Documents/academic/MSc/thesis/tex/fig_approx_puni");
+	plot.plotBuffered(PDF);
+}
+
+void Experiments::thesis_3_4_2()
+{
+	PiecewiseBase::setFixedNumberOfComponents(10);
+	Gnuplot::setAccuracy(100);
+	Gnuplot plot;
+
+	RandomVariable rv_original = new Uniform;
+	RandomVariable rv_puniform = new PiecewiseGaussian(new Uniform);
+
+	plot.addRV(rv_original);
+	plot.addRV(rv_puniform);
+
+	plot.setTexFile(
+			"/home/dimitrios/Documents/academic/MSc/thesis/tex/fig_approx_pnorm");
+	plot.plotBuffered(PDF);
+}
+
+void Experiments::thesis_4_2_1()
+{
+	Gnuplot::setAccuracy(100);
+	Gnuplot plot;
+	long int timer;
+
+
+	RandomVariable rv_original = new Gaussian;
+	RandomVariable rv_puniform;
+	RandomVariable rv_pgaussian;
+
+	vector<double> componentNumber;
+	componentNumber.push_back(10);
+	componentNumber.push_back(15);
+	componentNumber.push_back(20);
+	componentNumber.push_back(30);
+	componentNumber.push_back(40);
+	componentNumber.push_back(50);
+	componentNumber.push_back(60);
+	componentNumber.push_back(70);
+	componentNumber.push_back(80);
+	componentNumber.push_back(90);
+	componentNumber.push_back(100);
+	componentNumber.push_back(110);
+	componentNumber.push_back(120);
+	componentNumber.push_back(150);
+
+
+	vector <double> times_pu;
+	vector <double> kl_div_pu;
+	vector <double> times_pg;
+	vector <double> kl_div_pg;
+
+	unsigned int i;
+	for (i = 0; i < componentNumber.size(); i++)
+	{
+		PiecewiseBase::setFixedNumberOfComponents(componentNumber[i]);
+		std::cout << "--------------------------------------------\n";
+		std::cout << "\nNumber of Components: " << componentNumber[i];
+		std::cout << "\n";
+
+
+		// Approximate both ways
+		rv_puniform = new PiecewiseUniform(rv_original.getDistribution());
+		rv_pgaussian = new PiecewiseGaussian(rv_original.getDistribution());
+
+
+		// ----- Perform a computation
+		RandomVariable a(new Gaussian), b(new Gaussian);
+		timer = clock();
+		RandomVariable::setApproximatorType(new PiecewiseUniform);
+		a + b;
+		timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+		std::cout << "PU sum time (ms): " << timer << "\n";
+
+		times_pu.push_back(timer); // store the timers to plot them later
+
+		timer = clock();
+		RandomVariable::setApproximatorType(new PiecewiseGaussian);
+		a + b;
+		timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+		std::cout << "PG sum time (ms): " << timer << "\n\n";
+
+		times_pg.push_back(timer); // store the timers to plot them later
+
+
+
+		std::cout << "KL Divergence between PU and original: ";
+		std::cout << KL_Divergence(rv_original.getDistribution(),
+				rv_puniform.getDistribution());
+		std::cout << std::endl;
+		kl_div_pu.push_back(KL_Divergence(rv_original.getDistribution(),
+				rv_puniform.getDistribution()));
+
+		std::cout << "KL Divergence between PG and original: ";
+		std::cout << KL_Divergence(rv_original.getDistribution(),
+				rv_pgaussian.getDistribution());
+		std::cout << std::endl << std::endl;
+		kl_div_pg.push_back(KL_Divergence(rv_original.getDistribution(),
+				rv_pgaussian.getDistribution()));
+	}
+
+	plot.addCurve(OTHER, "Time (ms) for Piecewise Uniform",
+				componentNumber, times_pu);
+	plot.addCurve(OTHER, "Time (ms) for Piecewise Gaussian",
+				componentNumber, times_pg);
+
+	plot.setTexFile("/home/dimitrios/Documents/academic/MSc/thesis/tex/fig_acc");
+	plot.plotBuffered(OTHER);
+	plot.clearBuffer();
+
+	plot.addCurve(OTHER, "KL Divergence for Piecewise Uniform",
+			componentNumber, kl_div_pu);
+	plot.addCurve(OTHER, "KL Divergence for Piecewise Gaussian",
+			componentNumber, kl_div_pg);
+
+	plot.setTexFile("/home/dimitrios/Documents/academic/MSc/thesis/tex/fig_eff");
+	plot.plotBuffered(OTHER);
+}
+
+void Experiments::thesis_4_2_2__1()
+{
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	RandomVariable::setNumberOfSamplesMC(2000);
+	Gnuplot::setAccuracy(100);
+
+	Gnuplot plot;
+	long int timer;
+
+	RandomVariable rv_initial = new Gaussian(-4, 2);
+	RandomVariable rv_result = new Gaussian(6, 0.5);
+	RandomVariable rv_pu;
+	RandomVariable rv_pg;
+	RandomVariable rv_mc;
+
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	timer = clock();
+	rv_pu = -rv_initial / 2 + 4;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PU time (ms): " << timer << "\n\n";
+
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	timer = clock();
+	rv_pg = -rv_initial / 2 + 4;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PG time (ms): " << timer << "\n\n";
+
+	RandomVariable::setMonteCarloFlag(1);
+	timer = clock();
+	rv_mc = -rv_initial / 2 + 4;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "MC time (ms): " << timer << "\n\n";
+
+
+	std::cout << "KL Divergence between PU and original: ";
+	std::cout << KL_Divergence(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "KL Divergence between PG and original: ";
+	std::cout << KL_Divergence(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+	//-----------------------------------
+	std::cout << "Kolmogorov Distance between MC and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PU and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PG and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+	//-----------------------------------
+	std::cout << "CDF Distance between MC and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PU and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PG and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+
+
+
+	plot.addRV(rv_result);
+	plot.addRV(rv_pu);
+	plot.addRV(rv_pg);
+	plot.addRV(rv_mc);
+	plot.plotBuffered(PDF);
+	plot.plotBuffered(CDF);
+}
+
+void Experiments::thesis_4_2_2__2()
+{
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	Gnuplot::setAccuracy(50);
+
+	Gnuplot plot;
+	long int timer;
+
+	RandomVariable rv_initial = new Gaussian(4, 1);
+	RandomVariable rv_result;
+	RandomVariable rv_pu;
+	RandomVariable rv_pg;
+	RandomVariable rv_mc;
+
+
+	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable::setNumberOfSamplesMC(100000);
+	rv_result = max(rv_initial, 3);
+
+
+
+	// reset and go
+	RandomVariable::setNumberOfSamplesMC(2000);
+	RandomVariable::setMonteCarloFlag(0);
+
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	timer = clock();
+	rv_pu = max(rv_initial, 3);
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PU time (ms): " << timer << "\n\n";
+
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	timer = clock();
+	rv_pg = max(rv_initial, 3);
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PG time (ms): " << timer << "\n\n";
+
+	RandomVariable::setMonteCarloFlag(1);
+	timer = clock();
+	rv_mc = max(rv_initial, 3);
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "MC time (ms): " << timer << "\n\n";
+
+
+	//-----------------------------------
+	std::cout << "Kolmogorov Distance between MC and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PU and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PG and original: ";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+	//-----------------------------------
+	std::cout << "CDF Distance between MC and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PU and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PG and original: ";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+
+
+
+	plot.addRV(rv_result);
+	plot.addRV(rv_pu);
+	plot.addRV(rv_pg);
+//	plot.addRV(rv_mc);
+
+	plot.setTexFile("/home/dimitrios/Documents/academic/MSc/thesis/tex/fig_ex_max1");
+	plot.plotBuffered(PDF);
+}
+
+void Experiments::thesis_4_2_3()
+{
+	PiecewiseBase::setFixedNumberOfComponents(100);
+	RandomVariable::setNumberOfSamplesMC(8000);
+	Gnuplot::setAccuracy(100);
+
+	Gnuplot plot;
+	long int timer;
+
+	RandomVariable rv_1 = new Gaussian(2, 1);
+	RandomVariable rv_2 = new Gaussian(3, 2);
+	RandomVariable rv_result = new Gaussian(5, 3);
+
+	RandomVariable rv_pu_old;
+	RandomVariable rv_pu;
+	RandomVariable rv_pg;
+	RandomVariable rv_mc;
+
+	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	PiecewiseUniform::useold = 1;
+	timer = clock();
+	rv_pu_old = rv_1 + rv_2;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PU time (ms): " << timer << "\n\n";
+
+	PiecewiseUniform::useold = 0;
+	timer = clock();
+	rv_pu = rv_1 + rv_2;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PU time (ms): " << timer << "\n\n";
+
+	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	timer = clock();
+	rv_pg = rv_1 + rv_2;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "PG time (ms): " << timer << "\n\n";
+
+	RandomVariable::setMonteCarloFlag(1);
+	timer = clock();
+	rv_mc = rv_1 + rv_2;
+	timer = 1000 * (double) (clock() - timer) / CLOCKS_PER_SEC;
+	std::cout << "MC time (ms): " << timer << "\n\n";
+
+
+	std::cout << "KL Divergence between OLD PU and original: \t\t";
+	std::cout << KL_Divergence(rv_result.getDistribution(),
+			rv_pu_old.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "KL Divergence between PU and original: \t\t\t";
+	std::cout << KL_Divergence(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "KL Divergence between PG and original: \t\t\t";
+	std::cout << KL_Divergence(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl << std::endl;
+	//-----------------------------------
+	std::cout << "Kolmogorov Distance between MC and original: \t\t";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between OLD PU and original: \t";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pu_old.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PU and original: \t\t";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "Kolmogorov Distance between PG and original: \t\t";
+	std::cout << kolmogorovDistance(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl << std::endl;
+	//-----------------------------------
+	std::cout << "CDF Distance between MC and original: \t\t\t";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_mc.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between OLD PU and original: \t\t";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pu_old.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PU and original: \t\t\t";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pu.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "CDF Distance between PG and original: \t\t\t";
+	std::cout << manhattanDistanceCDF(rv_result.getDistribution(),
+			rv_pg.getDistribution());
+	std::cout << std::endl;
+
+
+
+	plot.addRV(rv_result);
+	plot.addRV(rv_pu_old);
+	plot.addRV(rv_pu);
+	plot.addRV(rv_pg);
+	plot.addRV(rv_mc);
+	plot.plotBuffered(PDF);
 }

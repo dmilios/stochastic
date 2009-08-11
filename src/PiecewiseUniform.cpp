@@ -35,7 +35,7 @@ PiecewiseUniform::~PiecewiseUniform()
 
 const char * PiecewiseUniform::getName()
 {
-	return "pUni";
+	return "Piecewise Uniform";
 }
 
 PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)

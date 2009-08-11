@@ -16,7 +16,11 @@ int Gnuplot::accuracy = 1000;
 
 Gnuplot::Gnuplot()
 {
-	options = " with lines lw 1";
+	outputFile = 0;
+	texFile = 0;
+	options.push_back(" with lines lw 1");
+//	options.push_back(" with lines lw 5");
+//	options.push_back(" with linespoints lw 1");
 }
 
 Gnuplot::~Gnuplot()
@@ -36,21 +40,21 @@ void Gnuplot::addRV(stochastic::RandomVariable rv)
 	vector <double> vx, vy;
 
 	rv.pdfOutline(accuracy, vx, vy);
-	curveName = "PDF ";
+	curveName = " ";
 	curveName.append(rvName.c_str());
 	addCurve(PDF, curveName.c_str(), vx, vy);
 
 	vx.clear();
 	vy.clear();
 	rv.cdfOutline(accuracy, vx, vy);
-	curveName = "CDF ";
+	curveName = " ";
 	curveName.append(rvName.c_str());
 	addCurve(CDF, curveName.c_str(), vx, vy);
 
 	vx.clear();
 	vy.clear();
 	rv.quantileOutline(accuracy, vx, vy);
-	curveName = "InverseCDF ";
+	curveName = " ";
 	curveName.append(rvName.c_str());
 	addCurve(INVERSE_CDF, curveName.c_str(), vx, vy);
 }
@@ -83,8 +87,22 @@ void Gnuplot::plotBuffered(CurveTypes type)
 	FILE * gnuplot;
 	unsigned int i;
 	int first_entered_flag = 0;
+	int entered_counter = 0;
 
 	gnuplot = popen("gnuplot", "w");
+
+
+	if (texFile)
+	{
+		fprintf(gnuplot, "set terminal latex\n");
+		fflush(gnuplot);
+
+		fprintf(gnuplot, "set output \"%s.tex\"\n", texFile->c_str());
+		fflush(gnuplot);
+
+//		fprintf(gnuplot, "set xlabel \"Number of Components\"\n");
+//		fflush(gnuplot);
+	}
 
 	fprintf(gnuplot, "plot ");
 	fflush(gnuplot);
@@ -99,20 +117,44 @@ void Gnuplot::plotBuffered(CurveTypes type)
 			}
 			else
 				first_entered_flag = 1;
-			fprintf(gnuplot, "'%s' title '%s' %s", tmpFiles[i].c_str(), names[i].c_str(), options.c_str());
+			fprintf(gnuplot, "'%s' title '%s' %s", tmpFiles[i].c_str(),
+					names[i].c_str(), options[entered_counter].c_str());
 			fflush(gnuplot);
+
+			entered_counter++;
+			entered_counter = entered_counter % options.size();
 		}
 	}
 	fprintf(gnuplot, "\n");
 	fflush(gnuplot);
 
+	if(outputFile)
+	{
+		fprintf(gnuplot, "shell\n");
+		fflush(gnuplot);
+		fprintf(gnuplot, "xwd -out %s.png\n", outputFile->c_str());
+		fflush(gnuplot);
+
+		fprintf(gnuplot, "xwdtopnm %s.png | pnmtopng > foo.png\n",
+				outputFile->c_str());
+		fflush(gnuplot);
+		printf("Click the output window to continue...\n");
+		fflush(stdout);
+
+		fprintf(gnuplot, "exit\n");
+		fflush(gnuplot);
+	}
+
+
 	printf("Press enter to continue...");
 	fflush(stdout);
 	getchar();
 
+
 	fprintf(gnuplot, "exit\n");
 	fflush(stdout);
 	pclose(gnuplot);
+	outputFile = 0;
 }
 
 void Gnuplot::clearBuffer()
@@ -120,4 +162,15 @@ void Gnuplot::clearBuffer()
 	names.clear();
 	tmpFiles.clear();
 	types.clear();
+}
+
+// should be called before plotBuffered()
+void Gnuplot::setOutputFile(const char * filename)
+{
+	outputFile = new string(filename);
+}
+
+void Gnuplot::setTexFile(const char * filename)
+{
+	texFile = new string(filename);
 }

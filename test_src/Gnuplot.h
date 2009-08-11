@@ -26,10 +26,13 @@ class Gnuplot
 {
 private:
 	static int accuracy;
+	string * outputFile;
+	string * texFile;
+
 	vector <string> names;
 	vector <string> tmpFiles;
 	vector <CurveTypes> types;
-	string options;
+	vector <string> options;
 
 public:
 	Gnuplot();
@@ -41,6 +44,8 @@ public:
 	void addCurve(CurveTypes, string, vector <double>, vector <double>);
 	void plotBuffered(CurveTypes);
 	void clearBuffer();
+	void setOutputFile(const char *);
+	void setTexFile(const char *);
 };
 
 #endif /* GNUPLOT_H_ */

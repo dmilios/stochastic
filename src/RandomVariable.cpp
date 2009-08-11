@@ -362,9 +362,9 @@ RandomVariable RandomVariable::operator +(double c_arg)
 	else
 		leftDistribution = (PiecewiseBase *) this->distribution;
 
+	// no re-approximation needed: linear function
 	Distribution * raw = leftDistribution->sum(c_arg);
-	PiecewiseBase * result = approximator->fit(raw);
-	return RandomVariable(result);
+	return RandomVariable(raw);
 }
 
 RandomVariable operator +(double c_arg, RandomVariable & rv_arg)
@@ -388,8 +388,9 @@ RandomVariable RandomVariable::operator -(double c_arg)
 
 	// just use the sum with negative sign
 	Distribution * raw = leftDistribution->sum(-c_arg);
-	PiecewiseBase * result = approximator->fit(raw);
-	return RandomVariable(result);
+
+	// no re-approximation needed: linear function
+	return RandomVariable(raw);
 }
 
 RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
@@ -412,8 +413,9 @@ RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 	   So, more efficient to implement
 		   the difference from constant directly */
 	Distribution * raw = distr_arg->differenceFrom(c_arg);
-	PiecewiseBase * result = rv_arg.approximator->fit(raw);
-	return RandomVariable(result);
+
+	// no re-approximation needed: linear function
+	return RandomVariable(raw);
 }
 
 RandomVariable RandomVariable::operator *(double c_arg)
@@ -434,8 +436,9 @@ RandomVariable RandomVariable::operator *(double c_arg)
 		leftDistribution = (PiecewiseBase *) this->distribution;
 
 	Distribution * raw = leftDistribution->product(c_arg);
-	PiecewiseBase * result = approximator->fit(raw);
-	return RandomVariable(result);
+
+	// no re-approximation needed: linear function
+	return RandomVariable(raw);
 }
 
 RandomVariable operator *(double c_arg, RandomVariable & rv_arg)
@@ -462,8 +465,9 @@ RandomVariable RandomVariable::operator /(double c_arg)
 
 	// just multiply with the inverse
 	Distribution * raw = leftDistribution->product(1 / c_arg);
-	PiecewiseBase * result = approximator->fit(raw);
-	return RandomVariable(result);
+
+	// no re-approximation needed: linear function
+	return RandomVariable(raw);
 }
 
 RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
@@ -528,7 +532,7 @@ RandomVariable RandomVariable::max(double c_arg)
 		return monteCarlo(MAX, this, delta);
 	}
 
-	Distribution * raw = new MinOfDistributions(
+	Distribution * raw = new MaxOfDistributions(
 			this->distribution,	new DeltaDistribution(c_arg));
 	PiecewiseBase * result = approximator->fit(raw);
 	return RandomVariable(result);

@@ -10,6 +10,7 @@
 #include "FileParser.h"
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 #include "mathFunctions.h"
 
 namespace stochastic {
@@ -33,7 +34,10 @@ EmpiricalDistribution::EmpiricalDistribution(std::vector<double> inputData)
 	data = inputData;
 	std::sort(data.begin(), data.end());
 
-	this->name = "emp";
+	std::stringstream samples_s;
+	samples_s << data.size();
+	this->name = samples_s.str();
+	this->name.append(" samples");
 
 	// initially: no cached margins
 	cacheLeftMargin = 0;
@@ -60,8 +64,8 @@ double EmpiricalDistribution::pdf(double x)
 //	return (cdf(x + dx) - cdf(x)) / dx;
 
 
-	double h = 0.1;
 	unsigned int n = this->data.size();
+	double h = (getRightMargin()- getLeftMargin()) / sqrt(n);
 
 	double sum = 0;
 	unsigned int i;
@@ -87,7 +91,7 @@ double EmpiricalDistribution::getLeftMargin()
 	// discard the first 0.1%
 	unsigned int i = 0;
 	for (i = 0; i < data.size(); i++)
-		if (cdf(data[i]) > 0.001)
+		if (cdf(data[i]) > 0.0001)
 		{
 			cacheLeftMargin = new double;
 			* cacheLeftMargin = data[i];
@@ -104,7 +108,7 @@ double EmpiricalDistribution::getRightMargin()
 	// discard the last 0.1%
 	unsigned int i = 0;
 	for (i = data.size() - 1; i > 0; i--)
-		if (cdf(data[i]) < 0.999)
+		if (cdf(data[i]) < 0.9999)
 		{
 			cacheRightMargin = new double;
 			* cacheRightMargin = data[i];
