@@ -15,8 +15,8 @@ namespace stochastic
 
 const double PI = 3.14159265;
 
-//NOTE: Abromowitz and Stegun approximation for Error Function
-inline double erf2(double x)
+// Abromowitz and Stegun approximation for Error Function
+inline double errorFunction(double x)
 {
 	static const double a1 =  0.254829592;
 	static const double a2 = -0.284496736;

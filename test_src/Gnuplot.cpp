@@ -14,13 +14,12 @@ using namespace std;
 
 int Gnuplot::accuracy = 1000;
 
+string Gnuplot::defaultOptions = " with lines";
+
 Gnuplot::Gnuplot()
 {
 	outputFile = 0;
 	texFile = 0;
-	options.push_back(" with lines lw 1");
-//	options.push_back(" with lines lw 5");
-//	options.push_back(" with linespoints lw 1");
 }
 
 Gnuplot::~Gnuplot()
@@ -70,6 +69,7 @@ void Gnuplot::addCurve(CurveTypes type, string name, vector <double> vx, vector 
 	counter << names.size();
 	tmpFile.append(counter.str());
 	tmpFiles.push_back(tmpFile);
+	options.push_back(defaultOptions);
 
 	curve = fopen(tmpFile.c_str(), "w");
 
@@ -82,12 +82,42 @@ void Gnuplot::addCurve(CurveTypes type, string name, vector <double> vx, vector 
 	fclose(curve);
 }
 
+void Gnuplot::addCurve(CurveTypes type, string name,
+		vector<double> vx, vector<double> vy, string current_options)
+{
+	FILE * curve;
+	stringstream counter;
+	string tmpFile = "tmp";
+
+	types.push_back(type);
+	names.push_back(name);
+	counter << names.size();
+	tmpFile.append(counter.str());
+	tmpFiles.push_back(tmpFile);
+	options.push_back(current_options);
+
+	curve = fopen(tmpFile.c_str(), "w");
+
+	unsigned int i;
+	for (i = 0; i < vx.size(); i++)
+	{
+		fprintf(curve, "%f\t%f\n", vx[i], vy[i]);
+		fflush(curve);
+	}
+	fclose(curve);
+}
+
+void Gnuplot::addtoPreamble(string statement)
+{
+	preamble.push_back(statement);
+}
+
 void Gnuplot::plotBuffered(CurveTypes type)
 {
 	FILE * gnuplot;
 	unsigned int i;
 	int first_entered_flag = 0;
-	int entered_counter = 0;
+	//int entered_counter = 0;
 
 	gnuplot = popen("gnuplot", "w");
 
@@ -99,9 +129,12 @@ void Gnuplot::plotBuffered(CurveTypes type)
 
 		fprintf(gnuplot, "set output \"%s.tex\"\n", texFile->c_str());
 		fflush(gnuplot);
+	}
 
-//		fprintf(gnuplot, "set xlabel \"Number of Components\"\n");
-//		fflush(gnuplot);
+	for (i = 0; i < preamble.size(); i++)
+	{
+		fprintf(gnuplot, "%s\n", preamble[i].c_str());
+		fflush(gnuplot);
 	}
 
 	fprintf(gnuplot, "plot ");
@@ -118,11 +151,11 @@ void Gnuplot::plotBuffered(CurveTypes type)
 			else
 				first_entered_flag = 1;
 			fprintf(gnuplot, "'%s' title '%s' %s", tmpFiles[i].c_str(),
-					names[i].c_str(), options[entered_counter].c_str());
+					names[i].c_str(), options[i].c_str());
 			fflush(gnuplot);
 
-			entered_counter++;
-			entered_counter = entered_counter % options.size();
+			//entered_counter++;
+			//entered_counter = entered_counter % options.size();
 		}
 	}
 	fprintf(gnuplot, "\n");
@@ -145,11 +178,12 @@ void Gnuplot::plotBuffered(CurveTypes type)
 		fflush(gnuplot);
 	}
 
-
-	printf("Press enter to continue...");
-	fflush(stdout);
-	getchar();
-
+	if (!texFile)
+	{
+		printf("Press enter to continue...");
+		fflush(stdout);
+		getchar();
+	}
 
 	fprintf(gnuplot, "exit\n");
 	fflush(stdout);
@@ -162,6 +196,8 @@ void Gnuplot::clearBuffer()
 	names.clear();
 	tmpFiles.clear();
 	types.clear();
+	options.clear();
+	preamble.clear();
 }
 
 // should be called before plotBuffered()

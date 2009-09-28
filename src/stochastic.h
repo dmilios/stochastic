@@ -20,6 +20,8 @@
 #include "MixtureModel.h"
 #include "Gaussian.h"
 #include "Uniform.h"
+#include "ChiSquare.h"
+#include "Cauchy.h"
 #include "Exponential.h"
 #include "EmpiricalDistribution.h"
 

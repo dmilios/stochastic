@@ -26,8 +26,10 @@ class Gnuplot
 {
 private:
 	static int accuracy;
+	static string defaultOptions;
 	string * outputFile;
 	string * texFile;
+	vector <string> preamble; // a series of statements in the beginning of a plot
 
 	vector <string> names;
 	vector <string> tmpFiles;
@@ -42,6 +44,9 @@ public:
 
 	void addRV(stochastic::RandomVariable);
 	void addCurve(CurveTypes, string, vector <double>, vector <double>);
+	void addCurve(CurveTypes, string, vector <double>, vector <double>, string);
+
+	void addtoPreamble(string);
 	void plotBuffered(CurveTypes);
 	void clearBuffer();
 	void setOutputFile(const char *);

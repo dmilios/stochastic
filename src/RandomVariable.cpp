@@ -9,6 +9,7 @@
 
 #include "exceptions.h"
 #include "PiecewiseUniform.h"
+#include "PiecewiseGaussian.h"
 #include "EmpiricalDistribution.h"
 #include "MinOfDistributions.h"
 #include "MaxOfDistributions.h"
@@ -45,6 +46,28 @@ void RandomVariable::setNumberOfSamplesMC(int n)
 {
 	numberOfSamplesMC = n;
 }
+
+
+void RandomVariable::setMonteCarlo(int number_of_samples)
+{
+	monteCarloFlag = 1;
+	numberOfSamplesMC = number_of_samples;
+}
+
+void RandomVariable::setPiecewiseUniform(int number_of_components)
+{
+	monteCarloFlag = 0;
+	setApproximatorType(new PiecewiseUniform);
+	PiecewiseBase::setFixedNumberOfComponents(number_of_components);
+}
+
+void RandomVariable::setPiecewiseGaussian(int number_of_components)
+{
+	monteCarloFlag = 0;
+	setApproximatorType(new PiecewiseGaussian);
+	PiecewiseBase::setFixedNumberOfComponents(number_of_components);
+}
+
 
 /*
  *
@@ -105,6 +128,11 @@ void RandomVariable::pdfOutline(int accuracy, std::vector <double> & x,
 	{
 		x.push_back(x_curr);
 		fx.push_back(this->distribution->pdf(x_curr));
+	}
+	if (start == end) // delta distribution
+	{
+		x.push_back(start);
+		fx.push_back(1); // actually infinity
 	}
 }
 
@@ -267,40 +295,20 @@ RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(RATIO, this, & rightarg);
 
-	if (1)
-	{
-		PiecewiseBase * leftDistribution;
-		PiecewiseBase * rightDistribution;
-		Distribution * inverseRight;
-		if (typeid(* this->distribution) != typeid(* approximator))
-			leftDistribution = approximator->fit(this->distribution);
-		else
-			leftDistribution = (PiecewiseBase *) this->distribution;
+	PiecewiseBase * leftDistribution;
+	PiecewiseBase * rightDistribution;
+	Distribution * inverseRight;
+	if (typeid(* this->distribution) != typeid(* approximator))
+		leftDistribution = approximator->fit(this->distribution);
+	else
+		leftDistribution = (PiecewiseBase *) this->distribution;
 
+	inverseRight = new InverseRV_Distribution(rightarg.distribution);
+	rightDistribution = approximator->fit(inverseRight);
 
-		inverseRight = new InverseRV_Distribution(rightarg.distribution);
-		rightDistribution = approximator->fit(inverseRight);
-
-		Distribution * raw = leftDistribution->product(rightDistribution);
-		PiecewiseBase * result = approximator->fit(raw);
-		return RandomVariable(result);
-	}
-	{
-		PiecewiseBase * leftDistribution;
-		PiecewiseBase * rightDistribution;
-		if (typeid(* this->distribution) != typeid(* approximator))
-			leftDistribution = approximator->fit(this->distribution);
-		else
-			leftDistribution = (PiecewiseBase *) this->distribution;
-		if (typeid(* rightarg.distribution) != typeid(* approximator))
-			rightDistribution = approximator->fit(rightarg.distribution);
-		else
-			rightDistribution = (PiecewiseBase *) rightarg.distribution;
-
-		Distribution * raw = leftDistribution->ratio(rightDistribution);
-		PiecewiseBase * result = approximator->fit(raw);
-		return RandomVariable(result);
-	}
+	Distribution * raw = leftDistribution->product(rightDistribution);
+	PiecewiseBase * result = approximator->fit(raw);
+	return RandomVariable(result);
 }
 
 /*

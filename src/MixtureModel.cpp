@@ -76,8 +76,6 @@ double MixtureModel::pdf(double x)
 	if (x < this->getLeftMargin() || x > this->getRightMargin())
 		return 0;
 
-	//TODO: somehow make MM::pdf() and MM::cdf() more efficient
-
 	unsigned int i;
 	double weighted_sum = 0;
 	for (i = 0; i < components.size(); i++)

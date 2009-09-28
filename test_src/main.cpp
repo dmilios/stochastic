@@ -33,7 +33,5 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	Experiments::dependencyMC();
-
 	return printArguments(argc, argv);
 }

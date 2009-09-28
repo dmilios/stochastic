@@ -58,14 +58,11 @@ double EmpiricalDistribution::pdf(double x)
 	if (x < getLeftMargin() || x > getRightMargin())
 		return 0;
 
-
-//	int accuracy = 100;
-//	double dx = (getRightMargin() - getLeftMargin()) / accuracy;
-//	return (cdf(x + dx) - cdf(x)) / dx;
-
-
 	unsigned int n = this->data.size();
 	double h = (getRightMargin()- getLeftMargin()) / sqrt(n);
+
+	h = (quantile(0.75)- quantile(0.25)) / pow(n, 0.3333);
+
 
 	double sum = 0;
 	unsigned int i;
@@ -91,7 +88,7 @@ double EmpiricalDistribution::getLeftMargin()
 	// discard the first 0.1%
 	unsigned int i = 0;
 	for (i = 0; i < data.size(); i++)
-		if (cdf(data[i]) > 0.0001)
+		if (cdf(data[i]) > 0.001)
 		{
 			cacheLeftMargin = new double;
 			* cacheLeftMargin = data[i];
@@ -108,7 +105,7 @@ double EmpiricalDistribution::getRightMargin()
 	// discard the last 0.1%
 	unsigned int i = 0;
 	for (i = data.size() - 1; i > 0; i--)
-		if (cdf(data[i]) < 0.9999)
+		if (cdf(data[i]) < 1 - 0.001)
 		{
 			cacheRightMargin = new double;
 			* cacheRightMargin = data[i];

@@ -65,7 +65,7 @@ const char * Uniform::getName()
 double Uniform::pdf(double x)
 {
 	/**
-	 * NOTE: pdf is defined for 'a <= x < b'
+	 * pdf is defined for 'a <= x < b'
 	 * instead of 'a <= x <= b', for convenience
 	 */
 	if (x < alpha || x >= beta)
