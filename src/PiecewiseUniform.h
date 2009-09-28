@@ -41,6 +41,7 @@ public:
 	const char * getName();
 
 
+	// TODO: isolate discretization in another class
 	static int useold; // TO BE DISCARDED, just for the experiment
 };
 
