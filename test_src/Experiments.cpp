@@ -14,9 +14,7 @@
 
 void current()
 {
-	RandomVariable::setNumberOfSamplesMC(1000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setPiecewiseGaussian(100);
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -27,7 +25,7 @@ void current()
 	RandomVariable r2 = new Uniform(1, 4.5);
 	RandomVariable r3 = new SumOfUniforms(2, 3.5, 1, 4.5);
 
-	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable::setMonteCarlo(1000);
 	RandomVariable r4 = r1 + r2;
 
 //	plot.addRV(r1);
@@ -45,10 +43,7 @@ void current()
 
 void comparePUwithMC()
 {
-	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	RandomVariable::setPiecewiseUniform(100);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -60,7 +55,7 @@ void comparePUwithMC()
 	RandomVariable r3 = r1 + r2;
 	std::cout << "PU time: " << clock() - timer << "\n";
 
-	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable::setMonteCarlo(10000);
 	timer = clock();
 	RandomVariable r4 = r1 + r2;
 	std::cout << "MC time: " << clock() - timer << "\n\n";
@@ -86,10 +81,7 @@ void comparePUwithMC()
 
 void comparePGwithMC()
 {
-	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setPiecewiseGaussian(100);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -101,7 +93,7 @@ void comparePGwithMC()
 	RandomVariable r3 = r1 + r2;
 	std::cout << "PG time: " << clock() - timer << "\n";
 
-	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable::setMonteCarlo(10000);
 	timer = clock();
 	RandomVariable r4 = r1 + r2;
 	std::cout << "MC time: " << clock() - timer << "\n\n";
@@ -127,7 +119,6 @@ void comparePGwithMC()
 
 void compareApproximations()
 {
-	PiecewiseBase::setFixedNumberOfComponents(100);
 	Gnuplot::setAccuracy(100);
 	Gnuplot plot;
 	long int timer;
@@ -152,13 +143,13 @@ void compareApproximations()
 
 	RandomVariable a(new Gaussian), b(new Gaussian);
 	timer = clock();
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	RandomVariable::setPiecewiseUniform(100);
 	a + b;
 	std::cout << "PU sum time (ms): " << 1000 * (double) (clock() - timer)
 			/ CLOCKS_PER_SEC << "\n";
 
 	timer = clock();
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setPiecewiseGaussian(100);
 	a + b;
 	std::cout << "PG sum time (ms): " << 1000 * (double) (clock() - timer)
 			/ CLOCKS_PER_SEC << "\n\n";
@@ -197,9 +188,6 @@ void computationsEvolution()
 	std::vector <double> iteration_numbers;
 	std::vector <double> errors;
 
-	PiecewiseBase::setFixedNumberOfComponents(200);
-
-
 	computationsPU(iteration_numbers, errors);
 	plot.addCurve(OTHER, "KL_Divergence Evolution for PU New",
 			iteration_numbers, errors);
@@ -225,7 +213,7 @@ void computationsEvolution()
 void computationsPU(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	RandomVariable::setPiecewiseUniform(100);
 	Gnuplot::setAccuracy(1000);
 //	Gnuplot plot;
 	long int timer;
@@ -273,7 +261,7 @@ void computationsPU(std::vector<double> & counters, std::vector<
 void computationsPG(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setPiecewiseGaussian(100);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -322,8 +310,7 @@ void computationsPG(std::vector<double> & counters, std::vector<
 void computationsMC(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setNumberOfSamplesMC(1000);
-	RandomVariable::setMonteCarloFlag(1);
+	RandomVariable::setMonteCarlo(1000);
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -366,8 +353,7 @@ void computationsMC(std::vector<double> & counters, std::vector<
 
 void dependencyMC()
 {
-	RandomVariable::setMonteCarloFlag(1);
-	RandomVariable::setNumberOfSamplesMC(1000);
+	RandomVariable::setMonteCarlo(1000);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 
@@ -386,8 +372,7 @@ void dependencyMC()
 
 void sumOfUniforms()
 {
-	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseUniform);
+	RandomVariable::setPiecewiseUniform(100);
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -425,9 +410,7 @@ void sumOfUniforms()
 
 void minmaxTests()
 {
-	RandomVariable::setNumberOfSamplesMC(10000);
-	PiecewiseBase::setFixedNumberOfComponents(100);
-	RandomVariable::setApproximatorType(new PiecewiseGaussian);
+	RandomVariable::setPiecewiseGaussian(100);
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;
@@ -437,7 +420,6 @@ void minmaxTests()
 	RandomVariable r3 = new MinOfDistributions(r1.getDistribution(),
 			r2.getDistribution());
 
-	RandomVariable::setMonteCarloFlag(0);
 	RandomVariable r4 = min(r1, r2);
 
 //	plot.addRV(r1);

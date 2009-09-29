@@ -26,7 +26,7 @@ namespace stochastic {
 class PiecewiseBase : public stochastic::MixtureModel
 {
 protected:
-	static int fixedNumberOfComponents;
+	int fixedNumberOfComponents;
 
 	// returns two vectors that define the intervals
 	// containing the support of input distribution
@@ -59,7 +59,7 @@ public:
 	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents
-	static void setFixedNumberOfComponents(int);
+	void setFixedNumberOfComponents(int);
 
 	MixtureModel * sum(PiecewiseBase *);
 	MixtureModel * difference(PiecewiseBase *);

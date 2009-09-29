@@ -31,22 +31,6 @@ std::map <RandomVariable *, double> RandomVariable::samplesCollection;
 /*
  * static methods
  */
-void RandomVariable::setApproximatorType(PiecewiseBase * type)
-{
-	RandomVariable::approximator = type;
-}
-
-// static method: 0 -> not use MC, otherwise -> use MC
-void RandomVariable::setMonteCarloFlag(int flag)
-{
-	monteCarloFlag = flag;
-}
-
-void RandomVariable::setNumberOfSamplesMC(int n)
-{
-	numberOfSamplesMC = n;
-}
-
 
 void RandomVariable::setMonteCarlo(int number_of_samples)
 {
@@ -57,15 +41,15 @@ void RandomVariable::setMonteCarlo(int number_of_samples)
 void RandomVariable::setPiecewiseUniform(int number_of_components)
 {
 	monteCarloFlag = 0;
-	setApproximatorType(new PiecewiseUniform);
-	PiecewiseBase::setFixedNumberOfComponents(number_of_components);
+	approximator = new PiecewiseUniform;
+	approximator->setFixedNumberOfComponents(number_of_components);
 }
 
 void RandomVariable::setPiecewiseGaussian(int number_of_components)
 {
 	monteCarloFlag = 0;
-	setApproximatorType(new PiecewiseGaussian);
-	PiecewiseBase::setFixedNumberOfComponents(number_of_components);
+	approximator = new PiecewiseGaussian;
+	approximator->setFixedNumberOfComponents(number_of_components);
 }
 
 

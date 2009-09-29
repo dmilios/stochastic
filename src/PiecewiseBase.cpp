@@ -17,8 +17,6 @@
 
 namespace stochastic {
 
-int PiecewiseBase::fixedNumberOfComponents = 10;
-
 // Static Method: sets the wanted number of components
 void PiecewiseBase::setFixedNumberOfComponents(int n)
 {

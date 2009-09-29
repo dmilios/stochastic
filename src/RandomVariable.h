@@ -52,13 +52,6 @@ public:
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
 
-	// old versions
-	// just keep the because the experiments are using them
-	static void setNumberOfSamplesMC(int);
-	static void setMonteCarloFlag(int);
-	static void setApproximatorType(PiecewiseBase *);
-
-	// new versions
 	static void setMonteCarlo(int number_of_samples);
 	static void setPiecewiseUniform(int number_of_components);
 	static void setPiecewiseGaussian(int number_of_components);
