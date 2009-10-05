@@ -9,7 +9,7 @@
 #define DISTRIBUTION_H_
 
 #include <vector>
-#include "RandomGenerator.h"
+#include "../utilities/RandomGenerator.h"
 
 namespace stochastic {
 

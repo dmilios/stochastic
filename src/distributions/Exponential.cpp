@@ -7,7 +7,7 @@
 
 #include "Exponential.h"
 
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <cmath>
 #include <string>
 #include <sstream>

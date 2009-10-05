@@ -7,8 +7,8 @@
 
 #include "Cauchy.h"
 
-#include "exceptions.h"
-#include "mathFunctions.h"
+#include "../utilities/exceptions.h"
+#include "../utilities/mathFunctions.h"
 #include <sstream>
 #include <cmath>
 #include <boost/math/special_functions.hpp>

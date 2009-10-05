@@ -10,7 +10,7 @@
 
 #include "PiecewiseBase.h"
 
-#include "Gaussian.h"
+#include "../distributions/Gaussian.h"
 
 namespace stochastic {
 

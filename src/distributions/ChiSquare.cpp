@@ -6,7 +6,7 @@
  */
 
 #include "ChiSquare.h"
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <sstream>
 #include <cmath>
 #include <boost/math/special_functions/gamma.hpp>

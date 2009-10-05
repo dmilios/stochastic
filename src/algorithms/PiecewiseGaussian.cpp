@@ -10,8 +10,8 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
-#include "exceptions.h"
-#include "mathFunctions.h"
+#include "../utilities/exceptions.h"
+#include "../utilities/mathFunctions.h"
 
 namespace stochastic {
 

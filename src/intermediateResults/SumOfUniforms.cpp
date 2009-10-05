@@ -7,7 +7,7 @@
 
 #include "SumOfUniforms.h"
 
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <sstream>
 
 namespace stochastic {
@@ -160,7 +160,7 @@ double SumOfUniforms::getRightMargin()
 
 double SumOfUniforms::nextSample()
 {
-	double maxprob;
+	double maxprob = 1;
 	switch(case_flag)
 	{
 		case 0:

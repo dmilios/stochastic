@@ -10,7 +10,7 @@
 
 #include "PiecewiseBase.h"
 
-#include "Uniform.h"
+#include "../distributions/Uniform.h"
 
 namespace stochastic {
 

@@ -7,13 +7,13 @@
 
 #include "PiecewiseBase.h"
 
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 
 #include <iostream>
 #include <vector>
 #include <typeinfo>
 
-#include "InverseRV_Distribution.h"
+#include "../intermediateResults/InverseRV_Distribution.h"
 
 namespace stochastic {
 

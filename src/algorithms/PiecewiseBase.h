@@ -8,9 +8,9 @@
 #ifndef PIECEWISEBASE_H_
 #define PIECEWISEBASE_H_
 
-#include "Distribution.h"
-#include "MixtureModel.h"
-#include "FileParser.h"
+#include "../distributions/Distribution.h"
+#include "../distributions/MixtureModel.h"
+#include "../utilities/FileParser.h"
 #include <vector>
 
 namespace stochastic {

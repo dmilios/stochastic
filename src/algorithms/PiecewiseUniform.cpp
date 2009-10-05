@@ -7,8 +7,8 @@
 
 #include "PiecewiseUniform.h"
 
-#include "exceptions.h"
-#include "SumOfUniforms.h"
+#include "../utilities/exceptions.h"
+#include "../intermediateResults/SumOfUniforms.h"
 #include <algorithm>
 #include <cmath>
 

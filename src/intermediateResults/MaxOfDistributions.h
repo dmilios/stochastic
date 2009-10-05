@@ -1,19 +1,20 @@
 /*
- * MinOfDistributions.h
+ * MaxOfDistributions.h
  *
  *  Created on: 27-Jul-2009
  *      Author: Dimitrios Milios
  */
 
-#ifndef MINOFDISTRIBUTIONS_H_
-#define MINOFDISTRIBUTIONS_H_
+#ifndef MAXOFDISTRIBUTIONS_H_
+#define MAXOFDISTRIBUTIONS_H_
 
-#include "MixtureComponent.h"
+#include "../distributions/MixtureComponent.h"
 
 namespace stochastic {
 
-class MinOfDistributions : public stochastic::MixtureComponent
+class MaxOfDistributions : public stochastic::MixtureComponent
 {
+public:
 private:
 	Distribution * arg1;
 	Distribution * arg2;
@@ -22,8 +23,8 @@ private:
 	double cache_rightMargin;
 
 public:
-	MinOfDistributions(Distribution *, Distribution *);
-	virtual ~MinOfDistributions();
+	MaxOfDistributions(Distribution *, Distribution *);
+	virtual ~MaxOfDistributions();
 
 	const char * getName();
 	double pdf(double);
@@ -35,4 +36,4 @@ public:
 
 } // namespace stochastic
 
-#endif /* MINOFDISTRIBUTIONS_H_ */
+#endif /* MAXOFDISTRIBUTIONS_H_ */

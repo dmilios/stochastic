@@ -7,7 +7,7 @@
 
 #include "Uniform.h"
 
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <typeinfo>
 #include <string>
 #include <sstream>

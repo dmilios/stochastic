@@ -10,7 +10,7 @@
 
 #include "Distribution.h"
 #include "MixtureComponent.h"
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <vector>
 
 namespace stochastic {

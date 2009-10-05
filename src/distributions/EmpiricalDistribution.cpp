@@ -7,11 +7,11 @@
 
 #include "EmpiricalDistribution.h"
 
-#include "FileParser.h"
+#include "../utilities/FileParser.h"
 #include <algorithm>
 #include <cmath>
 #include <sstream>
-#include "mathFunctions.h"
+#include "../utilities/mathFunctions.h"
 
 namespace stochastic {
 

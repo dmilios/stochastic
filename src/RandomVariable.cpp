@@ -7,14 +7,14 @@
 
 #include "RandomVariable.h"
 
-#include "exceptions.h"
-#include "PiecewiseUniform.h"
-#include "PiecewiseGaussian.h"
-#include "EmpiricalDistribution.h"
-#include "MinOfDistributions.h"
-#include "MaxOfDistributions.h"
-#include "DeltaDistribution.h"
-#include "InverseRV_Distribution.h"
+#include "utilities/exceptions.h"
+#include "algorithms/PiecewiseUniform.h"
+#include "algorithms/PiecewiseGaussian.h"
+#include "distributions/EmpiricalDistribution.h"
+#include "intermediateResults/MinOfDistributions.h"
+#include "intermediateResults/MaxOfDistributions.h"
+#include "distributions/DeltaDistribution.h"
+#include "intermediateResults/InverseRV_Distribution.h"
 #include <fstream>
 #include <string>
 #include <typeinfo>

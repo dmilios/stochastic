@@ -9,9 +9,7 @@
 #define GAUSSIAN_H_
 
 #include "MixtureComponent.h"
-#include "mathFunctions.h"
-
-#include "PiecewiseGaussian.h"
+#include "../utilities/mathFunctions.h"
 
 namespace stochastic {
 

@@ -8,7 +8,7 @@
 #ifndef SUMOFUNIFORMS_H_
 #define SUMOFUNIFORMS_H_
 
-#include "MixtureComponent.h"
+#include "../distributions/MixtureComponent.h"
 
 namespace stochastic {
 

@@ -8,8 +8,9 @@
 #ifndef RANDOMVARIABLE_H_
 #define RANDOMVARIABLE_H_
 
-#include "Distribution.h"
-#include "PiecewiseBase.h"
+#include "distributions/Distribution.h"
+#include "algorithms/PiecewiseBase.h"
+#include "algorithms/RandomVariableAlgorithm.h"
 
 #include <vector>
 #include <map>

@@ -7,7 +7,7 @@
 
 #include "Gaussian.h"
 
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 #include <typeinfo>
 #include <cmath>
 #include <string>

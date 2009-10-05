@@ -8,7 +8,7 @@
 #ifndef INVERSERV_DISTRIBUTION_H_
 #define INVERSERV_DISTRIBUTION_H_
 
-#include "MixtureComponent.h"
+#include "../distributions/MixtureComponent.h"
 
 namespace stochastic {
 

@@ -9,7 +9,7 @@
 
 #include <cmath>
 #include <limits>
-#include "exceptions.h"
+#include "../utilities/exceptions.h"
 
 namespace stochastic {
 
