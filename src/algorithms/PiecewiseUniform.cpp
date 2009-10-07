@@ -23,7 +23,7 @@ PiecewiseUniform::PiecewiseUniform(Distribution * distribution)
 	if (!distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	PiecewiseUniform temp = * (PiecewiseUniform *)fit(distribution);
+	PiecewiseUniform temp = * (PiecewiseUniform *)approximate(distribution);
 	this->weights = temp.weights;
 	this->components = temp.components;
 	this->cumulativeWeights = temp.cumulativeWeights;
@@ -38,7 +38,7 @@ const char * PiecewiseUniform::getName()
 	return "Piecewise Uniform";
 }
 
-PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
+MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 {
 	PiecewiseUniform * result = new PiecewiseUniform;
 	MixtureComponent * component;
@@ -97,7 +97,7 @@ PiecewiseBase * PiecewiseUniform::fit(Distribution * distribution)
 }
 
 // alternative fit using quantile
-PiecewiseBase * PiecewiseUniform::fit2(Distribution * distribution)
+MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 {
 	PiecewiseUniform * result = new PiecewiseUniform;
 

@@ -36,8 +36,8 @@ public:
 	PiecewiseUniform(Distribution *);
 	virtual ~PiecewiseUniform();
 
-	PiecewiseBase * fit(Distribution *);
-	PiecewiseBase * fit2(Distribution *);
+	MixtureModel * approximate(Distribution *);
+	MixtureModel * approximate2(Distribution *);
 	const char * getName();
 
 

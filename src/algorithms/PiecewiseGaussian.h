@@ -35,7 +35,7 @@ public:
 	PiecewiseGaussian(Distribution *);
 	virtual ~PiecewiseGaussian();
 
-	PiecewiseBase * fit(Distribution *);
+	MixtureModel * approximate(Distribution *);
 	const char * getName();
 };
 

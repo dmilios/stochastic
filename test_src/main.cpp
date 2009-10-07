@@ -33,5 +33,6 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+	comparePUwithMC();
 	return printArguments(argc, argv);
 }

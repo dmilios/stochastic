@@ -31,8 +31,8 @@ protected:
 	// returns two vectors that define the intervals
 	// containing the support of input distribution
 	// and the support itself
-	double retrieveSupport(Distribution *, std::vector<double> &,
-			std::vector<double> &);
+	double retrieveSupport(Distribution *, std::vector<double> &, std::vector<
+			double> &);
 
 	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
 			MixtureComponent *) = 0;
@@ -44,34 +44,38 @@ protected:
 			MixtureComponent *) = 0;
 
 	// for functions of ONE random variable
-	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
-			double) = 0;
+	virtual MixtureComponent * sumOfComponents(MixtureComponent *, double) = 0;
 	virtual MixtureComponent * differenceOfComponents(double,
 			MixtureComponent *) = 0;
-	virtual MixtureComponent * productOfComponents(MixtureComponent *,
-			double) = 0;
-	virtual MixtureComponent * ratioOfComponents(double,
-			MixtureComponent *) = 0;
-
+	virtual MixtureComponent
+			* productOfComponents(MixtureComponent *, double) = 0;
+	virtual MixtureComponent * ratioOfComponents(double, MixtureComponent *) = 0;
 
 public:
-	virtual PiecewiseBase * fit(Distribution *) = 0;
+	virtual MixtureModel * approximate(Distribution *) = 0;
 	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents
 	void setFixedNumberOfComponents(int);
 
-	MixtureModel * sum(PiecewiseBase *);
-	MixtureModel * difference(PiecewiseBase *);
-	MixtureModel * product(PiecewiseBase *);
-	MixtureModel * ratio(PiecewiseBase *);
+	Distribution * calculateSum(Distribution *, Distribution *);
+	Distribution * calculateDifference(Distribution *, Distribution *);
+	Distribution * calculateProduct(Distribution *, Distribution *);
+	Distribution * calculateRatio(Distribution *, Distribution *);
 
+	Distribution * calculateMin(Distribution *, Distribution *) {};
+	Distribution * calculateMax(Distribution *, Distribution *) {};
 
 	// for functions of ONE random variable
-	MixtureModel * sum(double);
-	MixtureModel * differenceFrom(double);
-	MixtureModel * product(double);
-	MixtureModel * denominatorOf(double);
+	Distribution * calculateSum(Distribution *, double);
+	Distribution * calculateDifference(Distribution *, double);
+	Distribution * calculateDifference(double, Distribution *) {};
+	Distribution * calculateProduct(Distribution *, double);
+	Distribution * calculateRatio(Distribution *, double);
+	Distribution * calculateRatio(double, Distribution *) {};
+
+	Distribution * calculateMin(Distribution *, double) {};
+	Distribution * calculateMax(Distribution *, double) {};
 };
 
 } // namespace stochastic

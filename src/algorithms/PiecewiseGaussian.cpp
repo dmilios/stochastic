@@ -24,7 +24,7 @@ PiecewiseGaussian::PiecewiseGaussian(Distribution * distribution)
 	if (!distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	PiecewiseGaussian temp = * (PiecewiseGaussian *)fit(distribution);
+	PiecewiseGaussian temp = * (PiecewiseGaussian *)approximate(distribution);
 	this->weights = temp.weights;
 	this->components = temp.components;
 	this->cumulativeWeights = temp.cumulativeWeights;
@@ -39,7 +39,7 @@ const char * PiecewiseGaussian::getName()
 	return "Piecewise Gaussian";
 }
 
-PiecewiseBase * PiecewiseGaussian::fit(Distribution * distribution)
+MixtureModel * PiecewiseGaussian::approximate(Distribution * distribution)
 {
 	PiecewiseGaussian * result = new PiecewiseGaussian;
 	MixtureComponent * component;

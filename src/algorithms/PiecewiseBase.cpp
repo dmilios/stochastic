@@ -71,11 +71,8 @@ double PiecewiseBase::retrieveSupport(Distribution * distribution,
 	return support;
 }
 
-MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
+Distribution * PiecewiseBase::calculateSum(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg))
-		throw stochastic::IncompatibleComponentsException();
-
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	unsigned int i, j;
@@ -83,21 +80,21 @@ MixtureModel * PiecewiseBase::sum(PiecewiseBase * arg)
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
 	for (i = 0; i < this->components.size(); i++)
-		for (j = 0; j < arg->components.size(); j++)
+		for (j = 0; j < ((PiecewiseBase *) arg2)->components.size(); j++)
 		{
 			left = this->components[i];
-			right = arg->components[j];
+			right = ((PiecewiseBase *)arg2)->components[j];
 			currentResult = sumOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-MixtureModel * PiecewiseBase::difference(PiecewiseBase * arg)
+Distribution * PiecewiseBase::calculateDifference(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg))
+	if (typeid(* this) != typeid(* arg2))
 		throw stochastic::IncompatibleComponentsException();
 
 	std::vector<MixtureComponent *> resultComponents;
@@ -110,18 +107,18 @@ MixtureModel * PiecewiseBase::difference(PiecewiseBase * arg)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
 			left = this->components[i];
-			right = arg->components[j];
+			right = ((PiecewiseBase *)arg2)->components[j];
 			currentResult = differenceOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-MixtureModel * PiecewiseBase::product(PiecewiseBase * arg)
+Distribution * PiecewiseBase::calculateProduct(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg))
+	if (typeid(* this) != typeid(* arg2))
 		throw stochastic::IncompatibleComponentsException();
 
 	std::vector<MixtureComponent *> resultComponents;
@@ -134,18 +131,18 @@ MixtureModel * PiecewiseBase::product(PiecewiseBase * arg)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
 			left = this->components[i];
-			right = arg->components[j];
+			right = ((PiecewiseBase *)arg2)->components[j];
 			currentResult = productOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * arg->weights[j]);
+			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
-MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
+Distribution * PiecewiseBase::calculateRatio(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg))
+	if (typeid(* this) != typeid(* arg2))
 		throw stochastic::IncompatibleComponentsException();
 
 	std::vector<MixtureComponent *> resultComponents;
@@ -158,14 +155,14 @@ MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
 		for (j = 0; j < fixedNumberOfComponents; j++)
 		{
 			left = this->components[i];
-			right = arg->components[j];
+			right = ((PiecewiseBase *)arg2)->components[j];
 			currentResult = ratioOfComponents(left, right);
 
 			// discard null results
 			if (currentResult)
 			{
 				resultComponents.push_back(currentResult);
-				resultWeights.push_back(this->weights[i] * arg->weights[j]);
+				resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
 			}
 		}
 	return new MixtureModel(resultComponents, resultWeights);
@@ -178,7 +175,7 @@ MixtureModel * PiecewiseBase::ratio(PiecewiseBase * arg)
  *
  * */
 
-MixtureModel * PiecewiseBase::sum(double c_arg)
+Distribution * PiecewiseBase::calculateSum(Distribution * d_arg, double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;
 	int i;
@@ -193,7 +190,7 @@ MixtureModel * PiecewiseBase::sum(double c_arg)
 	return new MixtureModel(resultComponents, this->weights);
 }
 
-MixtureModel * PiecewiseBase::differenceFrom(double c_arg)
+Distribution * PiecewiseBase::calculateDifference(Distribution * d_arg, double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;
 	int i;
@@ -208,7 +205,7 @@ MixtureModel * PiecewiseBase::differenceFrom(double c_arg)
 	return new MixtureModel(resultComponents, this->weights);
 }
 
-MixtureModel * PiecewiseBase::product(double c_arg)
+Distribution * PiecewiseBase::calculateProduct(Distribution * d_arg, double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;
 	int i;
@@ -224,7 +221,7 @@ MixtureModel * PiecewiseBase::product(double c_arg)
 }
 
 // deprecated: needed for comparison
-MixtureModel * PiecewiseBase::denominatorOf(double c_arg)
+Distribution * PiecewiseBase::calculateRatio(Distribution * d_arg, double c_arg)
 {
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
