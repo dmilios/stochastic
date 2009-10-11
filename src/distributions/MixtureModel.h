@@ -17,14 +17,13 @@ namespace stochastic {
 
 class MixtureModel : public stochastic::Distribution
 {
+
+// FIXME: protected
 protected:
 	std::vector<stochastic::MixtureComponent *> components;
 	std::vector<double> weights;
 	std::vector<double> cumulativeWeights;
 	std::vector<double> constructCumulativeWeights(std::vector<double> &);
-	MixtureModel()
-	{
-	}
 
 public:
 	MixtureModel(std::vector<MixtureComponent*>, std::vector<double>);
@@ -35,6 +34,9 @@ public:
 	double nextSample();
 	double getLeftMargin();
 	double getRightMargin();
+
+	std::vector<MixtureComponent *> getComponents();
+	std::vector<double> getWeights();
 };
 
 } // namespace stochastic

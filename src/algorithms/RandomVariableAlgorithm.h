@@ -8,6 +8,8 @@
 #ifndef RANDOMVARIABLEALGORITHM_H_
 #define RANDOMVARIABLEALGORITHM_H_
 
+#include "../distributions/Distribution.h"
+
 namespace stochastic {
 
 class RandomVariableAlgorithm

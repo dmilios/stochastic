@@ -9,6 +9,7 @@
 
 #include "../utilities/exceptions.h"
 #include "../intermediateResults/SumOfUniforms.h"
+#include "../distributions/MixtureModel.h"
 #include <algorithm>
 #include <cmath>
 
@@ -18,31 +19,17 @@ PiecewiseUniform::PiecewiseUniform()
 {
 }
 
-PiecewiseUniform::PiecewiseUniform(Distribution * distribution)
-{
-	if (!distribution)
-		throw stochastic::UndefinedDistributionException();
-
-	PiecewiseUniform temp = * (PiecewiseUniform *)approximate(distribution);
-	this->weights = temp.weights;
-	this->components = temp.components;
-	this->cumulativeWeights = temp.cumulativeWeights;
-}
-
 PiecewiseUniform::~PiecewiseUniform()
 {
 }
 
-const char * PiecewiseUniform::getName()
-{
-	return "Piecewise Uniform";
-}
-
 MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 {
-	PiecewiseUniform * result = new PiecewiseUniform;
-	MixtureComponent * component;
+	MixtureModel * result;
+	std::vector<MixtureComponent *> result_components;
+	std::vector<double> result_weights;
 
+	MixtureComponent * component;
 	std::vector<double> supportInterval_lmargins;
 	std::vector<double> supportInterval_rmargins;
 
@@ -62,9 +49,9 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 		// (F(b) - F(a)) * totalComponentNumber
 		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
 				- distribution->cdf(supportInterval_lmargins[k]))
-					* fixedNumberOfComponents;
+					* numberOfComponents;
 		if (k == total_support_intervals - 1) // the last one
-			intervalComponents = fixedNumberOfComponents - componentsUsed;
+			intervalComponents = numberOfComponents - componentsUsed;
 		else
 			componentsUsed += intervalComponents;
 
@@ -87,27 +74,29 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 			if (weight < 0) // negative results are just close to zero
 				weight = 0;
 			component = new Uniform(x, x + step);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
+			result_components.push_back(component);
+			result_weights.push_back(weight);
 			x += step;
 		}
 	}
-	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	result = new MixtureModel(result_components, result_weights);
 	return result;
 }
 
 // alternative fit using quantile
 MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 {
-	PiecewiseUniform * result = new PiecewiseUniform;
+	MixtureModel * result;
+	std::vector<MixtureComponent *> result_components;
+	std::vector<double> result_weights;
 
 	MixtureComponent * component;
 	double weight;
-	double step = 1 / (double) fixedNumberOfComponents;
+	double step = 1 / (double) numberOfComponents;
 	int i;
 	double p = 0;
 	double x, x_step;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
 		x = distribution->quantile(p);
 		if (p + step > 1)
@@ -128,11 +117,11 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 			component = new Uniform(0, 1e-5);
 			weight = 0;
 		}
-		result->components.push_back(component);
-		result->weights.push_back(weight);
+		result_components.push_back(component);
+		result_weights.push_back(weight);
 		p += step;
 	}
-	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	result = new MixtureModel(result_components, result_weights);
 	return result;
 }
 

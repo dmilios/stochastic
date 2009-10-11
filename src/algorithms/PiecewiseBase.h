@@ -8,6 +8,7 @@
 #ifndef PIECEWISEBASE_H_
 #define PIECEWISEBASE_H_
 
+#include "RandomVariableAlgorithm.h"
 #include "../distributions/Distribution.h"
 #include "../distributions/MixtureModel.h"
 #include "../utilities/FileParser.h"
@@ -23,10 +24,10 @@ namespace stochastic {
  * define different approximation methods for each approximation class,
  * but a unique interface.
  * */
-class PiecewiseBase : public stochastic::MixtureModel
+class PiecewiseBase : public RandomVariableAlgorithm
 {
 protected:
-	int fixedNumberOfComponents;
+	int numberOfComponents;
 
 	// returns two vectors that define the intervals
 	// containing the support of input distribution
@@ -53,7 +54,6 @@ protected:
 
 public:
 	virtual MixtureModel * approximate(Distribution *) = 0;
-	virtual const char * getName() = 0;
 
 	// in order to set the global fixedNumberOfComponents
 	void setFixedNumberOfComponents(int);
@@ -63,19 +63,19 @@ public:
 	Distribution * calculateProduct(Distribution *, Distribution *);
 	Distribution * calculateRatio(Distribution *, Distribution *);
 
-	Distribution * calculateMin(Distribution *, Distribution *) {};
-	Distribution * calculateMax(Distribution *, Distribution *) {};
+	Distribution * calculateMin(Distribution *, Distribution *);
+	Distribution * calculateMax(Distribution *, Distribution *);
 
 	// for functions of ONE random variable
 	Distribution * calculateSum(Distribution *, double);
 	Distribution * calculateDifference(Distribution *, double);
-	Distribution * calculateDifference(double, Distribution *) {};
+	Distribution * calculateDifference(double, Distribution *);
 	Distribution * calculateProduct(Distribution *, double);
 	Distribution * calculateRatio(Distribution *, double);
-	Distribution * calculateRatio(double, Distribution *) {};
+	Distribution * calculateRatio(double, Distribution *);
 
-	Distribution * calculateMin(Distribution *, double) {};
-	Distribution * calculateMax(Distribution *, double) {};
+	Distribution * calculateMin(Distribution *, double);
+	Distribution * calculateMax(Distribution *, double);
 };
 
 } // namespace stochastic

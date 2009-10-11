@@ -129,4 +129,14 @@ double MixtureModel::nextSample()
 	throw 0;
 }
 
+std::vector<MixtureComponent *> MixtureModel::getComponents()
+{
+	return this->components;
+}
+
+std::vector<double> MixtureModel::getWeights()
+{
+	return this->weights;
+}
+
 } // namespace stochastic

@@ -206,13 +206,13 @@ RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 	if (typeid(* rightarg.distribution) != typeid(* approximator))
 		rightDistribution = approximator->approximate(rightarg.distribution);
 	else
-		rightDistribution = (PiecewiseBase *) rightarg.distribution;
+		rightDistribution = (MixtureModel *) rightarg.distribution;
 
-	Distribution * raw = ((PiecewiseBase*) leftDistribution)->calculateSum(rightDistribution, (Distribution *) 0);
+	Distribution * raw = approximator->calculateSum(leftDistribution, rightDistribution);
 	MixtureModel * result = approximator->approximate(raw);
 	return RandomVariable(result);
 }
@@ -230,13 +230,13 @@ RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 	if (typeid(* rightarg.distribution) != typeid(* approximator))
 		rightDistribution = approximator->approximate(rightarg.distribution);
 	else
-		rightDistribution = (PiecewiseBase *) rightarg.distribution;
+		rightDistribution = (MixtureModel *) rightarg.distribution;
 
-	Distribution * raw = ((PiecewiseBase*)leftDistribution)->calculateDifference(rightDistribution, (Distribution *) 0);
+	Distribution * raw = approximator->calculateDifference(leftDistribution, rightDistribution);
 	MixtureModel * result = approximator->approximate(raw);
 	return RandomVariable(result);
 }
@@ -260,13 +260,13 @@ RandomVariable RandomVariable::operator *(RandomVariable & rightarg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 	if (typeid(* rightarg.distribution) != typeid(* approximator))
 		rightDistribution = approximator->approximate(rightarg.distribution);
 	else
-		rightDistribution = (PiecewiseBase *) rightarg.distribution;
+		rightDistribution = (MixtureModel *) rightarg.distribution;
 
-	Distribution * raw = ((PiecewiseBase*)leftDistribution)->calculateProduct(rightDistribution, (Distribution *) 0);
+	Distribution * raw = approximator->calculateProduct(leftDistribution, rightDistribution);
 	MixtureModel * result = approximator->approximate(raw);
 	return RandomVariable(result);
 }
@@ -285,12 +285,12 @@ RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 
 	inverseRight = new InverseRV_Distribution(rightarg.distribution);
 	rightDistribution = approximator->approximate(inverseRight);
 
-	Distribution * raw = ((PiecewiseBase*)leftDistribution)->calculateProduct(rightDistribution, (Distribution *) 0);
+	Distribution * raw = approximator->calculateProduct(leftDistribution, rightDistribution);
 	MixtureModel * result = approximator->approximate(raw);
 	return RandomVariable(result);
 }
@@ -352,10 +352,10 @@ RandomVariable RandomVariable::operator +(double c_arg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 
 	// no re-approximation needed: linear function
-	Distribution * raw = ((PiecewiseBase*) leftDistribution)->calculateSum(0, c_arg);
+	Distribution * raw = approximator->calculateSum(leftDistribution, c_arg);
 	return RandomVariable(raw);
 }
 
@@ -376,10 +376,10 @@ RandomVariable RandomVariable::operator -(double c_arg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 
 	// just use the sum with negative sign
-	Distribution * raw = ((PiecewiseBase*) leftDistribution)->calculateSum(0, -c_arg);
+	Distribution * raw = approximator->calculateSum(leftDistribution, -c_arg);
 
 	// no re-approximation needed: linear function
 	return RandomVariable(raw);
@@ -397,14 +397,14 @@ RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
 		distr_arg = rv_arg.approximator->approximate(rv_arg.distribution);
 	else
-		distr_arg = (PiecewiseBase *) rv_arg.distribution;
+		distr_arg = (MixtureModel *) rv_arg.distribution;
 
 	/* a change of sign for a RV would require:
 	   1. multiplication with '-1'
 	   2. sum with the 'c_arg'
 	   So, more efficient to implement
 		   the difference from constant directly */
-	Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateDifference(0, c_arg);
+	Distribution * raw = rv_arg.approximator->calculateDifference(distr_arg, c_arg);
 
 	// no re-approximation needed: linear function
 	return RandomVariable(raw);
@@ -425,9 +425,9 @@ RandomVariable RandomVariable::operator *(double c_arg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 
-	Distribution * raw = ((PiecewiseBase*) leftDistribution)->calculateProduct(0, c_arg);
+	Distribution * raw = approximator->calculateProduct(leftDistribution, c_arg);
 
 	// no re-approximation needed: linear function
 	return RandomVariable(raw);
@@ -453,10 +453,10 @@ RandomVariable RandomVariable::operator /(double c_arg)
 	if (typeid(* this->distribution) != typeid(* approximator))
 		leftDistribution = approximator->approximate(this->distribution);
 	else
-		leftDistribution = (PiecewiseBase *) this->distribution;
+		leftDistribution = (MixtureModel *) this->distribution;
 
 	// just multiply with the inverse
-	Distribution * raw = ((PiecewiseBase*) leftDistribution)->calculateProduct(0, 1 / c_arg);
+	Distribution * raw = approximator->calculateProduct(leftDistribution, 1 / c_arg);
 
 	// no re-approximation needed: linear function
 	return RandomVariable(raw);
@@ -480,7 +480,7 @@ RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 		MixtureModel * distr_arg = rv_arg.approximator->approximate(
 				new InverseRV_Distribution(rv_arg.distribution));
 
-		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateProduct(0, c_arg);
+		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateProduct(distr_arg, c_arg);
 		MixtureModel * result = rv_arg.approximator->approximate(raw);
 		return RandomVariable(result);
 	}
@@ -490,13 +490,13 @@ RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 		if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
 			distr_arg = rv_arg.approximator->approximate(rv_arg.distribution);
 		else
-			distr_arg = (PiecewiseBase *) rv_arg.distribution;
+			distr_arg = (MixtureModel *) rv_arg.distribution;
 
 		/*
 		 * Need to implement this, so as to define the inverse
 		 * of a random variable
 		 * */
-		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateRatio(0, c_arg);
+		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateRatio(distr_arg, c_arg);
 		MixtureModel * result = rv_arg.approximator->approximate(raw);
 		return RandomVariable(result);
 	}

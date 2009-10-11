@@ -20,7 +20,7 @@ namespace stochastic {
 // Static Method: sets the wanted number of components
 void PiecewiseBase::setFixedNumberOfComponents(int n)
 {
-	fixedNumberOfComponents = n;
+	numberOfComponents = n;
 }
 
 /*
@@ -38,13 +38,13 @@ double PiecewiseBase::retrieveSupport(Distribution * distribution,
 	double start = distribution->getLeftMargin();
 	double end = distribution->getRightMargin();
 	double support = end - start;
-	double step = support / (double) fixedNumberOfComponents;
+	double step = support / (double) numberOfComponents;
 	int i;
 	double x = start;
 
 	// check for support so as to revise the step
 	int flag_inSupport = 0;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
 		weight = distribution->pdf(x);
 		if (weight)
@@ -79,93 +79,95 @@ Distribution * PiecewiseBase::calculateSum(Distribution * arg1, Distribution * a
 	MixtureComponent * left;
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
-	for (i = 0; i < this->components.size(); i++)
-		for (j = 0; j < ((PiecewiseBase *) arg2)->components.size(); j++)
+
+	for (i = 0; i < ((MixtureModel *)arg1)->getComponents().size(); i++)
+		for (j = 0; j < ((MixtureModel *) arg2)->getComponents().size(); j++)
 		{
-			left = this->components[i];
-			right = ((PiecewiseBase *)arg2)->components[j];
+			left = ((MixtureModel *)arg1)->getComponents()[i];
+			right = ((MixtureModel *)arg2)->getComponents()[j];
 			currentResult = sumOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
+			resultWeights.push_back(((MixtureModel *)arg1)->getWeights()[i] * ((MixtureModel *)arg2)->getWeights()[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
 Distribution * PiecewiseBase::calculateDifference(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg2))
-		throw stochastic::IncompatibleComponentsException();
-
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
 	MixtureComponent * left;
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
+	for (i = 0; i < numberOfComponents; i++)
+		for (j = 0; j < numberOfComponents; j++)
 		{
-			left = this->components[i];
-			right = ((PiecewiseBase *)arg2)->components[j];
+			left = ((MixtureModel *)arg1)->getComponents()[i];
+			right = ((MixtureModel *)arg2)->getComponents()[j];
 			currentResult = differenceOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
+			resultWeights.push_back(((MixtureModel *)arg1)->getWeights()[i] * ((MixtureModel *)arg2)->getWeights()[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
 Distribution * PiecewiseBase::calculateProduct(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg2))
-		throw stochastic::IncompatibleComponentsException();
-
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
 	MixtureComponent * left;
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
+	for (i = 0; i < numberOfComponents; i++)
+		for (j = 0; j < numberOfComponents; j++)
 		{
-			left = this->components[i];
-			right = ((PiecewiseBase *)arg2)->components[j];
+			left = ((MixtureModel *)arg1)->getComponents()[i];
+			right = ((MixtureModel *)arg2)->getComponents()[j];
 			currentResult = productOfComponents(left, right);
 
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
+			resultWeights.push_back(((MixtureModel *)arg1)->getWeights()[i] * ((MixtureModel *)arg2)->getWeights()[j]);
 		}
 	return new MixtureModel(resultComponents, resultWeights);
 }
 
 Distribution * PiecewiseBase::calculateRatio(Distribution * arg1, Distribution * arg2)
 {
-	if (typeid(* this) != typeid(* arg2))
-		throw stochastic::IncompatibleComponentsException();
-
 	std::vector<MixtureComponent *> resultComponents;
 	std::vector<double> resultWeights;
 	int i, j;
 	MixtureComponent * left;
 	MixtureComponent * right;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
-		for (j = 0; j < fixedNumberOfComponents; j++)
+	for (i = 0; i < numberOfComponents; i++)
+		for (j = 0; j < numberOfComponents; j++)
 		{
-			left = this->components[i];
-			right = ((PiecewiseBase *)arg2)->components[j];
+			left = ((MixtureModel *)arg1)->getComponents()[i];
+			right = ((MixtureModel *)arg2)->getComponents()[j];
 			currentResult = ratioOfComponents(left, right);
 
 			// discard null results
 			if (currentResult)
 			{
 				resultComponents.push_back(currentResult);
-				resultWeights.push_back(this->weights[i] * ((PiecewiseBase *)arg2)->weights[j]);
+				resultWeights.push_back(((MixtureModel *)arg1)->getWeights()[i] * ((MixtureModel *)arg2)->getWeights()[j]);
 			}
 		}
 	return new MixtureModel(resultComponents, resultWeights);
+}
+
+Distribution * PiecewiseBase::calculateMin(Distribution * arg1, Distribution * arg2)
+{
+	return 0;
+}
+
+Distribution * PiecewiseBase::calculateMax(Distribution * arg1, Distribution * arg2)
+{
+	return 0;
 }
 
 /*
@@ -181,13 +183,13 @@ Distribution * PiecewiseBase::calculateSum(Distribution * d_arg, double c_arg)
 	int i;
 	MixtureComponent * distr_arg;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
-		distr_arg = this->components[i];
+		distr_arg = ((MixtureModel *)d_arg)->getComponents()[i];
 		currentResult = sumOfComponents(distr_arg, c_arg);
 		resultComponents.push_back(currentResult);
 	}
-	return new MixtureModel(resultComponents, this->weights);
+	return new MixtureModel(resultComponents, ((MixtureModel *)d_arg)->getWeights());
 }
 
 Distribution * PiecewiseBase::calculateDifference(Distribution * d_arg, double c_arg)
@@ -196,13 +198,18 @@ Distribution * PiecewiseBase::calculateDifference(Distribution * d_arg, double c
 	int i;
 	MixtureComponent * distr_arg;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
-		distr_arg = this->components[i];
+		distr_arg = ((MixtureModel *)d_arg)->getComponents()[i];
 		currentResult = differenceOfComponents(c_arg, distr_arg);
 		resultComponents.push_back(currentResult);
 	}
-	return new MixtureModel(resultComponents, this->weights);
+	return new MixtureModel(resultComponents, ((MixtureModel *)d_arg)->getWeights());
+}
+
+Distribution * PiecewiseBase::calculateDifference(double c_arg, Distribution * d_arg)
+{
+	return 0;
 }
 
 Distribution * PiecewiseBase::calculateProduct(Distribution * d_arg, double c_arg)
@@ -211,13 +218,13 @@ Distribution * PiecewiseBase::calculateProduct(Distribution * d_arg, double c_ar
 	int i;
 	MixtureComponent * distr_arg;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
-		distr_arg = this->components[i];
+		distr_arg = ((MixtureModel *)d_arg)->getComponents()[i];
 		currentResult = productOfComponents(distr_arg, c_arg);
 		resultComponents.push_back(currentResult);
 	}
-	return new MixtureModel(resultComponents, this->weights);
+	return new MixtureModel(resultComponents, ((MixtureModel *)d_arg)->getWeights());
 }
 
 // deprecated: needed for comparison
@@ -228,18 +235,33 @@ Distribution * PiecewiseBase::calculateRatio(Distribution * d_arg, double c_arg)
 	int i;
 	MixtureComponent * distr_arg;
 	MixtureComponent * currentResult;
-	for (i = 0; i < fixedNumberOfComponents; i++)
+	for (i = 0; i < numberOfComponents; i++)
 	{
-		distr_arg = this->components[i];
+		distr_arg = ((MixtureModel *)d_arg)->getComponents()[i];
 		currentResult = ratioOfComponents(c_arg, distr_arg);
 		// discard null results
 		if (currentResult)
 		{
 			resultComponents.push_back(currentResult);
-			resultWeights.push_back(this->weights[i]);
+			resultWeights.push_back(((MixtureModel *)d_arg)->getWeights()[i]);
 		}
 	}
 	return new MixtureModel(resultComponents, resultWeights);
+}
+
+Distribution * PiecewiseBase::calculateRatio(double c_arg, Distribution * d_arg)
+{
+	return 0;
+}
+
+Distribution * PiecewiseBase::calculateMin(Distribution * d_arg, double c_arg)
+{
+	return 0;
+}
+
+Distribution * PiecewiseBase::calculateMax(Distribution * d_arg, double c_arg)
+{
+	return 0;
 }
 
 } // namespace stochastic

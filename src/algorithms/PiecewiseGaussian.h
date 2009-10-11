@@ -32,11 +32,9 @@ private:
 
 public:
 	PiecewiseGaussian();
-	PiecewiseGaussian(Distribution *);
 	virtual ~PiecewiseGaussian();
 
 	MixtureModel * approximate(Distribution *);
-	const char * getName();
 };
 
 } // namespace stochastic

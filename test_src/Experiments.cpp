@@ -137,8 +137,8 @@ void compareApproximations()
 
 
 	RandomVariable rv = new Gaussian;
-	RandomVariable pu = new PiecewiseUniform(rv.getDistribution());
-	RandomVariable pg = new PiecewiseGaussian(rv.getDistribution());
+	RandomVariable pu = (new PiecewiseUniform())->approximate(rv.getDistribution());
+	RandomVariable pg = (new PiecewiseGaussian())->approximate(rv.getDistribution());
 
 
 	RandomVariable a(new Gaussian), b(new Gaussian);
@@ -221,14 +221,13 @@ void computationsPU(std::vector<double> & counters, std::vector<
 	errors.clear();
 
 	RandomVariable rv = new Gaussian;
-	PiecewiseUniform pu(new Gaussian);
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
-	std::cout << "\n0: KL_Divergence between PU and original: ";
+	/*std::cout << "\n0: KL_Divergence between PU and original: ";
 	errors.push_back(KL_Divergence(&pu, original));
 	counters.push_back(0);
 	std::cout << errors[0];
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl << std::endl;*/
 
 	RandomGenerator random;
 	int i;
@@ -269,14 +268,13 @@ void computationsPG(std::vector<double> & counters, std::vector<
 	errors.clear();
 
 	RandomVariable rv = new Gaussian;
-	PiecewiseGaussian pg(new Gaussian);
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
-	std::cout << "\n0: KL_Divergence between PG and original: ";
+	/*std::cout << "\n0: KL_Divergence between PG and original: ";
 	errors.push_back(KL_Divergence(&pg, original));
 	counters.push_back(0);
 	std::cout << errors[0];
-	std::cout << std::endl << std::endl;
+	std::cout << std::endl << std::endl;*/
 
 	RandomGenerator random;
 	int i;

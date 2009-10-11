@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include "../distributions/MixtureModel.h"
 #include "../utilities/exceptions.h"
 #include "../utilities/mathFunctions.h"
 
@@ -19,31 +20,17 @@ PiecewiseGaussian::PiecewiseGaussian()
 {
 }
 
-PiecewiseGaussian::PiecewiseGaussian(Distribution * distribution)
-{
-	if (!distribution)
-		throw stochastic::UndefinedDistributionException();
-
-	PiecewiseGaussian temp = * (PiecewiseGaussian *)approximate(distribution);
-	this->weights = temp.weights;
-	this->components = temp.components;
-	this->cumulativeWeights = temp.cumulativeWeights;
-}
-
 PiecewiseGaussian::~PiecewiseGaussian()
 {
 }
 
-const char * PiecewiseGaussian::getName()
-{
-	return "Piecewise Gaussian";
-}
-
 MixtureModel * PiecewiseGaussian::approximate(Distribution * distribution)
 {
-	PiecewiseGaussian * result = new PiecewiseGaussian;
-	MixtureComponent * component;
+	MixtureModel * result;
+	std::vector<MixtureComponent *> result_components;
+	std::vector<double> result_weights;
 
+	MixtureComponent * component;
 	std::vector<double> supportInterval_lmargins;
 	std::vector<double> supportInterval_rmargins;
 
@@ -63,9 +50,9 @@ MixtureModel * PiecewiseGaussian::approximate(Distribution * distribution)
 		// (F(b) - F(a)) * totalComponentNumber
 		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
 				- distribution->cdf(supportInterval_lmargins[k]))
-				* fixedNumberOfComponents;
+				* numberOfComponents;
 		if (k == total_support_intervals - 1) // the last one
-			intervalComponents = fixedNumberOfComponents - componentsUsed;
+			intervalComponents = numberOfComponents - componentsUsed;
 		else
 			componentsUsed += intervalComponents;
 
@@ -89,12 +76,12 @@ MixtureModel * PiecewiseGaussian::approximate(Distribution * distribution)
 			if (weight < 0) // negative results are just close to zero
 				weight = 0;
 			component = new Gaussian(x, var);
-			result->components.push_back(component);
-			result->weights.push_back(weight);
+			result_components.push_back(component);
+			result_weights.push_back(weight);
 			x += step;
 		}
 	}
-	result->cumulativeWeights = constructCumulativeWeights(result->weights);
+	result = new MixtureModel(result_components, result_weights);
 	return result;
 }
 

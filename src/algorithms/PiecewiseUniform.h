@@ -33,13 +33,10 @@ private:
 
 public:
 	PiecewiseUniform();
-	PiecewiseUniform(Distribution *);
 	virtual ~PiecewiseUniform();
 
 	MixtureModel * approximate(Distribution *);
 	MixtureModel * approximate2(Distribution *);
-	const char * getName();
-
 
 	// TODO: isolate discretization in another class
 	static int useold; // TO BE DISCARDED, just for the experiment
