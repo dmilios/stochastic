@@ -13,7 +13,8 @@
 #include <algorithm>
 #include <cmath>
 
-namespace stochastic {
+namespace stochastic
+{
 
 PiecewiseUniform::PiecewiseUniform()
 {
@@ -34,8 +35,8 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 	std::vector<double> supportInterval_rmargins;
 
 	// margin vectors are called by reference
-	retrieveSupport(distribution,
-			supportInterval_lmargins, supportInterval_rmargins);
+	retrieveSupport(distribution, supportInterval_lmargins,
+			supportInterval_rmargins);
 
 	int k; // counter for the support intervals
 	int componentsUsed = 0;
@@ -47,14 +48,13 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 	{
 		int intervalComponents;
 		// (F(b) - F(a)) * totalComponentNumber
-		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
-				- distribution->cdf(supportInterval_lmargins[k]))
-					* numberOfComponents;
+		intervalComponents = (int) (distribution->cdf(
+				supportInterval_rmargins[k]) - distribution->cdf(
+				supportInterval_lmargins[k])) * numberOfComponents;
 		if (k == total_support_intervals - 1) // the last one
 			intervalComponents = numberOfComponents - componentsUsed;
 		else
 			componentsUsed += intervalComponents;
-
 
 		int i;
 		double x = supportInterval_lmargins[k];
@@ -111,8 +111,7 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 		try
 		{
 			component = new Uniform(x, x_step);
-		}
-		catch(InvalidParametersException e)
+		} catch (InvalidParametersException e)
 		{
 			component = new Uniform(0, 1e-5);
 			weight = 0;
@@ -139,8 +138,8 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 
 int PiecewiseUniform::useold = 0;
 
-MixtureComponent * PiecewiseUniform::sumOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
+MixtureComponent * PiecewiseUniform::sumOfComponents(MixtureComponent * arg1,
+		MixtureComponent * arg2)
 {
 	if (useold)
 	{
@@ -159,15 +158,15 @@ MixtureComponent * PiecewiseUniform::sumOfComponents(
 MixtureComponent * PiecewiseUniform::differenceOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-//	double a = arg1->getLeftMargin() - arg2->getRightMargin();
-//	double b = arg1->getRightMargin() - arg2->getLeftMargin();
-//	return new Uniform(a, b);
+	//	double a = arg1->getLeftMargin() - arg2->getRightMargin();
+	//	double b = arg1->getRightMargin() - arg2->getLeftMargin();
+	//	return new Uniform(a, b);
 
 	double a1 = arg1->getLeftMargin();
 	double b1 = arg1->getRightMargin();
 	// multiply the second argument by -1
-	double a2 = - arg2->getRightMargin();
-	double b2 = - arg2->getLeftMargin();
+	double a2 = -arg2->getRightMargin();
+	double b2 = -arg2->getLeftMargin();
 	return new SumOfUniforms(a1, b1, a2, b2);
 }
 
@@ -185,15 +184,15 @@ MixtureComponent * PiecewiseUniform::productOfComponents(
 	margins.push_back(b1 * a2);
 	margins.push_back(b1 * b2);
 
-	std::vector<double>::iterator a = std::min_element(
-									margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-									margins.begin(), margins.end());
-	return new Uniform(* a, * b);
+	std::vector<double>::iterator a = std::min_element(margins.begin(),
+			margins.end());
+	std::vector<double>::iterator b = std::max_element(margins.begin(),
+			margins.end());
+	return new Uniform(*a, *b);
 }
 
-MixtureComponent * PiecewiseUniform::ratioOfComponents(
-		MixtureComponent * arg1, MixtureComponent * arg2)
+MixtureComponent * PiecewiseUniform::ratioOfComponents(MixtureComponent * arg1,
+		MixtureComponent * arg2)
 {
 	double a1 = arg1->getLeftMargin();
 	double b1 = arg1->getRightMargin();
@@ -211,11 +210,11 @@ MixtureComponent * PiecewiseUniform::ratioOfComponents(
 	margins.push_back(b1 / a2);
 	margins.push_back(b1 / b2);
 
-	std::vector<double>::iterator a = std::min_element(
-			margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-			margins.begin(), margins.end());
-	return new Uniform(* a, * b);
+	std::vector<double>::iterator a = std::min_element(margins.begin(),
+			margins.end());
+	std::vector<double>::iterator b = std::max_element(margins.begin(),
+			margins.end());
+	return new Uniform(*a, *b);
 }
 
 /*
@@ -237,8 +236,8 @@ MixtureComponent * PiecewiseUniform::sumOfComponents(
 MixtureComponent * PiecewiseUniform::differenceOfComponents(double c_arg,
 		MixtureComponent * distr_arg)
 {
-	double a =  c_arg - distr_arg->getRightMargin();
-	double b =  c_arg - distr_arg->getLeftMargin();
+	double a = c_arg - distr_arg->getRightMargin();
+	double b = c_arg - distr_arg->getLeftMargin();
 	return new Uniform(a, b);
 }
 

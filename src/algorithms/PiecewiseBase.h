@@ -14,7 +14,8 @@
 #include "../utilities/FileParser.h"
 #include <vector>
 
-namespace stochastic {
+namespace stochastic
+{
 
 /**
  * This class defines the interface of the Mixture Models
@@ -24,7 +25,7 @@ namespace stochastic {
  * define different approximation methods for each approximation class,
  * but a unique interface.
  * */
-class PiecewiseBase : public RandomVariableAlgorithm
+class PiecewiseBase: public RandomVariableAlgorithm
 {
 protected:
 	int numberOfComponents;
@@ -49,10 +50,14 @@ protected:
 	virtual MixtureComponent * differenceOfComponents(double,
 			MixtureComponent *) = 0;
 	virtual MixtureComponent
-			* productOfComponents(MixtureComponent *, double) = 0;
+	* productOfComponents(MixtureComponent *, double) = 0;
 	virtual MixtureComponent * ratioOfComponents(double, MixtureComponent *) = 0;
 
 public:
+	virtual ~PiecewiseBase()
+	{
+	}
+
 	virtual MixtureModel * approximate(Distribution *) = 0;
 
 	// in order to set the global fixedNumberOfComponents

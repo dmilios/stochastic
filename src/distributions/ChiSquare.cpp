@@ -9,7 +9,7 @@
 #include "../utilities/exceptions.h"
 #include <sstream>
 #include <cmath>
-#include <boost/math/special_functions/gamma.hpp>
+//#include <boost/math/special_functions/gamma.hpp>
 
 namespace stochastic {
 
@@ -53,7 +53,8 @@ double ChiSquare::cdf(double x)
 {
 	if (x <= 0)
 		return 0;
-	return boost::math::gamma_p((double) k / 2, x / 2);
+	//return boost::math::gamma_p((double) k / 2, x / 2);
+	return 0;
 }
 
 double ChiSquare::getLeftMargin()

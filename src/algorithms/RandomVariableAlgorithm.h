@@ -10,13 +10,19 @@
 
 #include "../distributions/Distribution.h"
 
-namespace stochastic {
+namespace stochastic
+{
 
 class RandomVariableAlgorithm
 {
 public:
+	virtual ~RandomVariableAlgorithm()
+	{
+	}
+
 	virtual Distribution * calculateSum(Distribution *, Distribution *) = 0;
-	virtual Distribution * calculateDifference(Distribution *, Distribution *) = 0;
+	virtual Distribution
+			* calculateDifference(Distribution *, Distribution *) = 0;
 	virtual Distribution * calculateProduct(Distribution *, Distribution *) = 0;
 	virtual Distribution * calculateRatio(Distribution *, Distribution *) = 0;
 
