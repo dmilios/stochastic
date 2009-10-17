@@ -8,13 +8,12 @@
 #ifndef PIECEWISEUNIFORM_H_
 #define PIECEWISEUNIFORM_H_
 
-#include "PiecewiseBase.h"
+#include "ApproximationAlgorithm.h"
 
-#include "../distributions/Uniform.h"
 
 namespace stochastic {
 
-class PiecewiseUniform : public stochastic::PiecewiseBase
+class PiecewiseUniform : public ApproximationAlgorithm
 {
 private:
 	MixtureComponent * sumOfComponents(MixtureComponent *, MixtureComponent *);
@@ -22,24 +21,20 @@ private:
 			MixtureComponent *);
 	MixtureComponent * productOfComponents(MixtureComponent *,
 			MixtureComponent *);
-	MixtureComponent * ratioOfComponents(MixtureComponent *,
-			MixtureComponent *);
+	MixtureComponent
+			* ratioOfComponents(MixtureComponent *, MixtureComponent *);
 
 	MixtureComponent * sumOfComponents(MixtureComponent *, double);
 	MixtureComponent * differenceOfComponents(double, MixtureComponent *);
 	MixtureComponent * productOfComponents(MixtureComponent *, double);
-	MixtureComponent * ratioOfComponents(double, MixtureComponent *);
-
 
 public:
-	PiecewiseUniform();
+	PiecewiseUniform(int);
 	virtual ~PiecewiseUniform();
 
-	MixtureModel * approximate(Distribution *);
-	MixtureModel * approximate2(Distribution *);
-
-	// TODO: isolate discretization in another class
-	static int useold; // TO BE DISCARDED, just for the experiment
+	int needsApproximation(Distribution *);
+	MixtureModel * performApproximation(Distribution *);
+	MixtureModel * performApproximation2(Distribution *);
 };
 
 } // namespace stochastic

@@ -14,7 +14,7 @@
 
 void current()
 {
-	RandomVariable::setPiecewiseGaussian(100);
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -43,7 +43,7 @@ void current()
 
 void comparePUwithMC()
 {
-	RandomVariable::setPiecewiseUniform(100);
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -81,7 +81,7 @@ void comparePUwithMC()
 
 void comparePGwithMC()
 {
-	RandomVariable::setPiecewiseGaussian(100);
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -137,19 +137,19 @@ void compareApproximations()
 
 
 	RandomVariable rv = new Gaussian;
-	RandomVariable pu = (new PiecewiseUniform())->approximate(rv.getDistribution());
-	RandomVariable pg = (new PiecewiseGaussian())->approximate(rv.getDistribution());
+	RandomVariable pu = (new PiecewiseUniform(10))->approximate(rv.getDistribution());
+	RandomVariable pg = (new PiecewiseGaussian(10))->approximate(rv.getDistribution());
 
 
 	RandomVariable a(new Gaussian), b(new Gaussian);
 	timer = clock();
-	RandomVariable::setPiecewiseUniform(100);
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 	a + b;
 	std::cout << "PU sum time (ms): " << 1000 * (double) (clock() - timer)
 			/ CLOCKS_PER_SEC << "\n";
 
 	timer = clock();
-	RandomVariable::setPiecewiseGaussian(100);
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 	a + b;
 	std::cout << "PG sum time (ms): " << 1000 * (double) (clock() - timer)
 			/ CLOCKS_PER_SEC << "\n\n";
@@ -200,7 +200,6 @@ void computationsEvolution()
 
 	std::cout << std::endl << "--------------------------------" << std::endl;
 
-	PiecewiseUniform::useold = 1;
 	computationsPU(iteration_numbers, errors);
 	plot.addCurve(OTHER, "KL_Divergence Evolution for PU Old",
 			iteration_numbers, errors);
@@ -213,7 +212,7 @@ void computationsEvolution()
 void computationsPU(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setPiecewiseUniform(100);
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 	Gnuplot::setAccuracy(1000);
 //	Gnuplot plot;
 	long int timer;
@@ -260,7 +259,7 @@ void computationsPU(std::vector<double> & counters, std::vector<
 void computationsPG(std::vector<double> & counters, std::vector<
 		double> & errors)
 {
-	RandomVariable::setPiecewiseGaussian(100);
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 	long int timer;
@@ -370,7 +369,7 @@ void dependencyMC()
 
 void sumOfUniforms()
 {
-	RandomVariable::setPiecewiseUniform(100);
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -408,7 +407,7 @@ void sumOfUniforms()
 
 void minmaxTests()
 {
-	RandomVariable::setPiecewiseGaussian(100);
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 	Gnuplot::setAccuracy(1000);
 
 	Gnuplot plot;

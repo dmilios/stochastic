@@ -8,13 +8,13 @@
 #ifndef PIECEWISEGAUSSIAN_H_
 #define PIECEWISEGAUSSIAN_H_
 
-#include "PiecewiseBase.h"
+#include "ApproximationAlgorithm.h"
 
 #include "../distributions/Gaussian.h"
 
 namespace stochastic {
 
-class PiecewiseGaussian : public stochastic::PiecewiseBase
+class PiecewiseGaussian : public stochastic::ApproximationAlgorithm
 {
 private:
 	MixtureComponent * sumOfComponents(MixtureComponent *, MixtureComponent *);
@@ -28,13 +28,13 @@ private:
 	MixtureComponent * sumOfComponents(MixtureComponent *, double);
 	MixtureComponent * differenceOfComponents(double, MixtureComponent *);
 	MixtureComponent * productOfComponents(MixtureComponent *, double);
-	MixtureComponent * ratioOfComponents(double, MixtureComponent *);
 
 public:
-	PiecewiseGaussian();
+	PiecewiseGaussian(int);
 	virtual ~PiecewiseGaussian();
 
-	MixtureModel * approximate(Distribution *);
+	int needsApproximation(Distribution *);
+	MixtureModel * performApproximation(Distribution *);
 };
 
 } // namespace stochastic

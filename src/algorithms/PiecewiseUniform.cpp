@@ -7,24 +7,47 @@
 
 #include "PiecewiseUniform.h"
 
-#include "../utilities/exceptions.h"
-#include "../intermediateResults/SumOfUniforms.h"
-#include "../distributions/MixtureModel.h"
 #include <algorithm>
 #include <cmath>
+#include <typeinfo>
 
-namespace stochastic
-{
+#include "../utilities/exceptions.h"
+#include "../distributions/Uniform.h"
+#include "../intermediateResults/SumOfUniforms.h"
+#include "../distributions/MixtureModel.h"
 
-PiecewiseUniform::PiecewiseUniform()
+namespace stochastic {
+
+PiecewiseUniform::PiecewiseUniform(int n)
 {
+	this->numberOfComponents = n;
 }
 
 PiecewiseUniform::~PiecewiseUniform()
 {
 }
 
-MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
+int PiecewiseUniform::needsApproximation(Distribution * argument)
+{
+	if (typeid(*argument) != typeid(MixtureModel))
+		return 1;
+	int size = ((MixtureModel *) argument)->getComponents().size();
+	if (size != numberOfComponents)
+		return 1;
+
+	int i;
+	for (i = 0; i < size; i++)
+	{
+		MixtureComponent * current =
+			((MixtureModel *) argument)->getComponents()[i];
+		if (typeid(*current) != typeid(Uniform))
+			return 1;
+	}
+	return 0;
+}
+
+MixtureModel * PiecewiseUniform::performApproximation(
+		Distribution * distribution)
 {
 	MixtureModel * result;
 	std::vector<MixtureComponent *> result_components;
@@ -40,7 +63,8 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 
 	int k; // counter for the support intervals
 	int componentsUsed = 0;
-	int total_support_intervals = supportInterval_lmargins.size();
+	int total_support_intervals =
+		supportInterval_lmargins.size();
 
 	// the accuracy for each support interval will be
 	// proportional to its probability mass
@@ -48,11 +72,15 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 	{
 		int intervalComponents;
 		// (F(b) - F(a)) * totalComponentNumber
-		intervalComponents = (int) (distribution->cdf(
-				supportInterval_rmargins[k]) - distribution->cdf(
-				supportInterval_lmargins[k])) * numberOfComponents;
+		intervalComponents
+		= (int) (distribution->cdf(
+				supportInterval_rmargins[k])
+				- distribution->cdf(
+						supportInterval_lmargins[k]))
+						* numberOfComponents;
 		if (k == total_support_intervals - 1) // the last one
-			intervalComponents = numberOfComponents - componentsUsed;
+			intervalComponents = numberOfComponents
+			- componentsUsed;
 		else
 			componentsUsed += intervalComponents;
 
@@ -60,14 +88,16 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 		double x = supportInterval_lmargins[k];
 		double weight;
 		double step = (supportInterval_rmargins[k]
-				- supportInterval_lmargins[k]) / intervalComponents;
+		                                        - supportInterval_lmargins[k])
+		                                        / intervalComponents;
 
 		double p = distribution->pdf(x);
 		for (i = 0; i < intervalComponents; i++)
 		{
 			p = distribution->pdf(x + step);
 
-			weight = distribution->cdf(x + step) - distribution->cdf(x);
+			weight = distribution->cdf(x + step)
+			- distribution->cdf(x);
 
 			if (x + step >= supportInterval_rmargins[k])
 				weight = 0;
@@ -79,12 +109,15 @@ MixtureModel * PiecewiseUniform::approximate(Distribution * distribution)
 			x += step;
 		}
 	}
-	result = new MixtureModel(result_components, result_weights);
+	result
+	= new MixtureModel(result_components,
+			result_weights);
 	return result;
 }
 
 // alternative fit using quantile
-MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
+MixtureModel * PiecewiseUniform::performApproximation2(
+		Distribution * distribution)
 {
 	MixtureModel * result;
 	std::vector<MixtureComponent *> result_components;
@@ -104,14 +137,16 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 		else
 			x_step = distribution->quantile(p + step);
 
-		weight = distribution->cdf(x_step) - distribution->cdf(x);
+		weight = distribution->cdf(x_step) - distribution->cdf(
+				x);
 		if (weight < 0) // negative results are just close to zero
-			weight = 0;
+		weight = 0;
 
 		try
 		{
 			component = new Uniform(x, x_step);
-		} catch (InvalidParametersException e)
+		}
+		catch (InvalidParametersException e)
 		{
 			component = new Uniform(0, 1e-5);
 			weight = 0;
@@ -120,7 +155,9 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
 		result_weights.push_back(weight);
 		p += step;
 	}
-	result = new MixtureModel(result_components, result_weights);
+	result
+	= new MixtureModel(result_components,
+			result_weights);
 	return result;
 }
 
@@ -131,23 +168,14 @@ MixtureModel * PiecewiseUniform::approximate2(Distribution * distribution)
  *
  *
  * Methods for computing the results of operations between components
- * Implement pure virtual methods from 'PiecewiseBase'
+ * Implement pure virtual methods from 'PiecewiseAlgorithm'
  *
  *
  * */
 
-int PiecewiseUniform::useold = 0;
-
-MixtureComponent * PiecewiseUniform::sumOfComponents(MixtureComponent * arg1,
-		MixtureComponent * arg2)
+MixtureComponent * PiecewiseUniform::sumOfComponents(
+		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-	if (useold)
-	{
-		double a = arg1->getLeftMargin() + arg2->getLeftMargin();
-		double b = arg1->getRightMargin() + arg2->getRightMargin();
-		return new Uniform(a, b);
-	}
-
 	double a1 = arg1->getLeftMargin();
 	double b1 = arg1->getRightMargin();
 	double a2 = arg2->getLeftMargin();
@@ -158,10 +186,6 @@ MixtureComponent * PiecewiseUniform::sumOfComponents(MixtureComponent * arg1,
 MixtureComponent * PiecewiseUniform::differenceOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
 {
-	//	double a = arg1->getLeftMargin() - arg2->getRightMargin();
-	//	double b = arg1->getRightMargin() - arg2->getLeftMargin();
-	//	return new Uniform(a, b);
-
 	double a1 = arg1->getLeftMargin();
 	double b1 = arg1->getRightMargin();
 	// multiply the second argument by -1
@@ -184,15 +208,15 @@ MixtureComponent * PiecewiseUniform::productOfComponents(
 	margins.push_back(b1 * a2);
 	margins.push_back(b1 * b2);
 
-	std::vector<double>::iterator a = std::min_element(margins.begin(),
-			margins.end());
-	std::vector<double>::iterator b = std::max_element(margins.begin(),
-			margins.end());
+	std::vector<double>::iterator a = std::min_element(
+			margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+			margins.begin(), margins.end());
 	return new Uniform(*a, *b);
 }
 
-MixtureComponent * PiecewiseUniform::ratioOfComponents(MixtureComponent * arg1,
-		MixtureComponent * arg2)
+MixtureComponent * PiecewiseUniform::ratioOfComponents(
+		MixtureComponent * arg1, MixtureComponent * arg2)
 {
 	double a1 = arg1->getLeftMargin();
 	double b1 = arg1->getRightMargin();
@@ -210,10 +234,10 @@ MixtureComponent * PiecewiseUniform::ratioOfComponents(MixtureComponent * arg1,
 	margins.push_back(b1 / a2);
 	margins.push_back(b1 / b2);
 
-	std::vector<double>::iterator a = std::min_element(margins.begin(),
-			margins.end());
-	std::vector<double>::iterator b = std::max_element(margins.begin(),
-			margins.end());
+	std::vector<double>::iterator a = std::min_element(
+			margins.begin(), margins.end());
+	std::vector<double>::iterator b = std::max_element(
+			margins.begin(), margins.end());
 	return new Uniform(*a, *b);
 }
 
@@ -225,43 +249,29 @@ MixtureComponent * PiecewiseUniform::ratioOfComponents(MixtureComponent * arg1,
  *
  * */
 
-MixtureComponent * PiecewiseUniform::sumOfComponents(
-		MixtureComponent * distr_arg, double c_arg)
-{
-	double a = distr_arg->getLeftMargin() + c_arg;
-	double b = distr_arg->getRightMargin() + c_arg;
-	return new Uniform(a, b);
-}
+ MixtureComponent * PiecewiseUniform::sumOfComponents(
+		 MixtureComponent * distr_arg, double c_arg)
+ {
+	 double a = distr_arg->getLeftMargin() + c_arg;
+	 double b = distr_arg->getRightMargin() + c_arg;
+	 return new Uniform(a, b);
+ }
 
-MixtureComponent * PiecewiseUniform::differenceOfComponents(double c_arg,
-		MixtureComponent * distr_arg)
-{
-	double a = c_arg - distr_arg->getRightMargin();
-	double b = c_arg - distr_arg->getLeftMargin();
-	return new Uniform(a, b);
-}
+ MixtureComponent * PiecewiseUniform::differenceOfComponents(
+		 double c_arg, MixtureComponent * distr_arg)
+ {
+	 double a = c_arg - distr_arg->getRightMargin();
+	 double b = c_arg - distr_arg->getLeftMargin();
+	 return new Uniform(a, b);
+ }
 
-MixtureComponent * PiecewiseUniform::productOfComponents(
-		MixtureComponent * distr_arg, double c_arg)
-{
-	double a = distr_arg->getLeftMargin() * c_arg;
-	double b = distr_arg->getRightMargin() * c_arg;
-	return new Uniform(std::min<double>(a, b), std::max<double>(a, b));
-}
-
-MixtureComponent * PiecewiseUniform::ratioOfComponents(double c_arg,
-		MixtureComponent * distr_arg)
-{
-	double a = distr_arg->getLeftMargin();
-	double b = distr_arg->getRightMargin();
-	if (std::abs(a) < 0.001)
-		return 0;
-	if (std::abs(b) < 0.001)
-		return 0;
-
-	a = c_arg / a;
-	b = c_arg / b;
-	return new Uniform(std::min<double>(a, b), std::max<double>(a, b));
-}
+ MixtureComponent * PiecewiseUniform::productOfComponents(
+		 MixtureComponent * distr_arg, double c_arg)
+ {
+	 double a = distr_arg->getLeftMargin() * c_arg;
+	 double b = distr_arg->getRightMargin() * c_arg;
+	 return new Uniform(std::min<double>(a, b),
+			 std::max<double>(a, b));
+ }
 
 } // namespace stochastic

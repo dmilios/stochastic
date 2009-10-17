@@ -14,7 +14,7 @@
 #include "RandomVariable.h"
 #include "distributions/Distribution.h"
 
-#include "algorithms/PiecewiseBase.h"
+#include "algorithms/ApproximationAlgorithm.h"
 #include "algorithms/PiecewiseGaussian.h"
 #include "algorithms/PiecewiseUniform.h"
 #include "distributions/MixtureModel.h"

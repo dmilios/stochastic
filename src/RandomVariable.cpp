@@ -22,7 +22,7 @@
 
 namespace stochastic {
 
-PiecewiseBase * RandomVariable::approximator = new PiecewiseUniform;
+RandomVariableAlgorithm * RandomVariable::algorithm = new PiecewiseUniform(100);
 int RandomVariable::monteCarloFlag = 0;
 int RandomVariable::numberOfSamplesMC = 10000;
 
@@ -32,26 +32,17 @@ std::map <RandomVariable *, double> RandomVariable::samplesCollection;
  * static methods
  */
 
+void  RandomVariable::setAlgorithm(RandomVariableAlgorithm * alg)
+{
+	monteCarloFlag = 0;
+	algorithm = alg;
+}
+
 void RandomVariable::setMonteCarlo(int number_of_samples)
 {
 	monteCarloFlag = 1;
 	numberOfSamplesMC = number_of_samples;
 }
-
-void RandomVariable::setPiecewiseUniform(int number_of_components)
-{
-	monteCarloFlag = 0;
-	approximator = new PiecewiseUniform;
-	approximator->setFixedNumberOfComponents(number_of_components);
-}
-
-void RandomVariable::setPiecewiseGaussian(int number_of_components)
-{
-	monteCarloFlag = 0;
-	approximator = new PiecewiseGaussian;
-	approximator->setFixedNumberOfComponents(number_of_components);
-}
-
 
 /*
  *
@@ -201,20 +192,7 @@ RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(SUM, this, & rightarg);
 
-	MixtureModel * leftDistribution;
-	MixtureModel * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-	if (typeid(* rightarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->approximate(rightarg.distribution);
-	else
-		rightDistribution = (MixtureModel *) rightarg.distribution;
-
-	Distribution * raw = approximator->calculateSum(leftDistribution, rightDistribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateSum(this->distribution, rightarg.distribution);
 }
 
 RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
@@ -225,20 +203,7 @@ RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(DIFFERENCE, this, & rightarg);
 
-	MixtureModel * leftDistribution;
-	MixtureModel * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-	if (typeid(* rightarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->approximate(rightarg.distribution);
-	else
-		rightDistribution = (MixtureModel *) rightarg.distribution;
-
-	Distribution * raw = approximator->calculateDifference(leftDistribution, rightDistribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateDifference(this->distribution, rightarg.distribution);
 }
 
 // Implementation of the negative sign for a RV
@@ -255,20 +220,7 @@ RandomVariable RandomVariable::operator *(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(PRODUCT, this, & rightarg);
 
-	MixtureModel * leftDistribution;
-	MixtureModel * rightDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-	if (typeid(* rightarg.distribution) != typeid(* approximator))
-		rightDistribution = approximator->approximate(rightarg.distribution);
-	else
-		rightDistribution = (MixtureModel *) rightarg.distribution;
-
-	Distribution * raw = approximator->calculateProduct(leftDistribution, rightDistribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateProduct(this->distribution, rightarg.distribution);
 }
 
 RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
@@ -279,20 +231,7 @@ RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(RATIO, this, & rightarg);
 
-	MixtureModel * leftDistribution;
-	MixtureModel * rightDistribution;
-	Distribution * inverseRight;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-
-	inverseRight = new InverseRV_Distribution(rightarg.distribution);
-	rightDistribution = approximator->approximate(inverseRight);
-
-	Distribution * raw = approximator->calculateProduct(leftDistribution, rightDistribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateRatio(this->distribution, rightarg.distribution);
 }
 
 /*
@@ -309,10 +248,7 @@ RandomVariable RandomVariable::min(RandomVariable & secondarg)
 	if (monteCarloFlag)
 		return monteCarlo(MIN, this, & secondarg);
 
-	Distribution * raw = new MinOfDistributions(this->distribution,
-			secondarg.distribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateMin(this->distribution, secondarg.distribution);
 }
 
 // The first argument is 'this' object
@@ -324,10 +260,7 @@ RandomVariable RandomVariable::max(RandomVariable & secondarg)
 	if (monteCarloFlag)
 		return monteCarlo(MAX, this, & secondarg);
 
-	Distribution * raw = new MaxOfDistributions(this->distribution,
-			secondarg.distribution);
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateMax(this->distribution, secondarg.distribution);
 }
 
 
@@ -347,16 +280,7 @@ RandomVariable RandomVariable::operator +(double c_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return monteCarlo(SUM, this, delta);
 	}
-
-	MixtureModel * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-
-	// no re-approximation needed: linear function
-	Distribution * raw = approximator->calculateSum(leftDistribution, c_arg);
-	return RandomVariable(raw);
+	return algorithm->calculateSum(this->distribution, c_arg);
 }
 
 RandomVariable operator +(double c_arg, RandomVariable & rv_arg)
@@ -371,18 +295,7 @@ RandomVariable RandomVariable::operator -(double c_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return monteCarlo(DIFFERENCE, this, delta);
 	}
-
-	MixtureModel * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-
-	// just use the sum with negative sign
-	Distribution * raw = approximator->calculateSum(leftDistribution, -c_arg);
-
-	// no re-approximation needed: linear function
-	return RandomVariable(raw);
+	return algorithm->calculateDifference(this->distribution, c_arg);
 }
 
 RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
@@ -392,22 +305,7 @@ RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return RandomVariable::monteCarlo(DIFFERENCE, delta, & rv_arg);
 	}
-
-	MixtureModel * distr_arg;
-	if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
-		distr_arg = rv_arg.approximator->approximate(rv_arg.distribution);
-	else
-		distr_arg = (MixtureModel *) rv_arg.distribution;
-
-	/* a change of sign for a RV would require:
-	   1. multiplication with '-1'
-	   2. sum with the 'c_arg'
-	   So, more efficient to implement
-		   the difference from constant directly */
-	Distribution * raw = rv_arg.approximator->calculateDifference(distr_arg, c_arg);
-
-	// no re-approximation needed: linear function
-	return RandomVariable(raw);
+	return rv_arg.algorithm->calculateDifference(c_arg, rv_arg.distribution);
 }
 
 RandomVariable RandomVariable::operator *(double c_arg)
@@ -420,17 +318,7 @@ RandomVariable RandomVariable::operator *(double c_arg)
 
 	if (!c_arg)
 		return RandomVariable();
-
-	MixtureModel * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-
-	Distribution * raw = approximator->calculateProduct(leftDistribution, c_arg);
-
-	// no re-approximation needed: linear function
-	return RandomVariable(raw);
+	return algorithm->calculateProduct(this->distribution, c_arg);
 }
 
 RandomVariable operator *(double c_arg, RandomVariable & rv_arg)
@@ -448,18 +336,7 @@ RandomVariable RandomVariable::operator /(double c_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return monteCarlo(RATIO, this, delta);
 	}
-
-	MixtureModel * leftDistribution;
-	if (typeid(* this->distribution) != typeid(* approximator))
-		leftDistribution = approximator->approximate(this->distribution);
-	else
-		leftDistribution = (MixtureModel *) this->distribution;
-
-	// just multiply with the inverse
-	Distribution * raw = approximator->calculateProduct(leftDistribution, 1 / c_arg);
-
-	// no re-approximation needed: linear function
-	return RandomVariable(raw);
+	return algorithm->calculateRatio(this->distribution, c_arg);
 }
 
 RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
@@ -472,34 +349,7 @@ RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 
 	if (!c_arg)
 		return RandomVariable();
-
-	if (true)
-	{
-		// construct an approximation of the inverse RV
-		// and multiply by the constant
-		MixtureModel * distr_arg = rv_arg.approximator->approximate(
-				new InverseRV_Distribution(rv_arg.distribution));
-
-		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateProduct(distr_arg, c_arg);
-		MixtureModel * result = rv_arg.approximator->approximate(raw);
-		return RandomVariable(result);
-	}
-	else
-	{
-		MixtureModel * distr_arg;
-		if (typeid(* rv_arg.distribution) != typeid(* rv_arg.approximator))
-			distr_arg = rv_arg.approximator->approximate(rv_arg.distribution);
-		else
-			distr_arg = (MixtureModel *) rv_arg.distribution;
-
-		/*
-		 * Need to implement this, so as to define the inverse
-		 * of a random variable
-		 * */
-		Distribution * raw = ((PiecewiseBase*) distr_arg)->calculateRatio(distr_arg, c_arg);
-		MixtureModel * result = rv_arg.approximator->approximate(raw);
-		return RandomVariable(result);
-	}
+	return rv_arg.algorithm->calculateRatio(c_arg, rv_arg.distribution);
 }
 
 RandomVariable RandomVariable::min(double c_arg)
@@ -509,11 +359,7 @@ RandomVariable RandomVariable::min(double c_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return monteCarlo(MIN, this, delta);
 	}
-
-	Distribution * raw = new MinOfDistributions(
-			this->distribution,	new DeltaDistribution(c_arg));
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateMin(this->distribution, c_arg);
 }
 
 RandomVariable RandomVariable::max(double c_arg)
@@ -523,11 +369,7 @@ RandomVariable RandomVariable::max(double c_arg)
 		RandomVariable * delta = new RandomVariable(new DeltaDistribution(c_arg));
 		return monteCarlo(MAX, this, delta);
 	}
-
-	Distribution * raw = new MaxOfDistributions(
-			this->distribution,	new DeltaDistribution(c_arg));
-	MixtureModel * result = approximator->approximate(raw);
-	return RandomVariable(result);
+	return algorithm->calculateMax(this->distribution, c_arg);
 }
 
 /* ====================================================================

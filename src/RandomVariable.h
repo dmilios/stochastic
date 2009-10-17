@@ -9,7 +9,6 @@
 #define RANDOMVARIABLE_H_
 
 #include "distributions/Distribution.h"
-#include "algorithms/PiecewiseBase.h"
 #include "algorithms/RandomVariableAlgorithm.h"
 
 #include <vector>
@@ -33,7 +32,7 @@ class RandomVariable
 private:
 	static int monteCarloFlag;
 	static int numberOfSamplesMC;
-	static PiecewiseBase * approximator;
+	static RandomVariableAlgorithm * algorithm;
 
 	static std::map <RandomVariable *, double> samplesCollection;
 
@@ -53,10 +52,8 @@ public:
 	RandomVariable(Distribution *);
 	virtual ~RandomVariable();
 
+	static void setAlgorithm(RandomVariableAlgorithm *);
 	static void setMonteCarlo(int number_of_samples);
-	static void setPiecewiseUniform(int number_of_components);
-	static void setPiecewiseGaussian(int number_of_components);
-
 
 	Distribution * getDistribution();
 	void setDistribution(Distribution *);

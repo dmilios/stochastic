@@ -10,21 +10,43 @@
 #include <algorithm>
 #include <limits>
 #include <cmath>
+#include <typeinfo>
+
 #include "../distributions/MixtureModel.h"
 #include "../utilities/exceptions.h"
 #include "../utilities/mathFunctions.h"
 
+
 namespace stochastic {
 
-PiecewiseGaussian::PiecewiseGaussian()
+PiecewiseGaussian::PiecewiseGaussian(int n)
 {
+	this->numberOfComponents = n;
 }
 
 PiecewiseGaussian::~PiecewiseGaussian()
 {
 }
 
-MixtureModel * PiecewiseGaussian::approximate(Distribution * distribution)
+int PiecewiseGaussian::needsApproximation(Distribution * argument)
+{
+	if (typeid(* argument) != typeid(MixtureModel))
+		return 1;
+	int size = ((MixtureModel *) argument)->getComponents().size();
+	if (size != numberOfComponents)
+		return 1;
+
+	int i;
+	for (i = 0; i < size; i++)
+	{
+		MixtureComponent * current = ((MixtureModel *) argument)->getComponents()[i];
+		if (typeid(* current) != typeid(Gaussian))
+			return 1;
+	}
+	return 0;
+}
+
+MixtureModel * PiecewiseGaussian::performApproximation(Distribution * distribution)
 {
 	MixtureModel * result;
 	std::vector<MixtureComponent *> result_components;
@@ -183,26 +205,6 @@ MixtureComponent * PiecewiseGaussian::productOfComponents(
 	double m = ((Gaussian *) distr_arg)->getMean();
 	double var = ((Gaussian *) distr_arg)->getVariance();
 	return new Gaussian(m * c_arg, var * pow(c_arg, 2));
-}
-
-MixtureComponent * PiecewiseGaussian::ratioOfComponents(double c_arg,
-		MixtureComponent * distr_arg)
-{
-	double a = distr_arg->getLeftMargin();
-	double b = distr_arg->getRightMargin();
-
-	if (std::abs(a) < 0.001)
-		return 0;
-	if (std::abs(b) < 0.001)
-		return 0;
-
-	a = c_arg / a;
-	b = c_arg / b;
-	double lmargin = std::min<double>(a,b);
-	double rmargin = std::max<double>(a,b);
-	double var = pow((rmargin - lmargin) / 8, 2);
-	double m = (lmargin + rmargin) / 2;
-	return new Gaussian(m, var);
 }
 
 } // namespace stochastic

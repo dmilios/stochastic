@@ -1,12 +1,12 @@
 /*
- * PiecewiseBase.h
+ * ApproximationAlgorithm.h
  *
  *  Created on: 08-Jun-2009
  *      Author: Dimitrios Milios
  */
 
-#ifndef PIECEWISEBASE_H_
-#define PIECEWISEBASE_H_
+#ifndef APPROXIMATIONALGORITHM_H_
+#define APPROXIMATIONALGORITHM_H_
 
 #include "RandomVariableAlgorithm.h"
 #include "../distributions/Distribution.h"
@@ -14,8 +14,7 @@
 #include "../utilities/FileParser.h"
 #include <vector>
 
-namespace stochastic
-{
+namespace stochastic {
 
 /**
  * This class defines the interface of the Mixture Models
@@ -25,16 +24,12 @@ namespace stochastic
  * define different approximation methods for each approximation class,
  * but a unique interface.
  * */
-class PiecewiseBase: public RandomVariableAlgorithm
+class ApproximationAlgorithm : public RandomVariableAlgorithm
 {
 protected:
 	int numberOfComponents;
-
-	// returns two vectors that define the intervals
-	// containing the support of input distribution
-	// and the support itself
-	double retrieveSupport(Distribution *, std::vector<double> &, std::vector<
-			double> &);
+	virtual int needsApproximation(Distribution *) = 0;
+	virtual MixtureModel * performApproximation(Distribution *) = 0;
 
 	virtual MixtureComponent * sumOfComponents(MixtureComponent *,
 			MixtureComponent *) = 0;
@@ -50,18 +45,17 @@ protected:
 	virtual MixtureComponent * differenceOfComponents(double,
 			MixtureComponent *) = 0;
 	virtual MixtureComponent
-	* productOfComponents(MixtureComponent *, double) = 0;
-	virtual MixtureComponent * ratioOfComponents(double, MixtureComponent *) = 0;
+			* productOfComponents(MixtureComponent *, double) = 0;
+
+	/* returns two vectors that define the intervals
+	 * containing the support of input distribution
+	 * and the support itself */
+	double retrieveSupport(Distribution *, std::vector<double> &, std::vector<
+			double> &);
 
 public:
-	virtual ~PiecewiseBase()
-	{
-	}
-
-	virtual MixtureModel * approximate(Distribution *) = 0;
-
-	// in order to set the global fixedNumberOfComponents
-	void setFixedNumberOfComponents(int);
+	virtual ~ApproximationAlgorithm();
+	Distribution * approximate(Distribution *);
 
 	Distribution * calculateSum(Distribution *, Distribution *);
 	Distribution * calculateDifference(Distribution *, Distribution *);
@@ -85,4 +79,4 @@ public:
 
 } // namespace stochastic
 
-#endif /* PIECEWISEBASE_H_ */
+#endif /* APPROXIMATIONALGORITHM_H_ */
