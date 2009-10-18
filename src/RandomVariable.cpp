@@ -40,6 +40,7 @@ void RandomVariable::setAlgorithm(RandomVariableAlgorithm * alg)
 {
 	monteCarloFlag = 0;
 	algorithm = alg;
+	algorithm->setRandomVariableGraph(& graph);
 }
 
 void RandomVariable::setMonteCarlo(int number_of_samples)
@@ -69,7 +70,10 @@ RandomVariable::RandomVariable(Distribution * distribution)
 	this->distribution = distribution;
 	std::stringstream idStream;
 	idStream << gen.nextDouble() + clock();
+	this->randomVariableID = idStream.str();
 	graph.addRandomVariable(this, idStream.str());
+
+	printf("OLE!\n");
 
 	precededOperation = NONE;
 	parrent1 = 0;
@@ -85,6 +89,11 @@ RandomVariable::~RandomVariable()
  * methods
  *
  * */
+
+std::string RandomVariable::getRandomVariableID() const
+{
+	return this->randomVariableID;
+}
 
 Distribution * RandomVariable::getDistribution() const
 {
@@ -197,7 +206,9 @@ RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 	if (monteCarloFlag)
 		return monteCarlo(SUM, this, &rightarg);
 
-	return algorithm->calculateSum(*this, rightarg);
+	RandomVariable result = algorithm->calculateSum(*this, rightarg);
+	graph.setParentsFor(result, * this, rightarg);
+	return result;
 }
 
 RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
@@ -427,104 +438,104 @@ double RandomVariable::recursiveSampling(OperationType op,
 	catch (std::out_of_range ex)
 	{
 		if (typeid(*arg1) == typeid(DeltaDistribution))
-					sample1 = arg1->getDistribution()->nextSample();
-				else if (!arg1->precededOperation)
-					sample1 = arg1->getDistribution()->nextSample();
-				else
-					sample1 = recursiveSampling(arg1->precededOperation,
-							arg1->parrent1, arg1->parrent2);
-				samplesCollection[arg1] = sample1;
-			}
-			try
-			{
-				sample2 = samplesCollection.at(arg2);
-			}
-			catch (std::out_of_range ex)
-			{
-				if (typeid(*arg2) == typeid(DeltaDistribution))
-							sample2 = arg2->getDistribution()->nextSample();
-						else if (!arg2->precededOperation)
-							sample2 = arg2->getDistribution()->nextSample();
-						else
-							sample2 = recursiveSampling(
-									arg2->precededOperation, arg2->parrent1,
-									arg2->parrent2);
-						samplesCollection[arg2] = sample2;
-					}
+			sample1 = arg1->getDistribution()->nextSample();
+		else if (!arg1->precededOperation)
+			sample1 = arg1->getDistribution()->nextSample();
+		else
+			sample1 = recursiveSampling(arg1->precededOperation,
+					arg1->parrent1, arg1->parrent2);
+		samplesCollection[arg1] = sample1;
+	}
+	try
+	{
+		sample2 = samplesCollection.at(arg2);
+	}
+	catch (std::out_of_range ex)
+	{
+		if (typeid(*arg2) == typeid(DeltaDistribution))
+			sample2 = arg2->getDistribution()->nextSample();
+		else if (!arg2->precededOperation)
+			sample2 = arg2->getDistribution()->nextSample();
+		else
+			sample2 = recursiveSampling(
+					arg2->precededOperation, arg2->parrent1,
+					arg2->parrent2);
+		samplesCollection[arg2] = sample2;
+	}
 
-					switch (op)
-					{
-						case SUM:
-							return sample1 + sample2;
-							break;
-						case DIFFERENCE:
-							return sample1 - sample2;
-							break;
-						case PRODUCT:
-							return sample1 * sample2;
-							break;
-						case RATIO:
-							if (sample2 == 0)
-								sample2 = 0.0001;
-							return sample1 / sample2;
-							break;
-						case MIN:
-							return std::min<double>(sample1, sample2);
-							break;
-						case MAX:
-							return std::max<double>(sample1, sample2);
-							break;
-						default:
-							break;
-					}
-					throw 0; // this should never happen
-				}
+	switch (op)
+	{
+		case SUM:
+			return sample1 + sample2;
+			break;
+		case DIFFERENCE:
+			return sample1 - sample2;
+			break;
+		case PRODUCT:
+			return sample1 * sample2;
+			break;
+		case RATIO:
+			if (sample2 == 0)
+				sample2 = 0.0001;
+			return sample1 / sample2;
+			break;
+		case MIN:
+			return std::min<double>(sample1, sample2);
+			break;
+		case MAX:
+			return std::max<double>(sample1, sample2);
+			break;
+		default:
+			break;
+	}
+	throw 0; // this should never happen
+}
 
-				/*
-				 *
-				 *
-				 *
-				 * MINMAX alternative implementations
-				 *
-				 * so as to be more intuitive
-				 *
-				 *
-				 * */
+/*
+ *
+ *
+ *
+ * MINMAX alternative implementations
+ *
+ * so as to be more intuitive
+ *
+ *
+ * */
 
-				// the very same implementation as in RandomVariable::min,
-				// but this is called in a more intuitive way
-				RandomVariable min(RandomVariable & firstarg,
-						RandomVariable & secondarg)
-				{
-					return firstarg.min(secondarg);
-				}
+ // the very same implementation as in RandomVariable::min,
+// but this is called in a more intuitive way
+RandomVariable min(RandomVariable & firstarg,
+		RandomVariable & secondarg)
+{
+	return firstarg.min(secondarg);
+}
 
-				RandomVariable min(RandomVariable & rv_arg, double c_arg)
-				{
-					return rv_arg.min(c_arg);
-				}
+RandomVariable min(RandomVariable & rv_arg, double c_arg)
+{
+	return rv_arg.min(c_arg);
+}
 
-				RandomVariable min(double c_arg, RandomVariable & rv_arg)
-				{
-					return rv_arg.min(c_arg);
-				}
+RandomVariable min(double c_arg, RandomVariable & rv_arg)
+{
+	return rv_arg.min(c_arg);
+}
 
-				// the very same implementation as in RandomVariable::max,
-				// but this is called in a more intuitive way
-				RandomVariable max(RandomVariable & firstarg,
-						RandomVariable & secondarg)
-				{
-					return firstarg.max(secondarg);
-				}
+// the very same implementation as in RandomVariable::max,
+// but this is called in a more intuitive way
+RandomVariable max(RandomVariable & firstarg,
+		RandomVariable & secondarg)
+{
+	return firstarg.max(secondarg);
+}
 
-				RandomVariable max(RandomVariable & rv_arg, double c_arg)
-				{
-					return rv_arg.max(c_arg);
-				}
+RandomVariable max(RandomVariable & rv_arg, double c_arg)
+{
+	return rv_arg.max(c_arg);
+}
 
-				RandomVariable max(double c_arg, RandomVariable & rv_arg)
-				{
-					return rv_arg.max(c_arg);
-				}
+RandomVariable max(double c_arg, RandomVariable & rv_arg)
+{
+	return rv_arg.max(c_arg);
+}
 
-				} // namespace stochastic
+} // namespace stochastic

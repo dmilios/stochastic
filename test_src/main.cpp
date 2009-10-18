@@ -33,11 +33,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	RandomVariable r1 = new Gaussian;
-	RandomVariable r2 = new Gaussian;
-
-	RandomVariable r3 = r1 + r2;
-	r3 = r1 + r1;
+	dependencyMC();
 
 	return printArguments(argc, argv);
 }

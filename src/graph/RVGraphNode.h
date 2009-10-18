@@ -29,6 +29,7 @@ public:
 	RVGraphNode(string);
 	virtual ~RVGraphNode();
 
+	string getRandomVariableID() const;
 	RVGraphNode * getParent1();
 	RVGraphNode * getParent2();
 	void setParents(RVGraphNode *, RVGraphNode *);

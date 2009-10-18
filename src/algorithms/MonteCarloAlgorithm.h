@@ -9,6 +9,9 @@
 #define MONTECARLOALGORITHM_H_
 
 #include "RandomVariableAlgorithm.h"
+#include <map>
+
+using namespace std;
 
 namespace stochastic {
 
@@ -20,6 +23,9 @@ private:
 public:
 	MonteCarloAlgorithm(int);
 	virtual ~MonteCarloAlgorithm();
+
+	double recursiveSampling(RandomVariable &, RandomVariable &, map<string,
+			double> );
 
 	RandomVariable calculateSum(RandomVariable &, RandomVariable &);
 	RandomVariable calculateDifference(RandomVariable &, RandomVariable &);

@@ -20,6 +20,11 @@ RVGraphNode::~RVGraphNode()
 {
 }
 
+string RVGraphNode::getRandomVariableID() const
+{
+	return randomVariableID;
+}
+
 RVGraphNode * RVGraphNode::getParent1()
 {
 	return parent1;

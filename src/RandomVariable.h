@@ -33,9 +33,15 @@ enum OperationType
 
 class RandomVariable
 {
+
+public:
+	static RandomVariableGraph graph;
+
+
 private:
 
-	static RandomVariableGraph graph;
+	std::string randomVariableID;
+
 
 
 	static int monteCarloFlag;
@@ -68,6 +74,7 @@ public:
 	void cdfOutline(int, std::vector <double> &, std::vector <double> &);
 	void quantileOutline(int, std::vector <double> &, std::vector <double> &);
 	void produceFileOfSamples(int);
+	std::string getRandomVariableID() const;
 
 	RandomVariable operator +(RandomVariable &);
 	RandomVariable operator -(RandomVariable &);

@@ -351,16 +351,18 @@ void computationsMC(std::vector<double> & counters, std::vector<
 
 void dependencyMC()
 {
-	RandomVariable::setMonteCarlo(1000);
+
+	MonteCarloAlgorithm algo(1000);
+
+	RandomVariable::setAlgorithm(& algo);
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 
 	RandomVariable a = new Gaussian, b = new Gaussian;
 	RandomVariable c, d;
 
-	c = a * b;
-//	a = new Uniform(7, 14);
-	d = c / a;
+	c = a + b;
+	d = a + a;
 
 	plot.addRV(c);
 	plot.addRV(d);

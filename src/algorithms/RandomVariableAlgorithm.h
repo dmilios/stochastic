@@ -9,16 +9,26 @@
 #define RANDOMVARIABLEALGORITHM_H_
 
 #include "../RandomVariable.h"
+#include "../graph/RandomVariableGraph.h"
 
 namespace stochastic {
 
 class RandomVariable;
+class RandomVariableGraph;
 
 class RandomVariableAlgorithm
 {
+protected:
+	RandomVariableGraph * graph;
+
 public:
 	virtual ~RandomVariableAlgorithm()
 	{
+	}
+
+	void setRandomVariableGraph(RandomVariableGraph * graph)
+	{
+		this->graph = graph;
 	}
 
 	virtual RandomVariable calculateSum(RandomVariable &, RandomVariable &) = 0;
