@@ -9,9 +9,12 @@
 #define APPROXIMATIONALGORITHM_H_
 
 #include "RandomVariableAlgorithm.h"
+
+#include "../RandomVariable.h"
 #include "../distributions/Distribution.h"
 #include "../distributions/MixtureModel.h"
 #include "../utilities/FileParser.h"
+
 #include <vector>
 
 namespace stochastic {
@@ -28,6 +31,43 @@ class ApproximationAlgorithm : public RandomVariableAlgorithm
 {
 protected:
 	int numberOfComponents;
+
+	/* returns two vectors that define the intervals
+	 * containing the support of input distribution
+	 * and the support itself */
+	double retrieveSupport(Distribution *, std::vector<double> &, std::vector<
+			double> &);
+
+public:
+	virtual ~ApproximationAlgorithm();
+	Distribution * approximate(Distribution *);
+
+	RandomVariable calculateSum(RandomVariable &, RandomVariable &);
+	RandomVariable calculateDifference(RandomVariable &, RandomVariable &);
+	RandomVariable calculateProduct(RandomVariable &, RandomVariable &);
+	RandomVariable calculateRatio(RandomVariable &, RandomVariable &);
+
+	RandomVariable calculateMin(RandomVariable &, RandomVariable &);
+	RandomVariable calculateMax(RandomVariable &, RandomVariable &);
+
+	// for functions of ONE random variable
+	RandomVariable calculateSum(RandomVariable &, double);
+	RandomVariable calculateDifference(RandomVariable &, double);
+	RandomVariable calculateDifference(double, RandomVariable &);
+	RandomVariable calculateProduct(RandomVariable &, double);
+	RandomVariable calculateRatio(RandomVariable &, double);
+	RandomVariable calculateRatio(double, RandomVariable &);
+
+	RandomVariable calculateMin(RandomVariable &, double);
+	RandomVariable calculateMax(RandomVariable &, double);
+
+	/*
+	 *
+	 *
+	 * Pure Virtual Methods
+	 *
+	 * */
+protected:
 	virtual int needsApproximation(Distribution *) = 0;
 	virtual MixtureModel * performApproximation(Distribution *) = 0;
 
@@ -46,35 +86,6 @@ protected:
 			MixtureComponent *) = 0;
 	virtual MixtureComponent
 			* productOfComponents(MixtureComponent *, double) = 0;
-
-	/* returns two vectors that define the intervals
-	 * containing the support of input distribution
-	 * and the support itself */
-	double retrieveSupport(Distribution *, std::vector<double> &, std::vector<
-			double> &);
-
-public:
-	virtual ~ApproximationAlgorithm();
-	Distribution * approximate(Distribution *);
-
-	Distribution * calculateSum(Distribution *, Distribution *);
-	Distribution * calculateDifference(Distribution *, Distribution *);
-	Distribution * calculateProduct(Distribution *, Distribution *);
-	Distribution * calculateRatio(Distribution *, Distribution *);
-
-	Distribution * calculateMin(Distribution *, Distribution *);
-	Distribution * calculateMax(Distribution *, Distribution *);
-
-	// for functions of ONE random variable
-	Distribution * calculateSum(Distribution *, double);
-	Distribution * calculateDifference(Distribution *, double);
-	Distribution * calculateDifference(double, Distribution *);
-	Distribution * calculateProduct(Distribution *, double);
-	Distribution * calculateRatio(Distribution *, double);
-	Distribution * calculateRatio(double, Distribution *);
-
-	Distribution * calculateMin(Distribution *, double);
-	Distribution * calculateMax(Distribution *, double);
 };
 
 } // namespace stochastic

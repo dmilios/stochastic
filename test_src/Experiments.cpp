@@ -53,6 +53,7 @@ void comparePUwithMC()
 
 	timer = clock();
 	RandomVariable r3 = r1 + r2;
+
 	std::cout << "PU time: " << clock() - timer << "\n";
 
 	RandomVariable::setMonteCarlo(10000);

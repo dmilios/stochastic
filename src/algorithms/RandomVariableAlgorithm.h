@@ -8,10 +8,11 @@
 #ifndef RANDOMVARIABLEALGORITHM_H_
 #define RANDOMVARIABLEALGORITHM_H_
 
-#include "../distributions/Distribution.h"
+#include "../RandomVariable.h"
 
-namespace stochastic
-{
+namespace stochastic {
+
+class RandomVariable;
 
 class RandomVariableAlgorithm
 {
@@ -20,24 +21,26 @@ public:
 	{
 	}
 
-	virtual Distribution * calculateSum(Distribution *, Distribution *) = 0;
-	virtual Distribution
-			* calculateDifference(Distribution *, Distribution *) = 0;
-	virtual Distribution * calculateProduct(Distribution *, Distribution *) = 0;
-	virtual Distribution * calculateRatio(Distribution *, Distribution *) = 0;
+	virtual RandomVariable calculateSum(RandomVariable &, RandomVariable &) = 0;
+	virtual RandomVariable calculateDifference(RandomVariable &,
+			RandomVariable &) = 0;
+	virtual RandomVariable
+			calculateProduct(RandomVariable &, RandomVariable &) = 0;
+	virtual RandomVariable
+			calculateRatio(RandomVariable &, RandomVariable &) = 0;
 
-	virtual Distribution * calculateMin(Distribution *, Distribution *) = 0;
-	virtual Distribution * calculateMax(Distribution *, Distribution *) = 0;
+	virtual RandomVariable calculateMin(RandomVariable &, RandomVariable &) = 0;
+	virtual RandomVariable calculateMax(RandomVariable &, RandomVariable &) = 0;
 
-	virtual Distribution * calculateSum(Distribution *, double) = 0;
-	virtual Distribution * calculateDifference(Distribution *, double) = 0;
-	virtual Distribution * calculateDifference(double, Distribution *) = 0;
-	virtual Distribution * calculateProduct(Distribution *, double) = 0;
-	virtual Distribution * calculateRatio(Distribution *, double) = 0;
-	virtual Distribution * calculateRatio(double, Distribution *) = 0;
+	virtual RandomVariable calculateSum(RandomVariable &, double) = 0;
+	virtual RandomVariable calculateDifference(RandomVariable &, double) = 0;
+	virtual RandomVariable calculateDifference(double, RandomVariable &) = 0;
+	virtual RandomVariable calculateProduct(RandomVariable &, double) = 0;
+	virtual RandomVariable calculateRatio(RandomVariable &, double) = 0;
+	virtual RandomVariable calculateRatio(double, RandomVariable &) = 0;
 
-	virtual Distribution * calculateMin(Distribution *, double) = 0;
-	virtual Distribution * calculateMax(Distribution *, double) = 0;
+	virtual RandomVariable calculateMin(RandomVariable &, double) = 0;
+	virtual RandomVariable calculateMax(RandomVariable &, double) = 0;
 };
 
 } // namespace stochastic

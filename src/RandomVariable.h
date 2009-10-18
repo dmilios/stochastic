@@ -10,11 +10,15 @@
 
 #include "distributions/Distribution.h"
 #include "algorithms/RandomVariableAlgorithm.h"
+#include "graph/RandomVariableGraph.h"
 
 #include <vector>
 #include <map>
 
 namespace stochastic {
+
+class RandomVariableAlgorithm;
+class RandomVariableGraph;
 
 enum OperationType
 {
@@ -30,6 +34,10 @@ enum OperationType
 class RandomVariable
 {
 private:
+
+	static RandomVariableGraph graph;
+
+
 	static int monteCarloFlag;
 	static int numberOfSamplesMC;
 	static RandomVariableAlgorithm * algorithm;
@@ -55,8 +63,7 @@ public:
 	static void setAlgorithm(RandomVariableAlgorithm *);
 	static void setMonteCarlo(int number_of_samples);
 
-	Distribution * getDistribution();
-	void setDistribution(Distribution *);
+	Distribution * getDistribution() const;
 	void pdfOutline(int, std::vector <double> &, std::vector <double> &);
 	void cdfOutline(int, std::vector <double> &, std::vector <double> &);
 	void quantileOutline(int, std::vector <double> &, std::vector <double> &);

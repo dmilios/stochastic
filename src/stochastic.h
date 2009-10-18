@@ -14,9 +14,12 @@
 #include "RandomVariable.h"
 #include "distributions/Distribution.h"
 
+#include "algorithms/MonteCarloAlgorithm.h"
 #include "algorithms/ApproximationAlgorithm.h"
 #include "algorithms/PiecewiseGaussian.h"
 #include "algorithms/PiecewiseUniform.h"
+#include "algorithms/ProbabilisticDiscretization.h"
+
 #include "distributions/MixtureModel.h"
 #include "distributions/Gaussian.h"
 #include "distributions/Uniform.h"
@@ -24,8 +27,8 @@
 #include "distributions/Cauchy.h"
 #include "distributions/Exponential.h"
 #include "distributions/EmpiricalDistribution.h"
-
 #include "distributions/DeltaDistribution.h"
+
 #include "intermediateResults/MinOfDistributions.h"
 #include "intermediateResults/MaxOfDistributions.h"
 #include "intermediateResults/SumOfUniforms.h"

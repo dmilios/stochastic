@@ -62,7 +62,7 @@ void Gnuplot::addCurve(CurveTypes type, string name, vector <double> vx, vector 
 {
 	FILE * curve;
 	stringstream counter;
-	string tmpFile = "tmp";
+	string tmpFile = "tmp/tmp";
 
 	types.push_back(type);
 	names.push_back(name);
@@ -87,7 +87,7 @@ void Gnuplot::addCurve(CurveTypes type, string name,
 {
 	FILE * curve;
 	stringstream counter;
-	string tmpFile = "tmp";
+	string tmpFile = "tmp/tmp";
 
 	types.push_back(type);
 	names.push_back(name);

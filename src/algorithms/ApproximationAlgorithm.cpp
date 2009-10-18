@@ -5,13 +5,14 @@
  *      Author: Dimitrios Milios
  */
 
-#include "PiecewiseAlgorithm.h"
+#include "ApproximationAlgorithm.h"
 
 #include "../utilities/exceptions.h"
 
 #include <iostream>
 #include <vector>
 
+#include "../RandomVariable.h"
 #include "../distributions/MixtureModel.h"
 #include "../distributions/DeltaDistribution.h"
 #include "../intermediateResults/InverseRV_Distribution.h"
@@ -86,15 +87,15 @@ double ApproximationAlgorithm::retrieveSupport(Distribution * distribution,
  *
  * */
 
-Distribution * ApproximationAlgorithm::calculateSum(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateSum(RandomVariable & rv1,
+		RandomVariable & rv2)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 	vector<double> resultWeights;
 
-	arg1 = approximate(arg1);
-	arg2 = approximate(arg2);
+	Distribution * arg1 = approximate(rv1.getDistribution());
+	Distribution * arg2 = approximate(rv2.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	vector<MixtureComponent *> components2;
@@ -117,15 +118,15 @@ Distribution * ApproximationAlgorithm::calculateSum(Distribution * arg1,
 	return approximate(new MixtureModel(resultComponents, resultWeights));
 }
 
-Distribution * ApproximationAlgorithm::calculateDifference(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateDifference(
+		RandomVariable & rv1, RandomVariable & rv2)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 	vector<double> resultWeights;
 
-	arg1 = approximate(arg1);
-	arg2 = approximate(arg2);
+	Distribution * arg1 = approximate(rv1.getDistribution());
+	Distribution * arg2 = approximate(rv2.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	vector<MixtureComponent *> components2;
@@ -149,15 +150,15 @@ Distribution * ApproximationAlgorithm::calculateDifference(Distribution * arg1,
 	return approximate(new MixtureModel(resultComponents, resultWeights));
 }
 
-Distribution * ApproximationAlgorithm::calculateProduct(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateProduct(RandomVariable & rv1,
+		RandomVariable & rv2)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 	vector<double> resultWeights;
 
-	arg1 = approximate(arg1);
-	arg2 = approximate(arg2);
+	Distribution * arg1 = approximate(rv1.getDistribution());
+	Distribution * arg2 = approximate(rv2.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	vector<MixtureComponent *> components2;
@@ -180,15 +181,15 @@ Distribution * ApproximationAlgorithm::calculateProduct(Distribution * arg1,
 	return approximate(new MixtureModel(resultComponents, resultWeights));
 }
 
-Distribution * ApproximationAlgorithm::calculateRatio(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateRatio(RandomVariable & rv1,
+		RandomVariable & rv2)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 	vector<double> resultWeights;
 
-	arg1 = approximate(arg1);
-	arg2 = approximate(arg2);
+	Distribution * arg1 = approximate(rv1.getDistribution());
+	Distribution * arg2 = approximate(rv2.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	vector<MixtureComponent *> components2;
@@ -211,18 +212,20 @@ Distribution * ApproximationAlgorithm::calculateRatio(Distribution * arg1,
 	return approximate(new MixtureModel(resultComponents, resultWeights));
 }
 
-Distribution * ApproximationAlgorithm::calculateMin(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateMin(RandomVariable & rv1,
+		RandomVariable & rv2)
 {
-	Distribution * rawResult = new MinOfDistributions(arg1, arg2);
-	return approximate(rawResult);
+	Distribution * arg1 = rv1.getDistribution();
+	Distribution * arg2 = rv2.getDistribution();
+	return approximate(new MinOfDistributions(arg1, arg2));
 }
 
-Distribution * ApproximationAlgorithm::calculateMax(Distribution * arg1,
-		Distribution * arg2)
+RandomVariable ApproximationAlgorithm::calculateMax(RandomVariable & rv1,
+		RandomVariable & rv2)
 {
-	Distribution * rawResult = new MaxOfDistributions(arg1, arg2);
-	return approximate(rawResult);
+	Distribution * arg1 = rv1.getDistribution();
+	Distribution * arg2 = rv2.getDistribution();
+	return approximate(new MaxOfDistributions(arg1, arg2));
 }
 
 /*
@@ -232,13 +235,13 @@ Distribution * ApproximationAlgorithm::calculateMax(Distribution * arg1,
  *
  * */
 
-Distribution * ApproximationAlgorithm::calculateSum(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateSum(RandomVariable & rv,
 		double c_arg)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = approximate(d_arg);
+	Distribution * d_arg = approximate(rv.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	components1 = ((MixtureModel *) d_arg)->getComponents();
@@ -255,13 +258,13 @@ Distribution * ApproximationAlgorithm::calculateSum(Distribution * d_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateDifference(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateDifference(RandomVariable & rv,
 		double c_arg)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = approximate(d_arg);
+	Distribution * d_arg = approximate(rv.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	components1 = ((MixtureModel *) d_arg)->getComponents();
@@ -278,13 +281,13 @@ Distribution * ApproximationAlgorithm::calculateDifference(Distribution * d_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateDifference(double c_arg,
-		Distribution * d_arg)
+RandomVariable ApproximationAlgorithm::calculateDifference(double c_arg,
+		RandomVariable & rv)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = approximate(d_arg);
+	Distribution * d_arg = approximate(rv.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	components1 = ((MixtureModel *) d_arg)->getComponents();
@@ -301,13 +304,13 @@ Distribution * ApproximationAlgorithm::calculateDifference(double c_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateProduct(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateProduct(RandomVariable & rv,
 		double c_arg)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = approximate(d_arg);
+	Distribution * d_arg = approximate(rv.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	components1 = ((MixtureModel *) d_arg)->getComponents();
@@ -324,13 +327,13 @@ Distribution * ApproximationAlgorithm::calculateProduct(Distribution * d_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateRatio(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateRatio(RandomVariable & rv,
 		double c_arg)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = approximate(d_arg);
+	Distribution * d_arg = approximate(rv.getDistribution());
 
 	vector<MixtureComponent *> components1;
 	components1 = ((MixtureModel *) d_arg)->getComponents();
@@ -347,13 +350,13 @@ Distribution * ApproximationAlgorithm::calculateRatio(Distribution * d_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateRatio(double c_arg,
-		Distribution * d_arg)
+RandomVariable ApproximationAlgorithm::calculateRatio(double c_arg,
+		RandomVariable & rv)
 {
 	using namespace std;
 	vector<MixtureComponent *> resultComponents;
 
-	d_arg = new InverseRV_Distribution(d_arg);
+	Distribution * d_arg = new InverseRV_Distribution(rv.getDistribution());
 	d_arg = approximate(d_arg);
 
 	vector<MixtureComponent *> components1;
@@ -371,18 +374,18 @@ Distribution * ApproximationAlgorithm::calculateRatio(double c_arg,
 	return new MixtureModel(resultComponents, weights1);
 }
 
-Distribution * ApproximationAlgorithm::calculateMin(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateMin(RandomVariable & rv,
 		double c_arg)
 {
-	Distribution * rawResult = new MinOfDistributions(d_arg,
+	Distribution * rawResult = new MinOfDistributions(rv.getDistribution(),
 			new DeltaDistribution(c_arg));
 	return approximate(rawResult);
 }
 
-Distribution * ApproximationAlgorithm::calculateMax(Distribution * d_arg,
+RandomVariable ApproximationAlgorithm::calculateMax(RandomVariable & rv,
 		double c_arg)
 {
-	Distribution * rawResult = new MaxOfDistributions(d_arg,
+	Distribution * rawResult = new MaxOfDistributions(rv.getDistribution(),
 			new DeltaDistribution(c_arg));
 	return approximate(rawResult);
 }
