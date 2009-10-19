@@ -40,6 +40,8 @@ public:
 
 private:
 
+	static std::vector<RandomVariable *> rightExpression;
+
 	std::string randomVariableID;
 
 
@@ -75,6 +77,8 @@ public:
 	void quantileOutline(int, std::vector <double> &, std::vector <double> &);
 	void produceFileOfSamples(int);
 	std::string getRandomVariableID() const;
+
+	RandomVariable & operator=(const RandomVariable &);
 
 	RandomVariable operator +(RandomVariable &);
 	RandomVariable operator -(RandomVariable &);

@@ -361,13 +361,14 @@ void dependencyMC()
 	RandomVariable a = new Gaussian, b = new Gaussian;
 	RandomVariable c, d;
 
-	c = a + b;
-	d = a + a;
+	printf("old a: %s\n", a.getRandomVariableID().c_str());
+	c = a + a;
+	a = a + a;
+	printf("\n\nnew a: %s\n", a.getRandomVariableID().c_str());
 
 	plot.addRV(c);
-	plot.addRV(d);
+	plot.addRV(a);
 	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
 }
 
 void sumOfUniforms()
