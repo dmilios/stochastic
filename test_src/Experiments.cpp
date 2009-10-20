@@ -358,12 +358,14 @@ void dependencyMC()
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 
-	RandomVariable a = new Gaussian, b = new Gaussian;
+	RandomVariable a = new Gaussian();
+	RandomVariable b = new Gaussian();
 	RandomVariable c, d;
 
 	printf("old a: %s\n", a.getRandomVariableID().c_str());
 	c = a + a;
 	a = a + a;
+	d = a + c;
 	printf("\n\nnew a: %s\n", a.getRandomVariableID().c_str());
 
 	plot.addRV(c);

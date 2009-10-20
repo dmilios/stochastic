@@ -32,6 +32,11 @@ void RandomVariableGraph::addRandomVariable(RandomVariable * rv, string id)
 	randomVariableHashMap[id] = rv;
 }
 
+void RandomVariableGraph::changeRandomVariable(RandomVariable * rv, string id)
+{
+	randomVariableHashMap[id] = rv;
+}
+
 void RandomVariableGraph::setParentsFor(RandomVariable result,
 		RandomVariable parent1, RandomVariable parent2)
 {

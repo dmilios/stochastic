@@ -213,7 +213,7 @@ RandomVariable & RandomVariable::operator=(const RandomVariable & rvalue)
 				RandomVariable * foo = new RandomVariable;
 				foo->distribution = rightExpression[i]->distribution;
 				foo->randomVariableID = rightExpression[i]->randomVariableID;
-
+				graph.changeRandomVariable(foo, foo->randomVariableID);
 				break;
 			}
 	}

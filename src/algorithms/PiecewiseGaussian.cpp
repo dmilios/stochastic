@@ -70,7 +70,7 @@ MixtureModel * PiecewiseGaussian::performApproximation(Distribution * distributi
 	{
 		int intervalComponents;
 		// (F(b) - F(a)) * totalComponentNumber
-		intervalComponents = (distribution->cdf(supportInterval_rmargins[k])
+		intervalComponents = (int) (distribution->cdf(supportInterval_rmargins[k])
 				- distribution->cdf(supportInterval_lmargins[k]))
 				* numberOfComponents;
 		if (k == total_support_intervals - 1) // the last one

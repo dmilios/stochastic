@@ -33,6 +33,7 @@ public:
 	virtual ~RandomVariableGraph();
 
 	void addRandomVariable(RandomVariable *, string);
+	void changeRandomVariable(RandomVariable *, string);
 	void setParentsFor(RandomVariable, RandomVariable, RandomVariable);
 	RandomVariable & getParent1For(RandomVariable);
 	RandomVariable & getParent2For(RandomVariable);
