@@ -13,19 +13,19 @@
 
 using namespace std;
 
-namespace stochastic {
+namespace stochastic
+{
 
-class MonteCarloAlgorithm : public RandomVariableAlgorithm
+class MonteCarloAlgorithm: public RandomVariableAlgorithm
 {
 private:
 	int numberOfSamples;
+	double recursiveSampling(OperationType, RandomVariable &, RandomVariable &,
+			map<string, double> &);
 
 public:
 	MonteCarloAlgorithm(int);
 	virtual ~MonteCarloAlgorithm();
-
-	double recursiveSampling(RandomVariable &, RandomVariable &, map<string,
-			double> );
 
 	RandomVariable calculateSum(RandomVariable &, RandomVariable &);
 	RandomVariable calculateDifference(RandomVariable &, RandomVariable &);

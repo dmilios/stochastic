@@ -9,24 +9,24 @@
 #define RANDOMVARIABLEALGORITHM_H_
 
 #include "../RandomVariable.h"
-#include "../graph/RandomVariableGraph.h"
+#include "../graph/GraphRV.h"
 
 namespace stochastic {
 
 class RandomVariable;
-class RandomVariableGraph;
+class GraphRV;
 
 class RandomVariableAlgorithm
 {
 protected:
-	RandomVariableGraph * graph;
+	GraphRV * graph;
 
 public:
 	virtual ~RandomVariableAlgorithm()
 	{
 	}
 
-	void setRandomVariableGraph(RandomVariableGraph * graph)
+	void setRandomVariableGraph(GraphRV * graph)
 	{
 		this->graph = graph;
 	}

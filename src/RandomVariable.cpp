@@ -23,33 +23,20 @@
 #include <stdexcept>
 #include <ctime>
 
-namespace stochastic {
+namespace stochastic
+{
 
-RandomVariableGraph RandomVariable::graph;
+GraphRV RandomVariable::graph;
 RandomVariableAlgorithm * RandomVariable::algorithm = new PiecewiseUniform(100);
-int RandomVariable::monteCarloFlag = 0;
-int RandomVariable::numberOfSamplesMC = 10000;
-
-std::vector<RandomVariable *> RandomVariable::rightExpression;
-
-
-std::map<RandomVariable *, double> RandomVariable::samplesCollection;
 
 /*
- * static methods
+ * static method
  */
 
 void RandomVariable::setAlgorithm(RandomVariableAlgorithm * alg)
 {
-	monteCarloFlag = 0;
 	algorithm = alg;
 	algorithm->setRandomVariableGraph(&graph);
-}
-
-void RandomVariable::setMonteCarlo(int number_of_samples)
-{
-	monteCarloFlag = 1;
-	numberOfSamplesMC = number_of_samples;
 }
 
 /*
@@ -61,9 +48,6 @@ void RandomVariable::setMonteCarlo(int number_of_samples)
 RandomVariable::RandomVariable()
 {
 	this->distribution = 0;
-	precededOperation = NONE;
-	parrent1 = 0;
-	parrent2 = 0;
 }
 
 RandomVariable::RandomVariable(Distribution * distribution)
@@ -74,11 +58,7 @@ RandomVariable::RandomVariable(Distribution * distribution)
 	std::stringstream idStream;
 	idStream << gen.nextDouble() + clock();
 	this->randomVariableID = idStream.str();
-	graph.addRandomVariable(this, idStream.str());
-
-	precededOperation = NONE;
-	parrent1 = 0;
-	parrent2 = 0;
+	graph.addRandomVariable(*this, idStream.str());
 }
 
 RandomVariable::~RandomVariable()
@@ -199,46 +179,15 @@ void RandomVariable::produceFileOfSamples(int n)
  *
  */
 
-RandomVariable & RandomVariable::operator=(const RandomVariable & rvalue)
-{
-	if (this != & rvalue)
-	{
-		this->distribution = rvalue.getDistribution();
-		this->randomVariableID = rvalue.randomVariableID;
-
-		unsigned int i;
-		for (i = 0; i < rightExpression.size(); i++)
-			if (this == rightExpression[i])
-			{
-				RandomVariable * foo = new RandomVariable;
-				foo->distribution = rightExpression[i]->distribution;
-				foo->randomVariableID = rightExpression[i]->randomVariableID;
-				graph.changeRandomVariable(foo, foo->randomVariableID);
-				break;
-			}
-	}
-	rightExpression.clear();
-	return *this;
-}
-
 RandomVariable RandomVariable::operator +(RandomVariable & rightarg)
 {
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(SUM, this, &rightarg);
-
 	RandomVariable result = algorithm->calculateSum(*this, rightarg);
-
-
-	printf("\nresult: %s\n", result.getRandomVariableID().c_str());
-	printf("left: %s\n", this->getRandomVariableID().c_str());
-	printf("right: %s\n", rightarg.getRandomVariableID().c_str());
-
-	rightExpression.push_back(this);
-	rightExpression.push_back(& rightarg);
-	graph.setParentsFor(result, *this, rightarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, rightarg);
+	graph.setOperationTypeFor(result, SUM);
 	return result;
 }
 
@@ -247,10 +196,11 @@ RandomVariable RandomVariable::operator -(RandomVariable & rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(DIFFERENCE, this, &rightarg);
-
-	return algorithm->calculateDifference(*this, rightarg);
+	RandomVariable result = algorithm->calculateDifference(*this, rightarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, rightarg);
+	graph.setOperationTypeFor(result, DIFFERENCE);
+	return result;
 }
 
 // Implementation of the negative sign for a RV
@@ -264,10 +214,11 @@ RandomVariable RandomVariable::operator *(RandomVariable & rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(PRODUCT, this, &rightarg);
-
-	return algorithm->calculateProduct(*this, rightarg);
+	RandomVariable result = algorithm->calculateProduct(*this, rightarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, rightarg);
+	graph.setOperationTypeFor(result, PRODUCT);
+	return result;
 }
 
 RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
@@ -275,10 +226,11 @@ RandomVariable RandomVariable::operator /(RandomVariable & rightarg)
 	if (!distribution || !rightarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(RATIO, this, &rightarg);
-
-	return algorithm->calculateRatio(*this, rightarg);
+	RandomVariable result = algorithm->calculateRatio(*this, rightarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, rightarg);
+	graph.setOperationTypeFor(result, RATIO);
+	return result;
 }
 
 /*
@@ -292,10 +244,11 @@ RandomVariable RandomVariable::min(RandomVariable & secondarg)
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(MIN, this, &secondarg);
-
-	return algorithm->calculateMin(*this, secondarg);
+	RandomVariable result = algorithm->calculateMin(*this, secondarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, secondarg);
+	graph.setOperationTypeFor(result, MIN);
+	return result;
 }
 
 // The first argument is 'this' object
@@ -304,10 +257,11 @@ RandomVariable RandomVariable::max(RandomVariable & secondarg)
 	if (!distribution || !secondarg.distribution)
 		throw stochastic::UndefinedDistributionException();
 
-	if (monteCarloFlag)
-		return monteCarlo(MAX, this, &secondarg);
-
-	return algorithm->calculateMax(*this, secondarg);
+	RandomVariable result = algorithm->calculateMax(*this, secondarg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, secondarg);
+	graph.setOperationTypeFor(result, MAX);
+	return result;
 }
 
 /*
@@ -321,13 +275,11 @@ RandomVariable RandomVariable::max(RandomVariable & secondarg)
 
 RandomVariable RandomVariable::operator +(double c_arg)
 {
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(SUM, this, delta);
-	}
-	return algorithm->calculateSum(*this, c_arg);
+	RandomVariable result = algorithm->calculateSum(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, SUM);
+	return result;
 }
 
 RandomVariable operator +(double c_arg, RandomVariable & rv_arg)
@@ -337,38 +289,31 @@ RandomVariable operator +(double c_arg, RandomVariable & rv_arg)
 
 RandomVariable RandomVariable::operator -(double c_arg)
 {
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(DIFFERENCE, this, delta);
-	}
-	return algorithm->calculateDifference(*this, c_arg);
+	RandomVariable result = algorithm->calculateDifference(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, DIFFERENCE);
+	return result;
 }
 
 RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 {
-	if (RandomVariable::monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return RandomVariable::monteCarlo(DIFFERENCE, delta, &rv_arg);
-	}
-	return rv_arg.algorithm->calculateDifference(c_arg, rv_arg);
+	RandomVariable result = rv_arg.algorithm->calculateDifference(c_arg, rv_arg);
+	RandomVariable::graph.setParent1For(result, new DeltaDistribution(c_arg));
+	RandomVariable::graph.setParent2For(result, rv_arg);
+	RandomVariable::graph.setOperationTypeFor(result, DIFFERENCE);
+	return result;
 }
 
 RandomVariable RandomVariable::operator *(double c_arg)
 {
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(PRODUCT, this, delta);
-	}
-
 	if (!c_arg)
 		return RandomVariable();
-	return algorithm->calculateProduct(*this, c_arg);
+	RandomVariable result = algorithm->calculateProduct(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, PRODUCT);
+	return result;
 }
 
 RandomVariable operator *(double c_arg, RandomVariable & rv_arg)
@@ -381,192 +326,87 @@ RandomVariable RandomVariable::operator /(double c_arg)
 	if (!c_arg)
 		return RandomVariable();
 
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(RATIO, this, delta);
-	}
-	return algorithm->calculateRatio(*this, c_arg);
+	RandomVariable result = algorithm->calculateRatio(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, RATIO);
+	return result;
 }
 
 RandomVariable operator /(double c_arg, RandomVariable & rv_arg)
 {
-	if (RandomVariable::monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return RandomVariable::monteCarlo(RATIO, delta, &rv_arg);
-	}
-
 	if (!c_arg)
 		return RandomVariable();
-	return rv_arg.algorithm->calculateRatio(c_arg, rv_arg);
+	RandomVariable result = rv_arg.algorithm->calculateRatio(c_arg, rv_arg);
+	RandomVariable::graph.setParent1For(result, new DeltaDistribution(c_arg));
+	RandomVariable::graph.setParent2For(result, rv_arg);
+	RandomVariable::graph.setOperationTypeFor(result, RATIO);
+	return result;
 }
 
 RandomVariable RandomVariable::min(double c_arg)
 {
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(MIN, this, delta);
-	}
-	return algorithm->calculateMin(*this, c_arg);
+	RandomVariable result = algorithm->calculateMin(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, MIN);
+	return result;
 }
 
 RandomVariable RandomVariable::max(double c_arg)
 {
-	if (monteCarloFlag)
-	{
-		RandomVariable * delta = new RandomVariable(
-				new DeltaDistribution(c_arg));
-		return monteCarlo(MAX, this, delta);
-	}
-	return algorithm->calculateMax(*this, c_arg);
-}
-
-/* ====================================================================
- *
- *
- *
- *
- * Implementation of MonteCarlo
- *
- *
- *
- * ====================================================================
- * */
-
-RandomVariable RandomVariable::monteCarlo(OperationType op,
-		RandomVariable * arg1, RandomVariable * arg2)
-{
-	std::vector<double> produced_data;
-	int i;
-
-	for (i = 0; i < numberOfSamplesMC; i++)
-	{
-		samplesCollection.clear();
-		produced_data.push_back(recursiveSampling(op, arg1, arg2));
-	}
-
-	RandomVariable result = new EmpiricalDistribution(produced_data);
-	result.precededOperation = op;
-	result.parrent1 = arg1;
-	result.parrent2 = arg2;
+	RandomVariable result = algorithm->calculateMax(*this, c_arg);
+	graph.setParent1For(result, *this);
+	graph.setParent2For(result, new DeltaDistribution(c_arg));
+	graph.setOperationTypeFor(result, MAX);
 	return result;
 }
 
-double RandomVariable::recursiveSampling(OperationType op,
-		RandomVariable * arg1, RandomVariable * arg2)
+/*
+ *
+ *
+ *
+ * MINMAX alternative implementations
+ *
+ * so as to be more intuitive
+ *
+ *
+ * */
+
+ // the very same implementation as in RandomVariable::min,
+// but this is called in a more intuitive way
+RandomVariable min(RandomVariable & firstarg,
+		RandomVariable & secondarg)
 {
-	double sample1;
-	double sample2;
-	try
-	{
-		sample1 = samplesCollection.at(arg1);
-	}
-	catch (std::out_of_range ex)
-	{
-		if (typeid(*arg1) == typeid(DeltaDistribution))
-					sample1 = arg1->getDistribution()->nextSample();
-				else if (!arg1->precededOperation)
-					sample1 = arg1->getDistribution()->nextSample();
-				else
-					sample1 = recursiveSampling(arg1->precededOperation,
-							arg1->parrent1, arg1->parrent2);
-				samplesCollection[arg1] = sample1;
-			}
-			try
-			{
-				sample2 = samplesCollection.at(arg2);
-			}
-			catch (std::out_of_range ex)
-			{
-				if (typeid(*arg2) == typeid(DeltaDistribution))
-							sample2 = arg2->getDistribution()->nextSample();
-						else if (!arg2->precededOperation)
-							sample2 = arg2->getDistribution()->nextSample();
-						else
-							sample2 = recursiveSampling(
-									arg2->precededOperation, arg2->parrent1,
-									arg2->parrent2);
-						samplesCollection[arg2] = sample2;
-					}
+	return firstarg.min(secondarg);
+}
 
-					switch (op)
-					{
-						case SUM:
-							return sample1 + sample2;
-							break;
-						case DIFFERENCE:
-							return sample1 - sample2;
-							break;
-						case PRODUCT:
-							return sample1 * sample2;
-							break;
-						case RATIO:
-							if (sample2 == 0)
-								sample2 = 0.0001;
-							return sample1 / sample2;
-							break;
-						case MIN:
-							return std::min<double>(sample1, sample2);
-							break;
-						case MAX:
-							return std::max<double>(sample1, sample2);
-							break;
-						default:
-							break;
-					}
-					throw 0; // this should never happen
-				}
+RandomVariable min(RandomVariable & rv_arg, double c_arg)
+{
+	return rv_arg.min(c_arg);
+}
 
-				/*
-				 *
-				 *
-				 *
-				 * MINMAX alternative implementations
-				 *
-				 * so as to be more intuitive
-				 *
-				 *
-				 * */
+RandomVariable min(double c_arg, RandomVariable & rv_arg)
+{
+	return rv_arg.min(c_arg);
+}
 
-				// the very same implementation as in RandomVariable::min,
-				// but this is called in a more intuitive way
-				RandomVariable min(RandomVariable & firstarg,
-						RandomVariable & secondarg)
-				{
-					return firstarg.min(secondarg);
-				}
+// the very same implementation as in RandomVariable::max,
+// but this is called in a more intuitive way
+RandomVariable max(RandomVariable & firstarg,
+		RandomVariable & secondarg)
+{
+	return firstarg.max(secondarg);
+}
 
-				RandomVariable min(RandomVariable & rv_arg, double c_arg)
-				{
-					return rv_arg.min(c_arg);
-				}
+RandomVariable max(RandomVariable & rv_arg, double c_arg)
+{
+	return rv_arg.max(c_arg);
+}
 
-				RandomVariable min(double c_arg, RandomVariable & rv_arg)
-				{
-					return rv_arg.min(c_arg);
-				}
+RandomVariable max(double c_arg, RandomVariable & rv_arg)
+{
+	return rv_arg.max(c_arg);
+}
 
-				// the very same implementation as in RandomVariable::max,
-				// but this is called in a more intuitive way
-				RandomVariable max(RandomVariable & firstarg,
-						RandomVariable & secondarg)
-				{
-					return firstarg.max(secondarg);
-				}
-
-				RandomVariable max(RandomVariable & rv_arg, double c_arg)
-				{
-					return rv_arg.max(c_arg);
-				}
-
-				RandomVariable max(double c_arg, RandomVariable & rv_arg)
-				{
-					return rv_arg.max(c_arg);
-				}
-
-				} // namespace stochastic
+} // namespace stochastic

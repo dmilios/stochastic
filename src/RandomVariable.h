@@ -10,58 +10,26 @@
 
 #include "distributions/Distribution.h"
 #include "algorithms/RandomVariableAlgorithm.h"
-#include "graph/RandomVariableGraph.h"
+#include "graph/GraphRV.h"
+#include "graph/OperationType.h"
 
 #include <vector>
 #include <map>
 
-namespace stochastic {
+namespace stochastic
+{
 
 class RandomVariableAlgorithm;
-class RandomVariableGraph;
-
-enum OperationType
-{
-	NONE,
-	SUM,
-	DIFFERENCE,
-	PRODUCT,
-	RATIO,
-	MIN,
-	MAX
-};
+class GraphRV;
 
 class RandomVariable
 {
-
-public:
-	static RandomVariableGraph graph;
-
-
 private:
-
-	static std::vector<RandomVariable *> rightExpression;
-
+	Distribution * distribution;
 	std::string randomVariableID;
 
-
-
-	static int monteCarloFlag;
-	static int numberOfSamplesMC;
+	static GraphRV graph;
 	static RandomVariableAlgorithm * algorithm;
-
-	static std::map <RandomVariable *, double> samplesCollection;
-
-	Distribution * distribution;
-
-	OperationType precededOperation;
-	RandomVariable * parrent1;
-	RandomVariable * parrent2;
-
-	static RandomVariable monteCarlo(OperationType, RandomVariable *,
-			RandomVariable *);
-	static double recursiveSampling(OperationType, RandomVariable *,
-			RandomVariable *);
 
 public:
 	RandomVariable();
@@ -69,16 +37,14 @@ public:
 	virtual ~RandomVariable();
 
 	static void setAlgorithm(RandomVariableAlgorithm *);
-	static void setMonteCarlo(int number_of_samples);
 
 	Distribution * getDistribution() const;
-	void pdfOutline(int, std::vector <double> &, std::vector <double> &);
-	void cdfOutline(int, std::vector <double> &, std::vector <double> &);
-	void quantileOutline(int, std::vector <double> &, std::vector <double> &);
-	void produceFileOfSamples(int);
 	std::string getRandomVariableID() const;
 
-	RandomVariable & operator=(const RandomVariable &);
+	void pdfOutline(int, std::vector<double> &, std::vector<double> &);
+	void cdfOutline(int, std::vector<double> &, std::vector<double> &);
+	void quantileOutline(int, std::vector<double> &, std::vector<double> &);
+	void produceFileOfSamples(int);
 
 	RandomVariable operator +(RandomVariable &);
 	RandomVariable operator -(RandomVariable &);

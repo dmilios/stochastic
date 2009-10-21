@@ -19,20 +19,17 @@ void current()
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
 
-
-
 	RandomVariable r1 = new Uniform(2, 3.5);
 	RandomVariable r2 = new Uniform(1, 4.5);
 	RandomVariable r3 = new SumOfUniforms(2, 3.5, 1, 4.5);
 
-	RandomVariable::setMonteCarlo(1000);
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000));
 	RandomVariable r4 = r1 + r2;
 
-//	plot.addRV(r1);
-//	plot.addRV(r2);
+	//	plot.addRV(r1);
+	//	plot.addRV(r2);
 	plot.addRV(r3);
 	plot.addRV(r4);
-
 
 	//	std::cout << Experiments::kolmogorovDistance(r1.getDistribution(), r2.getDistribution()) << "\n";
 
@@ -56,7 +53,7 @@ void comparePUwithMC()
 
 	std::cout << "PU time: " << clock() - timer << "\n";
 
-	RandomVariable::setMonteCarlo(10000);
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(10000));
 	timer = clock();
 	RandomVariable r4 = r1 + r2;
 	std::cout << "MC time: " << clock() - timer << "\n\n";
@@ -94,7 +91,7 @@ void comparePGwithMC()
 	RandomVariable r3 = r1 + r2;
 	std::cout << "PG time: " << clock() - timer << "\n";
 
-	RandomVariable::setMonteCarlo(10000);
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000));
 	timer = clock();
 	RandomVariable r4 = r1 + r2;
 	std::cout << "MC time: " << clock() - timer << "\n\n";
@@ -124,8 +121,8 @@ void compareApproximations()
 	Gnuplot plot;
 	long int timer;
 
-	std::vector <MixtureComponent *> c;
-	std::vector <double> w;
+	std::vector<MixtureComponent *> c;
+	std::vector<double> w;
 	c.push_back(new Gaussian(-2, 1));
 	w.push_back(1);
 	c.push_back(new Gaussian(4, 1.5));
@@ -138,9 +135,10 @@ void compareApproximations()
 
 
 	RandomVariable rv = new Gaussian;
-	RandomVariable pu = (new PiecewiseUniform(10))->approximate(rv.getDistribution());
-	RandomVariable pg = (new PiecewiseGaussian(10))->approximate(rv.getDistribution());
-
+	RandomVariable pu = (new PiecewiseUniform(10))->approximate(
+			rv.getDistribution());
+	RandomVariable pg = (new PiecewiseGaussian(10))->approximate(
+			rv.getDistribution());
 
 	RandomVariable a(new Gaussian), b(new Gaussian);
 	timer = clock();
@@ -170,10 +168,12 @@ void compareApproximations()
 	std::cout << std::endl << std::endl;
 
 	std::cout << "CDF Distance between PU and original: ";
-	std::cout << manhattanDistanceCDF(rv.getDistribution(), pu.getDistribution());
+	std::cout << manhattanDistanceCDF(rv.getDistribution(),
+			pu.getDistribution());
 	std::cout << std::endl;
 	std::cout << "CDF Distance between PG and original: ";
-	std::cout << manhattanDistanceCDF(rv.getDistribution(), pg.getDistribution());
+	std::cout << manhattanDistanceCDF(rv.getDistribution(),
+			pg.getDistribution());
 	std::cout << std::endl << std::endl;
 
 	plot.addRV(rv);
@@ -186,8 +186,8 @@ void compareApproximations()
 void computationsEvolution()
 {
 	Gnuplot plot;
-	std::vector <double> iteration_numbers;
-	std::vector <double> errors;
+	std::vector<double> iteration_numbers;
+	std::vector<double> errors;
 
 	computationsPU(iteration_numbers, errors);
 	plot.addCurve(OTHER, "KL_Divergence Evolution for PU New",
@@ -195,9 +195,9 @@ void computationsEvolution()
 
 	std::cout << std::endl << "--------------------------------" << std::endl;
 
-//	Experiments::computationsPG(iteration_numbers, errors);
-//	plot.addCurve(OTHER, "KL_Divergence Evolution for PG", iteration_numbers,
-//			errors);
+	//	Experiments::computationsPG(iteration_numbers, errors);
+	//	plot.addCurve(OTHER, "KL_Divergence Evolution for PG", iteration_numbers,
+	//			errors);
 
 	std::cout << std::endl << "--------------------------------" << std::endl;
 
@@ -210,12 +210,12 @@ void computationsEvolution()
 
 // conduct a series of computations with known results
 // to see how PU approximation is affected
-void computationsPU(std::vector<double> & counters, std::vector<
-		double> & errors)
+void computationsPU(std::vector<double> & counters,
+		std::vector<double> & errors)
 {
 	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 	Gnuplot::setAccuracy(1000);
-//	Gnuplot plot;
+	//	Gnuplot plot;
 	long int timer;
 	counters.clear();
 	errors.clear();
@@ -224,10 +224,10 @@ void computationsPU(std::vector<double> & counters, std::vector<
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
 	/*std::cout << "\n0: KL_Divergence between PU and original: ";
-	errors.push_back(KL_Divergence(&pu, original));
-	counters.push_back(0);
-	std::cout << errors[0];
-	std::cout << std::endl << std::endl;*/
+	 errors.push_back(KL_Divergence(&pu, original));
+	 counters.push_back(0);
+	 std::cout << errors[0];
+	 std::cout << std::endl << std::endl;*/
 
 	RandomGenerator random;
 	int i;
@@ -250,15 +250,15 @@ void computationsPU(std::vector<double> & counters, std::vector<
 		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-//	plot.addRV(*new RandomVariable(original)); // plot the last only
-//	plot.addRV(rv);
-//	plot.plotBuffered(PDF);
+	//	plot.addRV(*new RandomVariable(original)); // plot the last only
+	//	plot.addRV(rv);
+	//	plot.plotBuffered(PDF);
 }
 
 // conduct a series of computations with known results
 // to see how PG approximation is affected
-void computationsPG(std::vector<double> & counters, std::vector<
-		double> & errors)
+void computationsPG(std::vector<double> & counters,
+		std::vector<double> & errors)
 {
 	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
 	Gnuplot::setAccuracy(1000);
@@ -271,10 +271,10 @@ void computationsPG(std::vector<double> & counters, std::vector<
 
 	Gaussian * original = (Gaussian *) rv.getDistribution();
 	/*std::cout << "\n0: KL_Divergence between PG and original: ";
-	errors.push_back(KL_Divergence(&pg, original));
-	counters.push_back(0);
-	std::cout << errors[0];
-	std::cout << std::endl << std::endl;*/
+	 errors.push_back(KL_Divergence(&pg, original));
+	 counters.push_back(0);
+	 std::cout << errors[0];
+	 std::cout << std::endl << std::endl;*/
 
 	RandomGenerator random;
 	int i;
@@ -297,18 +297,18 @@ void computationsPG(std::vector<double> & counters, std::vector<
 		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-//	plot.addRV(*new RandomVariable(original)); // plot the last only
-//	plot.addRV(rv);
-//	plot.plotBuffered(PDF);
-//	plot.plotBuffered(CDF);
+	//	plot.addRV(*new RandomVariable(original)); // plot the last only
+	//	plot.addRV(rv);
+	//	plot.plotBuffered(PDF);
+	//	plot.plotBuffered(CDF);
 }
 
 // conduct a series of computations with known results
 // to see how MC is affected
-void computationsMC(std::vector<double> & counters, std::vector<
-		double> & errors)
+void computationsMC(std::vector<double> & counters,
+		std::vector<double> & errors)
 {
-	RandomVariable::setMonteCarlo(1000);
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000));
 
 	Gnuplot::setAccuracy(1000);
 	Gnuplot plot;
@@ -334,7 +334,8 @@ void computationsMC(std::vector<double> & counters, std::vector<
 		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
 
 		timer = clock();
-		rv[i] = rv[i - 1] + (*new RandomVariable(new Gaussian(mean_added, var_added)));
+		rv[i] = rv[i - 1] + (*new RandomVariable(new Gaussian(mean_added,
+				var_added)));
 		std::cout << "PU time: " << clock() - timer << "\n";
 		std::cout << i << ": ";
 		std::cout << "Kolmogorov Distance between MC and original: ";
@@ -351,25 +352,20 @@ void computationsMC(std::vector<double> & counters, std::vector<
 
 void dependencyMC()
 {
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(500));
 
-	MonteCarloAlgorithm algo(1000);
-
-	RandomVariable::setAlgorithm(& algo);
-	Gnuplot::setAccuracy(1000);
+	Gnuplot::setAccuracy(100);
 	Gnuplot plot;
 
 	RandomVariable a = new Gaussian();
 	RandomVariable b = new Gaussian();
 	RandomVariable c, d;
 
-	printf("old a: %s\n", a.getRandomVariableID().c_str());
-	c = a + a;
-	a = a + a;
-	d = a + c;
-	printf("\n\nnew a: %s\n", a.getRandomVariableID().c_str());
+	c = a + a + a;
+	d = 3 * a;
 
 	plot.addRV(c);
-	plot.addRV(a);
+	plot.addRV(d);
 	plot.plotBuffered(PDF);
 }
 
@@ -425,8 +421,8 @@ void minmaxTests()
 
 	RandomVariable r4 = min(r1, r2);
 
-//	plot.addRV(r1);
-//	plot.addRV(r2);
+	//	plot.addRV(r1);
+	//	plot.addRV(r2);
 	plot.addRV(r3);
 	plot.addRV(r4);
 
@@ -434,9 +430,4 @@ void minmaxTests()
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
 }
-
-
-
-
-
 
