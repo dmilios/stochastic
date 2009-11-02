@@ -361,10 +361,13 @@ void dependencyMC()
 	RandomVariable b = new Gaussian();
 	RandomVariable c, d;
 
-	c = a + a + a;
-	d = 3 * a;
+	c = 9 * a;
+	a = a + a + a;
+	d = a + a + a;
 
-	plot.addRV(c);
+	b = c;
+
+	plot.addRV(b);
 	plot.addRV(d);
 	plot.plotBuffered(PDF);
 }

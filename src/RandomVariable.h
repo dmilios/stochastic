@@ -34,6 +34,7 @@ private:
 public:
 	RandomVariable();
 	RandomVariable(Distribution *);
+	RandomVariable& operator=(RandomVariable);
 	virtual ~RandomVariable();
 
 	static void setAlgorithm(RandomVariableAlgorithm *);

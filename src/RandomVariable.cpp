@@ -61,6 +61,16 @@ RandomVariable::RandomVariable(Distribution * distribution)
 	graph.addRandomVariable(*this, idStream.str());
 }
 
+RandomVariable& RandomVariable::operator=(RandomVariable rv)
+{
+	if (this != &rv)
+	{
+		this->distribution = rv.distribution;
+		this->randomVariableID = rv.randomVariableID;
+	}
+	return *this;
+}
+
 RandomVariable::~RandomVariable()
 {
 }
@@ -298,7 +308,8 @@ RandomVariable RandomVariable::operator -(double c_arg)
 
 RandomVariable operator -(double c_arg, RandomVariable & rv_arg)
 {
-	RandomVariable result = rv_arg.algorithm->calculateDifference(c_arg, rv_arg);
+	RandomVariable result =
+			rv_arg.algorithm->calculateDifference(c_arg, rv_arg);
 	RandomVariable::graph.setParent1For(result, new DeltaDistribution(c_arg));
 	RandomVariable::graph.setParent2For(result, rv_arg);
 	RandomVariable::graph.setOperationTypeFor(result, DIFFERENCE);
@@ -373,10 +384,9 @@ RandomVariable RandomVariable::max(double c_arg)
  *
  * */
 
- // the very same implementation as in RandomVariable::min,
+// the very same implementation as in RandomVariable::min,
 // but this is called in a more intuitive way
-RandomVariable min(RandomVariable & firstarg,
-		RandomVariable & secondarg)
+RandomVariable min(RandomVariable & firstarg, RandomVariable & secondarg)
 {
 	return firstarg.min(secondarg);
 }
@@ -393,8 +403,7 @@ RandomVariable min(double c_arg, RandomVariable & rv_arg)
 
 // the very same implementation as in RandomVariable::max,
 // but this is called in a more intuitive way
-RandomVariable max(RandomVariable & firstarg,
-		RandomVariable & secondarg)
+RandomVariable max(RandomVariable & firstarg, RandomVariable & secondarg)
 {
 	return firstarg.max(secondarg);
 }

@@ -1,0 +1,9 @@
+
+TODO:
+
+improve PiecewiseUniform approximation
+	-> test "divide into halves" idea
+	
+improve PiecewiseGaussian approximation
+	-> apply EM algorithm
+	-> look for more efficient algorithms
