@@ -32,7 +32,7 @@ private:
 	vector <string> preamble; // a series of statements in the beginning of a plot
 
 	vector <string> names;
-	vector <string> tmpFiles;
+	vector <string> curve_data;
 	vector <CurveTypes> types;
 	vector <string> options;
 
