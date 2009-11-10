@@ -132,7 +132,7 @@ void Gnuplot::plotBuffered(CurveTypes type)
 	if (!texFile)
 	{
 		fflush(gnuplot);
-		printf("Press enter to continue...");
+		printf("Press enter to continue...\n");
 		fflush(stdout);
 		getchar();
 	}

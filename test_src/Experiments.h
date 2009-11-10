@@ -20,11 +20,12 @@ void comparePGwithMC();
 void compareApproximations();
 
 void computationsEvolution();
-void computationsPU(std::vector<double> &, std::vector<double> &);
-void computationsPG(std::vector<double> &, std::vector<double> &);
-void computationsMC(std::vector<double> &, std::vector<double> &);
+void computationsPU(std::vector<double>&, std::vector<double>&);
+void computationsPG(std::vector<double>&, std::vector<double>&);
+void computationsMC(std::vector<double>&, std::vector<double>&);
 
 void dependencyMC();
+void testApproximation(RandomVariable, ApproximationAlgorithm&);
 
 void sumOfUniforms();
 void minmaxTests();

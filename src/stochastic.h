@@ -34,4 +34,6 @@
 #include "intermediateResults/SumOfUniforms.h"
 #include "intermediateResults/InverseRV_Distribution.h"
 
+#include "algorithms/PG_EM.h"
+
 #endif /* STOCHASTIC_H_ */

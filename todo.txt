@@ -7,3 +7,6 @@ improve PiecewiseUniform approximation
 improve PiecewiseGaussian approximation
 	-> apply EM algorithm
 	-> look for more efficient algorithms
+
+find out about the product of unifrom distributions
+(ratio is not needed, inverse RV is used instead)

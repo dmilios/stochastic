@@ -25,7 +25,7 @@
 int printArguments(int argc, char *argv[])
 {
 	int i;
-	std::cout << "\nThe arguments were:\n";
+	std::cout << "The arguments were:\n";
 	for (i = 0; i < argc; i++)
 		std::cout << argv[i]<< "\n" ;
 	return 0;
@@ -33,7 +33,15 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	dependencyMC();
+	RandomVariable rv = new Gaussian;
+
+	PG_EM a1(100, 10000);
+	std::cout << "PG_EM\n";
+	testApproximation(rv, a1);
+
+	std::cout << "PiecewiseGaussian\n";
+	PiecewiseGaussian a2(100);
+	testApproximation(rv, a2);
 
 	return printArguments(argc, argv);
 }

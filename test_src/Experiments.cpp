@@ -372,6 +372,35 @@ void dependencyMC()
 	plot.plotBuffered(PDF);
 }
 
+void testApproximation(RandomVariable original,
+		ApproximationAlgorithm &algorithm)
+{
+	Gnuplot::setAccuracy(100);
+	Gnuplot plot;
+
+	RandomVariable approximated;
+	approximated = algorithm.approximate(original.getDistribution());
+
+	std::cout << "\tKL Divergence: \t\t";
+	std::cout << KL_Divergence(original.getDistribution(),
+			approximated.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "\tKolmogorov Distance: \t";
+	std::cout << kolmogorovDistance(original.getDistribution(),
+			approximated.getDistribution());
+	std::cout << std::endl;
+
+	std::cout << "\tCDF Distance: \t\t";
+	std::cout << manhattanDistanceCDF(original.getDistribution(),
+			approximated.getDistribution());
+	std::cout << std::endl << std::endl;
+
+	plot.addRV(original);
+	plot.addRV(approximated);
+	plot.plotBuffered(PDF);
+}
+
 void sumOfUniforms()
 {
 	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
