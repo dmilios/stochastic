@@ -35,5 +35,6 @@
 #include "intermediateResults/InverseRV_Distribution.h"
 
 #include "algorithms/PG_EM.h"
+#include "algorithms/PU_DivideAndConquer.h"
 
 #endif /* STOCHASTIC_H_ */
