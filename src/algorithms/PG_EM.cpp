@@ -24,6 +24,35 @@ PG_EM::~PG_EM()
 {
 }
 
+std::vector<double> PG_EM::produceData(Distribution * d)
+{
+	double samples = (double) intermediateSamples;
+
+	std::vector<double> data;
+	double start = d->getLeftMargin();
+	double end = d->getRightMargin();
+	double step = (end - start) / numberOfComponents;
+
+	double x = start;
+	int i;
+	for (i = 0; i < numberOfComponents; i++)
+	{
+		Gaussian gaussian(x + (step / 2), step / 100);
+		double weight = d->cdf(x + step) - d->cdf(x);
+		int j;
+		for (j = 0; j < samples * weight; j++)
+		{
+			double sample = gaussian.nextSample();
+			if (sample < x || sample > x + step)
+				j--;
+			else
+				data.push_back(sample);
+		}
+		x += step;
+	}
+	return data;
+}
+
 MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 {
 	MixtureModel * result;
@@ -35,7 +64,10 @@ MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 	double *coefficients = new double[numberOfComponents];
 	int k;
 
-	std::vector<double> data = distribution->sample(intermediateSamples);
+	std::vector<double> data;
+	data = produceData(distribution);
+	// data = distribution->sample(intermediateSamples);
+
 	std::vector<double>::iterator minimum = std::min_element(data.begin(),
 			data.end());
 	std::vector<double>::iterator maximum = std::max_element(data.begin(),

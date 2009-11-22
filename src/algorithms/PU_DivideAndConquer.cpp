@@ -37,6 +37,7 @@ void PU_DivideAndConquer::approximateInterval(
 	components.push_back(curr);
 	weights.push_back(w);
 	errors.push_back(0);
+
 	while (components.size() != (unsigned) componentNumber)
 	{
 		std::vector<MixtureComponent *>::iterator it_comp = components.begin();
@@ -53,7 +54,11 @@ void PU_DivideAndConquer::approximateInterval(
 		Uniform *split1 = new Uniform(x1, x2);
 		Uniform *split2 = new Uniform(x2, x3);
 		double w1 = dist->cdf(x2) - dist->cdf(x1);
+		if (w1 < 0)
+			w1 = 0;
 		double w2 = dist->cdf(x3) - dist->cdf(x2);
+		if (w2 < 0)
+			w2 = 0;
 		double error1 = errorMeasure(split1, w1, dist);
 		double error2 = errorMeasure(split2, w2, dist);
 
@@ -110,14 +115,32 @@ void PU_DivideAndConquer::approximateInterval(
 	}
 }
 
+double pdfDistance(MixtureComponent * mc, double w, Distribution * dist)
+{
+	int accuracy = 100;
+
+	double error = 0;
+	double x1 = mc->getLeftMargin();
+	double x2 = mc->getRightMargin();
+	double x = x1;
+	double step = (x2 - x1) / accuracy;
+	double fx_a, fx_b;
+	int i;
+	fx_a = std::abs(w * mc->pdf(x) - dist->pdf(x));
+	for (i = 0; i < accuracy; i++)
+	{
+		fx_b = std::abs(w * mc->pdf(x + step) - dist->pdf(x + step));
+		error += step * (fx_a + fx_b) / 2;
+		fx_a = fx_b;
+		x = x + step;
+	}
+	return error;
+}
+
 double PU_DivideAndConquer::errorMeasure(MixtureComponent * mc, double w,
 		Distribution * dist)
 {
-	double x1 = mc->getLeftMargin();
-	double x2 = mc->getRightMargin();
-	double error = std::abs(dist->pdf((x1 + x2) / 2) - mc->pdf((x1 + x2) / 2)
-			* w);
-	return error;
+	return pdfDistance(mc, w, dist);
 }
 
 MixtureModel * PU_DivideAndConquer::performApproximation(

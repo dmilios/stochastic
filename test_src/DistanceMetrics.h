@@ -46,7 +46,7 @@ inline double KL_Divergence(Distribution * arg1, Distribution * arg2)
 		if (tmp != INFINITY)
 			sum += tmp;
 	}
-	if (sum < 0) // computatinal error -> try again
+	if (sum < 0) // computational error -> try again
 		return KL_Divergence(arg1, arg2);
 	return sum / accuracy;
 }

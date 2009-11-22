@@ -19,6 +19,8 @@ private:
 	RandomGenerator generator;
 	int intermediateSamples;
 
+	std::vector<double> produceData(Distribution *);
+
 public:
 	PG_EM(int, int);
 	virtual ~PG_EM();

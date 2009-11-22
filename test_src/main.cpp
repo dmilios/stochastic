@@ -35,8 +35,8 @@ int main(int argc, char *argv[])
 {
 	RandomVariable rv = new Gaussian;
 
-	PU_DivideAndConquer a1(100);
-	std::cout << "PU_DivideAndConquer\n";
+	PG_EM a1(100, 1000);
+	std::cout << "PG_EM\n";
 	testApproximation(rv, a1);
 
 	std::cout << "PiecewiseUniform\n";

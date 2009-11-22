@@ -183,25 +183,21 @@ void compareApproximations()
 	plot.plotBuffered(CDF);
 }
 
-void computationsEvolution()
+void computationsEvolution(int n)
 {
 	Gnuplot plot;
 	std::vector<double> iteration_numbers;
 	std::vector<double> errors;
 
-	computationsPU(iteration_numbers, errors);
-	plot.addCurve(OTHER, "KL_Divergence Evolution for PU New",
+	RandomVariable::setAlgorithm(new PU_DivideAndConquer(100));
+	computations(n, iteration_numbers, errors);
+	plot.addCurve(OTHER, "KL_Divergence Evolution for PU DivideAndConquer",
 			iteration_numbers, errors);
 
 	std::cout << std::endl << "--------------------------------" << std::endl;
 
-	//	Experiments::computationsPG(iteration_numbers, errors);
-	//	plot.addCurve(OTHER, "KL_Divergence Evolution for PG", iteration_numbers,
-	//			errors);
-
-	std::cout << std::endl << "--------------------------------" << std::endl;
-
-	computationsPU(iteration_numbers, errors);
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
+	computations(n, iteration_numbers, errors);
 	plot.addCurve(OTHER, "KL_Divergence Evolution for PU Old",
 			iteration_numbers, errors);
 
@@ -209,29 +205,19 @@ void computationsEvolution()
 }
 
 // conduct a series of computations with known results
-// to see how PU approximation is affected
-void computationsPU(std::vector<double> & counters,
+void computations(int n, std::vector<double> & counters,
 		std::vector<double> & errors)
 {
-	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
-	Gnuplot::setAccuracy(1000);
-	//	Gnuplot plot;
 	long int timer;
 	counters.clear();
 	errors.clear();
 
 	RandomVariable rv = new Gaussian;
-
 	Gaussian * original = (Gaussian *) rv.getDistribution();
-	/*std::cout << "\n0: KL_Divergence between PU and original: ";
-	 errors.push_back(KL_Divergence(&pu, original));
-	 counters.push_back(0);
-	 std::cout << errors[0];
-	 std::cout << std::endl << std::endl;*/
 
 	RandomGenerator random;
 	int i;
-	for (i = 0; i < 100; i++)
+	for (i = 0; i < n; i++)
 	{
 		double curr_mean = original->getMean();
 		double curr_var = original->getVariance();
@@ -242,112 +228,14 @@ void computationsPU(std::vector<double> & counters,
 
 		timer = clock();
 		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
-		std::cout << "PU time: " << clock() - timer << "\n";
+		std::cout << "Time: " << clock() - timer << "\n";
 		std::cout << i + 1 << ": ";
-		std::cout << "KL_Divergence between PU and original: ";
-		errors.push_back(KL_Divergence(rv.getDistribution(), original));
+		std::cout << "PDF Distance from original: ";
+		errors.push_back(manhattanDistancePDF(rv.getDistribution(), original));
 		counters.push_back(i + 1);
 		std::cout << errors[i + 1];
 		std::cout << std::endl << std::endl;
 	}
-	//	plot.addRV(*new RandomVariable(original)); // plot the last only
-	//	plot.addRV(rv);
-	//	plot.plotBuffered(PDF);
-}
-
-// conduct a series of computations with known results
-// to see how PG approximation is affected
-void computationsPG(std::vector<double> & counters,
-		std::vector<double> & errors)
-{
-	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
-	Gnuplot::setAccuracy(1000);
-	Gnuplot plot;
-	long int timer;
-	counters.clear();
-	errors.clear();
-
-	RandomVariable rv = new Gaussian;
-
-	Gaussian * original = (Gaussian *) rv.getDistribution();
-	/*std::cout << "\n0: KL_Divergence between PG and original: ";
-	 errors.push_back(KL_Divergence(&pg, original));
-	 counters.push_back(0);
-	 std::cout << errors[0];
-	 std::cout << std::endl << std::endl;*/
-
-	RandomGenerator random;
-	int i;
-	for (i = 0; i < 20; i++)
-	{
-		double curr_mean = original->getMean();
-		double curr_var = original->getVariance();
-
-		double mean_added = random.nextDouble(-10, 10);
-		double var_added = random.nextDouble(0.001, 5);
-		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
-
-		timer = clock();
-		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
-		std::cout << "PG time: " << clock() - timer << "\n";
-		std::cout << i + 1 << ": ";
-		std::cout << "KL_Divergence between PG and original: ";
-		errors.push_back(KL_Divergence(rv.getDistribution(), original));
-		counters.push_back(i + 1);
-		std::cout << errors[i + 1];
-		std::cout << std::endl << std::endl;
-	}
-	//	plot.addRV(*new RandomVariable(original)); // plot the last only
-	//	plot.addRV(rv);
-	//	plot.plotBuffered(PDF);
-	//	plot.plotBuffered(CDF);
-}
-
-// conduct a series of computations with known results
-// to see how MC is affected
-void computationsMC(std::vector<double> & counters,
-		std::vector<double> & errors)
-{
-	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000));
-
-	Gnuplot::setAccuracy(1000);
-	Gnuplot plot;
-	long int timer;
-	counters.clear();
-	errors.clear();
-
-	int N = 50;
-	RandomVariable rv[N];
-	rv[0] = new Gaussian;
-	Gaussian * original = new Gaussian;
-
-	std::cout << std::endl;
-	RandomGenerator random;
-	int i;
-	for (i = 1; i < N; i++)
-	{
-		double curr_mean = original->getMean();
-		double curr_var = original->getVariance();
-
-		double mean_added = random.nextDouble(-10, 10);
-		double var_added = random.nextDouble(0.001, 5);
-		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
-
-		timer = clock();
-		rv[i] = rv[i - 1] + (*new RandomVariable(new Gaussian(mean_added,
-				var_added)));
-		std::cout << "PU time: " << clock() - timer << "\n";
-		std::cout << i << ": ";
-		std::cout << "Kolmogorov Distance between MC and original: ";
-		errors.push_back(kolmogorovDistance(rv[i].getDistribution(), original));
-		counters.push_back(i);
-		std::cout << errors[i];
-		std::cout << std::endl << std::endl;
-	}
-	plot.addRV(*new RandomVariable(original)); // plot the last only
-	plot.addRV(rv[N - 1]);
-	plot.plotBuffered(PDF);
-	plot.plotBuffered(CDF);
 }
 
 void dependencyMC()
@@ -381,8 +269,8 @@ void testApproximation(RandomVariable original,
 	RandomVariable approximated;
 	approximated = algorithm.approximate(original.getDistribution());
 
-	std::cout << "\tKL Divergence: \t\t";
-	std::cout << KL_Divergence(original.getDistribution(),
+	std::cout << "\tPDF Distance: \t";
+	std::cout << manhattanDistancePDF(original.getDistribution(),
 			approximated.getDistribution());
 	std::cout << std::endl;
 
