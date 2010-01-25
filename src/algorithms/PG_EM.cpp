@@ -14,6 +14,9 @@
 namespace stochastic
 {
 
+/// Arguments:
+/// number of components,
+/// number of intermediate samples in order to perform EM
 PG_EM::PG_EM(int n, int samples) :
 	PiecewiseGaussian(n)
 {
@@ -22,6 +25,11 @@ PG_EM::PG_EM(int n, int samples) :
 
 PG_EM::~PG_EM()
 {
+}
+
+std::string PG_EM::getName()
+{
+	return std::string("PG EM");
 }
 
 std::vector<double> PG_EM::produceData(Distribution * d)
@@ -65,8 +73,8 @@ MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 	int k;
 
 	std::vector<double> data;
-	data = produceData(distribution);
-	// data = distribution->sample(intermediateSamples);
+	// data = produceData(distribution);
+	data = distribution->sample(intermediateSamples);
 
 	std::vector<double>::iterator minimum = std::min_element(data.begin(),
 			data.end());
@@ -104,7 +112,11 @@ MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 				denominator += responsibilities[j][k];
 			}
 			for (k = 0; k < numberOfComponents; k++)
+			{
+				if (!denominator)
+					denominator = 0.000001;
 				responsibilities[j][k] /= denominator;
+			}
 		}
 
 		// Maximisation step
@@ -114,6 +126,8 @@ MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 			ni[k] = 0;
 			for (j = 0; j < instances; j++)
 				ni[k] += responsibilities[j][k];
+			if (!ni[k])
+				ni[k] = 0.000001;
 			coefficients[k] = ni[k] / instances;
 		}
 		for (k = 0; k < numberOfComponents; k++) // update means
@@ -147,7 +161,7 @@ MixtureModel * PG_EM::performApproximation(Distribution * distribution)
 		//		printf("log likelihood: %f\n", logLikelihood);
 	}
 
-	MixtureComponent * component;
+	Gaussian * component;
 	for (k = 0; k < numberOfComponents; k++)
 	{
 		component = new Gaussian(means[k], variances[k]);

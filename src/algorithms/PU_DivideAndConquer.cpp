@@ -22,6 +22,11 @@ PU_DivideAndConquer::~PU_DivideAndConquer()
 {
 }
 
+std::string PU_DivideAndConquer::getName()
+{
+	return string("PU Divide and Conquer");
+}
+
 void PU_DivideAndConquer::approximateInterval(
 		std::vector<MixtureComponent *> &components,
 		std::vector<double> &weights, int componentNumber, double start,

@@ -19,7 +19,6 @@
 #include <fstream>
 #include <string>
 #include <sstream>
-#include <typeinfo>
 #include <stdexcept>
 #include <ctime>
 

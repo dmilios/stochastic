@@ -27,21 +27,16 @@ int printArguments(int argc, char *argv[])
 	int i;
 	std::cout << "The arguments were:\n";
 	for (i = 0; i < argc; i++)
-		std::cout << argv[i]<< "\n" ;
+		std::cout << argv[i] << "\n";
 	return 0;
 }
 
 int main(int argc, char *argv[])
 {
-	RandomVariable rv = new Gaussian;
-
-	PG_EM a1(100, 1000);
-	std::cout << "PG_EM\n";
-	testApproximation(rv, a1);
-
-	std::cout << "PiecewiseUniform\n";
-	PiecewiseUniform a2(100);
-	testApproximation(rv, a2);
+	Gnuplot plot;
+	plot.addErrorEvolution(50, new PiecewiseGaussian(100));
+	plot.addErrorEvolution(50, new PG_EM(100, 100));
+	plot.plotBuffered(EVOLUTION);
 
 	return printArguments(argc, argv);
 }

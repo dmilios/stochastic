@@ -183,61 +183,6 @@ void compareApproximations()
 	plot.plotBuffered(CDF);
 }
 
-void computationsEvolution(int n)
-{
-	Gnuplot plot;
-	std::vector<double> iteration_numbers;
-	std::vector<double> errors;
-
-	RandomVariable::setAlgorithm(new PU_DivideAndConquer(100));
-	computations(n, iteration_numbers, errors);
-	plot.addCurve(OTHER, "KL_Divergence Evolution for PU DivideAndConquer",
-			iteration_numbers, errors);
-
-	std::cout << std::endl << "--------------------------------" << std::endl;
-
-	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
-	computations(n, iteration_numbers, errors);
-	plot.addCurve(OTHER, "KL_Divergence Evolution for PU Old",
-			iteration_numbers, errors);
-
-	plot.plotBuffered(OTHER);
-}
-
-// conduct a series of computations with known results
-void computations(int n, std::vector<double> & counters,
-		std::vector<double> & errors)
-{
-	long int timer;
-	counters.clear();
-	errors.clear();
-
-	RandomVariable rv = new Gaussian;
-	Gaussian * original = (Gaussian *) rv.getDistribution();
-
-	RandomGenerator random;
-	int i;
-	for (i = 0; i < n; i++)
-	{
-		double curr_mean = original->getMean();
-		double curr_var = original->getVariance();
-
-		double mean_added = random.nextDouble(-10, 10);
-		double var_added = random.nextDouble(0.001, 5);
-		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
-
-		timer = clock();
-		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
-		std::cout << "Time: " << clock() - timer << "\n";
-		std::cout << i + 1 << ": ";
-		std::cout << "PDF Distance from original: ";
-		errors.push_back(manhattanDistancePDF(rv.getDistribution(), original));
-		counters.push_back(i + 1);
-		std::cout << errors[i + 1];
-		std::cout << std::endl << std::endl;
-	}
-}
-
 void dependencyMC()
 {
 	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(500));

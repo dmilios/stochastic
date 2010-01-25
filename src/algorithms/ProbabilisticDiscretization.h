@@ -25,6 +25,12 @@ private:
 			MixtureComponent *);
 	MixtureComponent
 			* ratioOfComponents(MixtureComponent *, MixtureComponent *);
+
+public:
+	ProbabilisticDiscretization(int);
+	virtual ~ProbabilisticDiscretization();
+
+	std::string getName();
 };
 
 } // namespace stochastic

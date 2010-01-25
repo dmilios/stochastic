@@ -25,6 +25,7 @@ public:
 	PG_EM(int, int);
 	virtual ~PG_EM();
 
+	std::string getName();
 	MixtureModel * performApproximation(Distribution *);
 };
 

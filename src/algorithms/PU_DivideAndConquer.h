@@ -24,6 +24,7 @@ public:
 	PU_DivideAndConquer(int);
 	virtual ~PU_DivideAndConquer();
 
+	std::string getName();
 	MixtureModel * performApproximation(Distribution *);
 };
 

@@ -27,6 +27,8 @@ public:
 	MonteCarloAlgorithm(int);
 	virtual ~MonteCarloAlgorithm();
 
+	string getName();
+
 	RandomVariable calculateSum(RandomVariable &, RandomVariable &);
 	RandomVariable calculateDifference(RandomVariable &, RandomVariable &);
 	RandomVariable calculateProduct(RandomVariable &, RandomVariable &);

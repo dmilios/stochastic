@@ -125,8 +125,7 @@ double MixtureModel::nextSample()
 		if (roulette < cumulativeWeights[i])
 			return this->components[i]->nextSample();
 
-	// this line should never be executed
-	throw 0;
+	throw 0; // this should never happen
 }
 
 std::vector<MixtureComponent *> MixtureModel::getComponents()

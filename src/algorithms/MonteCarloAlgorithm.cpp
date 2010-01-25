@@ -24,6 +24,11 @@ MonteCarloAlgorithm::~MonteCarloAlgorithm()
 {
 }
 
+string MonteCarloAlgorithm::getName()
+{
+	return string("Monte Carlo");
+}
+
 double MonteCarloAlgorithm::recursiveSampling(OperationType operationType,
 		RandomVariable & arg1, RandomVariable & arg2,
 		map<string, double> & visited_ids)

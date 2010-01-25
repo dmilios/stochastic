@@ -27,6 +27,11 @@ PiecewiseUniform::~PiecewiseUniform()
 {
 }
 
+string PiecewiseUniform::getName()
+{
+	return string("Piecewise Uniform");
+}
+
 int PiecewiseUniform::needsApproximation(Distribution * argument)
 {
 	if (typeid(*argument) != typeid(MixtureModel))

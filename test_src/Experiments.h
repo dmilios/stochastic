@@ -19,9 +19,6 @@ void comparePUwithMC();
 void comparePGwithMC();
 void compareApproximations();
 
-void computations(int, std::vector<double>&, std::vector<double>&);
-void computationsEvolution(int);
-
 void dependencyMC();
 void testApproximation(RandomVariable, ApproximationAlgorithm&);
 

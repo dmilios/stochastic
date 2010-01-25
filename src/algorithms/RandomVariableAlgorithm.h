@@ -10,6 +10,7 @@
 
 #include "../RandomVariable.h"
 #include "../graph/GraphRV.h"
+#include <string>
 
 namespace stochastic {
 
@@ -30,6 +31,8 @@ public:
 	{
 		this->graph = graph;
 	}
+
+	virtual std::string getName() = 0;
 
 	virtual RandomVariable calculateSum(RandomVariable &, RandomVariable &) = 0;
 	virtual RandomVariable calculateDifference(RandomVariable &,

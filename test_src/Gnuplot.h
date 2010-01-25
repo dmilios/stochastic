@@ -11,15 +11,14 @@
 #include <vector>
 #include <string>
 #include "../src/stochastic.h"
+#include "../src/algorithms/RandomVariableAlgorithm.h"
 
 using namespace std;
+using namespace stochastic;
 
 enum CurveTypes
 {
-	PDF,
-	CDF,
-	INVERSE_CDF,
-	OTHER
+	PDF, CDF, INVERSE_CDF, EVOLUTION, OTHER
 };
 
 class Gnuplot
@@ -29,12 +28,16 @@ private:
 	static string defaultOptions;
 	string * outputFile;
 	string * texFile;
-	vector <string> preamble; // a series of statements in the beginning of a plot
+	vector<string> preamble; // a series of statements in the beginning of a plot
 
-	vector <string> names;
-	vector <string> curve_data;
-	vector <CurveTypes> types;
-	vector <string> options;
+	vector<string> names;
+	vector<string> curve_data;
+	vector<CurveTypes> types;
+	vector<string> options;
+
+	void addCurve(CurveTypes, string, vector<double> , vector<double> );
+	void addCurve(CurveTypes, string, vector<double> , vector<double> , string);
+	void buildErrorCurves(int n, std::vector<double> &, std::vector<double> &);
 
 public:
 	Gnuplot();
@@ -42,9 +45,8 @@ public:
 
 	static void setAccuracy(int);
 
-	void addRV(stochastic::RandomVariable);
-	void addCurve(CurveTypes, string, vector <double>, vector <double>);
-	void addCurve(CurveTypes, string, vector <double>, vector <double>, string);
+	void addRV(RandomVariable);
+	void addErrorEvolution(int, RandomVariableAlgorithm *);
 
 	void addtoPreamble(string);
 	void plotBuffered(CurveTypes);

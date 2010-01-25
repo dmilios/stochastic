@@ -28,6 +28,11 @@ PiecewiseGaussian::~PiecewiseGaussian()
 {
 }
 
+string PiecewiseGaussian::getName()
+{
+	return string("Piecewise Gaussian");
+}
+
 int PiecewiseGaussian::needsApproximation(Distribution * argument)
 {
 	if (typeid(* argument) != typeid(MixtureModel))

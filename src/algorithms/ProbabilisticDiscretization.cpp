@@ -15,7 +15,22 @@
 #include "../distributions/Uniform.h"
 #include "../distributions/MixtureModel.h"
 
-namespace stochastic {
+namespace stochastic
+{
+
+ProbabilisticDiscretization::ProbabilisticDiscretization(int n) :
+	PiecewiseUniform(n)
+{
+}
+
+ProbabilisticDiscretization::~ProbabilisticDiscretization()
+{
+}
+
+std::string ProbabilisticDiscretization::getName()
+{
+	return string("Discretization");
+}
 
 MixtureComponent * ProbabilisticDiscretization::sumOfComponents(
 		MixtureComponent * arg1, MixtureComponent * arg2)
@@ -47,10 +62,10 @@ MixtureComponent * ProbabilisticDiscretization::productOfComponents(
 	margins.push_back(b1 * a2);
 	margins.push_back(b1 * b2);
 
-	std::vector<double>::iterator a = std::min_element(
-			margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-			margins.begin(), margins.end());
+	std::vector<double>::iterator a = std::min_element(margins.begin(),
+			margins.end());
+	std::vector<double>::iterator b = std::max_element(margins.begin(),
+			margins.end());
 	return new Uniform(*a, *b);
 }
 
@@ -73,10 +88,10 @@ MixtureComponent * ProbabilisticDiscretization::ratioOfComponents(
 	margins.push_back(b1 / a2);
 	margins.push_back(b1 / b2);
 
-	std::vector<double>::iterator a = std::min_element(
-			margins.begin(), margins.end());
-	std::vector<double>::iterator b = std::max_element(
-			margins.begin(), margins.end());
+	std::vector<double>::iterator a = std::min_element(margins.begin(),
+			margins.end());
+	std::vector<double>::iterator b = std::max_element(margins.begin(),
+			margins.end());
 	return new Uniform(*a, *b);
 }
 

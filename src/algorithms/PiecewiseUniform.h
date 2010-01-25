@@ -32,6 +32,7 @@ public:
 	PiecewiseUniform(int);
 	virtual ~PiecewiseUniform();
 
+	string getName();
 	int needsApproximation(Distribution *);
 	MixtureModel * performApproximation(Distribution *);
 	MixtureModel * performApproximation2(Distribution *);

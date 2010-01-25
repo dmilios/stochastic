@@ -9,12 +9,77 @@
 
 #include <cstdio>
 #include <sstream>
+#include "DistanceMetrics.h"
 
 using namespace std;
 
 int Gnuplot::accuracy = 1000;
 
 string Gnuplot::defaultOptions = " with lines";
+
+/*
+ * Private methods
+ * */
+
+void Gnuplot::addCurve(CurveTypes type, string name, vector<double> vx, vector<
+		double> vy)
+{
+	addCurve(type, name, vx, vy, defaultOptions);
+}
+
+void Gnuplot::addCurve(CurveTypes type, string name, vector<double> vx, vector<
+		double> vy, string current_options)
+{
+	stringstream data;
+
+	types.push_back(type);
+	names.push_back(name);
+	options.push_back(current_options);
+
+	unsigned int i;
+	for (i = 0; i < vx.size(); i++)
+		data << vx[i] << '\t' << vy[i] << endl;
+	curve_data.push_back(data.str());
+}
+
+// conduct a series of computations with known results
+void Gnuplot::buildErrorCurves(int n, std::vector<double> & counters,
+		std::vector<double> & errors)
+{
+	long int timer;
+	counters.clear();
+	errors.clear();
+
+	RandomVariable rv = new Gaussian;
+	Gaussian * original = (Gaussian *) rv.getDistribution();
+
+	RandomGenerator random;
+	int i;
+	for (i = 0; i < n; i++)
+	{
+		double curr_mean = original->getMean();
+		double curr_var = original->getVariance();
+
+		double mean_added = random.nextDouble(-10, 10);
+		double var_added = random.nextDouble(0.001, 5);
+		original = new Gaussian(curr_mean + mean_added, curr_var + var_added);
+
+		timer = clock();
+		rv = rv + (*new RandomVariable(new Gaussian(mean_added, var_added)));
+		std::cout << "Time: " << clock() - timer << "\n";
+		std::cout << i + 1 << ": ";
+		std::cout << "PDF Distance from original: ";
+		errors.push_back(manhattanDistancePDF(rv.getDistribution(), original));
+		counters.push_back(i + 1);
+		std::cout << errors[i + 1];
+		std::cout << std::endl << std::endl;
+	}
+}
+
+/*
+ *
+ * Constructors
+ * */
 
 Gnuplot::Gnuplot()
 {
@@ -26,6 +91,11 @@ Gnuplot::~Gnuplot()
 {
 }
 
+/*
+ *
+ * Methods
+ * */
+
 void Gnuplot::setAccuracy(int n)
 {
 	accuracy = n;
@@ -36,7 +106,7 @@ void Gnuplot::addRV(stochastic::RandomVariable rv)
 	string curveName;
 	stochastic::Distribution * rvDist = rv.getDistribution();
 	string rvName = rvDist->getName();
-	vector <double> vx, vy;
+	vector<double> vx, vy;
 
 	rv.pdfOutline(accuracy, vx, vy);
 	curveName = " ";
@@ -58,24 +128,21 @@ void Gnuplot::addRV(stochastic::RandomVariable rv)
 	addCurve(INVERSE_CDF, curveName.c_str(), vx, vy);
 }
 
-void Gnuplot::addCurve(CurveTypes type, string name, vector <double> vx, vector <double> vy)
+void Gnuplot::addErrorEvolution(int steps, RandomVariableAlgorithm * algorithm)
 {
-	addCurve(type, name, vx, vy, defaultOptions);
-}
+	std::vector<double> iteration_numbers;
+	std::vector<double> errors;
 
-void Gnuplot::addCurve(CurveTypes type, string name,
-		vector<double> vx, vector<double> vy, string current_options)
-{
-	stringstream data;
+	std::cout << std::endl << "--------------------------------" << std::endl;
+	std::cout << algorithm->getName().c_str() << std::endl << std::endl;
 
-	types.push_back(type);
-	names.push_back(name);
-	options.push_back(current_options);
+	RandomVariable::setAlgorithm(algorithm);
+	buildErrorCurves(steps, iteration_numbers, errors);
 
-	unsigned int i;
-	for (i = 0; i < vx.size(); i++)
-		data << vx[i] << '\t' << vy[i] << endl;
-	curve_data.push_back(data.str());
+	std::string label("Manhattan Distance Evolution for ");
+	label.append(algorithm->getName().c_str());
+
+	this->addCurve(EVOLUTION, label, iteration_numbers, errors);
 }
 
 void Gnuplot::addtoPreamble(string statement)
@@ -94,7 +161,7 @@ void Gnuplot::plotBuffered(CurveTypes type)
 
 	if (texFile)
 		fprintf(gnuplot, "set terminal latex\nset output \"%s.tex\"\n",
-			texFile->c_str());
+				texFile->c_str());
 
 	for (i = 0; i < preamble.size(); i++)
 		fprintf(gnuplot, "%s\n", preamble[i].c_str());
@@ -109,18 +176,18 @@ void Gnuplot::plotBuffered(CurveTypes type)
 			else
 				first_entered_flag = 1;
 			fprintf(gnuplot, "'-' title '%s' %s", names[i].c_str(),
-				options[i].c_str());
+					options[i].c_str());
 
 			//entered_counter++;
 			//entered_counter = entered_counter % options.size();
 		}
 	}
 	fprintf(gnuplot, "\n");
-	for(i = 0; i < curve_data.size(); i++)
+	for (i = 0; i < curve_data.size(); i++)
 		if (type == types[i])
 			fprintf(gnuplot, "%se\n", curve_data[i].c_str());
 
-	if(outputFile)
+	if (outputFile)
 	{
 		fprintf(gnuplot, "shell\n");
 		fprintf(gnuplot, "xwd -out %s.png\n", outputFile->c_str());

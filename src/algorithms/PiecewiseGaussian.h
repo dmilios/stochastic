@@ -33,6 +33,7 @@ public:
 	PiecewiseGaussian(int);
 	virtual ~PiecewiseGaussian();
 
+	string getName();
 	int needsApproximation(Distribution *);
 	MixtureModel * performApproximation(Distribution *);
 };
