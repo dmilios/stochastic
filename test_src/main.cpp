@@ -33,6 +33,10 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
+	productOfUniforms(Uniform(0, 1), Uniform(0, 1));
+	productOfUniforms(Uniform(0, 2), Uniform(0, 2));
+	return 0;
+
 	Gnuplot plot;
 	plot.addErrorEvolution(50, new PiecewiseGaussian(100));
 	plot.addErrorEvolution(50, new PG_EM(100, 100));

@@ -22,6 +22,8 @@ void compareApproximations();
 void dependencyMC();
 void testApproximation(RandomVariable, ApproximationAlgorithm&);
 
+void productOfUniforms(Uniform , Uniform);
+
 void sumOfUniforms();
 void minmaxTests();
 void testKernel();

@@ -1,12 +1,16 @@
 
 TODO:
 
+Empirical Distribution:
+	-> check out when should discard samples 
+		(only for too wide distributions, but how to define wide)
+	 -> maybe offer a histogram option (so as to discard the dataset)
+
 improve PiecewiseUniform approximation
 	-> test "divide into halves" idea
 	
 improve PiecewiseGaussian approximation
-	-> apply EM algorithm
-	-> look for more efficient algorithms
+	-> look for more efficient algorithms than EM
 
 find out about the product of unifrom distributions
 (ratio is not needed, inverse RV is used instead)

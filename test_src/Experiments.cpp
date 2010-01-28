@@ -234,6 +234,31 @@ void testApproximation(RandomVariable original,
 	plot.plotBuffered(PDF);
 }
 
+void productOfUniforms(Uniform u1, Uniform u2)
+{
+	using namespace std;
+	cout << "X ~ U(" << u1.getLeftMargin() << "," << u1.getRightMargin() << ")"
+			<< endl;
+	cout << "Y ~ U(" << u2.getLeftMargin() << "," << u2.getRightMargin() << ")"
+			<< endl;
+
+	RandomVariable rv1 = &u1;
+	RandomVariable rv2 = &u2;
+
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(10000));
+	RandomVariable result_mc = rv1 * rv2;
+
+	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
+	RandomVariable result_pu = rv1 * rv2;
+
+	Gnuplot plot;
+	plot.addRV(result_mc);
+	plot.addRV(result_pu);
+	plot.plotBuffered(PDF);
+	plot.plotBuffered(CDF);
+	plot.clearBuffer();
+}
+
 void sumOfUniforms()
 {
 	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
