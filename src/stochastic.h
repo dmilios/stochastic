@@ -27,6 +27,7 @@
 #include "distributions/Cauchy.h"
 #include "distributions/Exponential.h"
 #include "distributions/EmpiricalDistribution.h"
+#include "distributions/HistogramDistribution.h"
 #include "distributions/DeltaDistribution.h"
 
 #include "intermediateResults/MinOfDistributions.h"

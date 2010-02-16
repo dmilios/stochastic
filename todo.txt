@@ -4,7 +4,6 @@ TODO:
 Empirical Distribution:
 	-> check out when should discard samples 
 		(only for too wide distributions, but how to define wide)
-	 -> maybe offer a histogram option (so as to discard the dataset)
 
 improve PiecewiseUniform approximation
 	-> test "divide into halves" idea

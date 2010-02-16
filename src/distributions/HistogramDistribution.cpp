@@ -45,18 +45,29 @@ void HistogramDistribution::createHistogram(std::vector<double> data)
 	double binWidth = (q75 - q25) / pow(data.size(), 0.3333);
 
 	// k = (max - min) / h, 	data is sorted in ascending order
-	double maxx = data[data.size() - 1];
-	double minx = data[0];
-	int numberOfBins = (int) ceil((maxx - minx) / binWidth);
+	double max_x = data[data.size() - 1];
+	double min_x = data[0];
+	int numberOfBins = (int) ceil((max_x - min_x) / binWidth);
 
 	std::vector<double> weights;
 	std::vector<MixtureComponent *> components;
-	long int i;
-	for (i = 0; i < data.size(); i++)
+	double current_a = min_x;
+	double current_b = min_x + binWidth;
+	double current_count = 0;
+	int i;
+	unsigned long int c = 0;
+	for (i = 0; i < numberOfBins; i++)
 	{
-		// TODO: finish this...
-	}
+		components.push_back(new Uniform(current_a, current_b));
+		while (c < data.size() && data[c++] < current_b)
+			current_count++;
+		weights.push_back(current_count / data.size());
 
+		c--;
+		current_count = 0;
+		current_a = current_b;
+		current_b += binWidth;
+	}
 	mixtureOfUniforms = new MixtureModel(components, weights);
 
 	this->name = "Hist: ";

@@ -15,7 +15,7 @@
 namespace stochastic
 {
 
-class HistogramDistribution : Distribution
+class HistogramDistribution : public Distribution
 {
 private:
 	std::string name;

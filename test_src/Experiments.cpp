@@ -245,10 +245,10 @@ void productOfUniforms(Uniform u1, Uniform u2)
 	RandomVariable rv1 = &u1;
 	RandomVariable rv2 = &u2;
 
-	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(10000));
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000000));
 	RandomVariable result_mc = rv1 * rv2;
 
-	RandomVariable::setAlgorithm(new PiecewiseGaussian(100));
+	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
 	RandomVariable result_pu = rv1 * rv2;
 
 	Gnuplot plot;
@@ -257,6 +257,21 @@ void productOfUniforms(Uniform u1, Uniform u2)
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
 	plot.clearBuffer();
+}
+
+void histogramTest(int samples, Distribution * distr)
+{
+	RandomVariable rv1 = distr;
+	RandomVariable rv2 = new HistogramDistribution(distr->sample(samples));
+	RandomVariable rv3 = new EmpiricalDistribution(distr->sample(samples));
+
+	Gnuplot gp;
+	gp.addRV(rv1);
+	gp.addRV(rv2);
+	gp.addRV(rv3);
+	gp.plotBuffered(PDF);
+	gp.plotBuffered(CDF);
+	gp.plotBuffered(INVERSE_CDF);
 }
 
 void sumOfUniforms()

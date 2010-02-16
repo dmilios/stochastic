@@ -22,8 +22,9 @@ void compareApproximations();
 void dependencyMC();
 void testApproximation(RandomVariable, ApproximationAlgorithm&);
 
-void productOfUniforms(Uniform , Uniform);
+void productOfUniforms(Uniform, Uniform);
 
+void histogramTest(int, Distribution *);
 void sumOfUniforms();
 void minmaxTests();
 void testKernel();
