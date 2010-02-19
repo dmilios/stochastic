@@ -22,7 +22,8 @@ void compareApproximations();
 void dependencyMC();
 void testApproximation(RandomVariable, ApproximationAlgorithm&);
 
-void productOfUniforms(Uniform, Uniform);
+void productOfUniforms(int argc, char *argv[]);
+void productOfUniforms(Uniform, Uniform, int, int);
 
 void histogramTest(int, Distribution *);
 void sumOfUniforms();

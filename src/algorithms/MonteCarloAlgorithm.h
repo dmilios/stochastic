@@ -23,8 +23,11 @@ private:
 	double recursiveSampling(OperationType, RandomVariable &, RandomVariable &,
 			map<string, double> &);
 
+	int discardSamplesFlag;
+
 public:
 	MonteCarloAlgorithm(int);
+	MonteCarloAlgorithm(int, int);
 	virtual ~MonteCarloAlgorithm();
 
 	string getName();

@@ -10,7 +10,9 @@
 #include "Gnuplot.h"
 #include <cmath>
 #include <ctime>
+#include <cstdlib>
 #include <algorithm>
+#include <iostream>
 
 void current()
 {
@@ -234,7 +236,46 @@ void testApproximation(RandomVariable original,
 	plot.plotBuffered(PDF);
 }
 
-void productOfUniforms(Uniform u1, Uniform u2)
+/** This function implements the "Product Of Uniforms Test" program
+ * The arguments stored in 'argv' are:
+ *
+ * left endpoint of Uniform 1
+ * right endpoint of Uniform 1
+ *
+ * left endpoint of Uniform 2
+ * right endpoint of Uniform 2
+ *
+ * sample number for MC methods
+ * component number for Piecewise methods
+ * */
+void productOfUniforms(int argc, char *argv[])
+{
+	using namespace std;
+	double a1, b1, a2, b2;
+	int samples, bins;
+	if (argc != 7) // arg[0] is the command itself
+	{
+		cout << "\nExactly 6 arguments needed!" << endl
+				<< "1: left endpoint of Uniform 1" << endl
+				<< "2: right endpoint of Uniform 1" << endl
+				<< "3: left endpoint of Uniform 2" << endl
+				<< "4: right endpoint of Uniform 2" << endl
+				<< "5: sample number for MC methods" << endl
+				<< "6: component number for Piecewise methods" << endl;
+		throw ;
+	}
+	a1 = atof(argv[1]);
+	b1 = atof(argv[2]);
+	a2 = atof(argv[3]);
+	b2 = atof(argv[4]);
+	samples = atoi(argv[5]);
+	bins = atoi(argv[6]);
+	productOfUniforms(Uniform(a1, b1), Uniform(a2, b2), samples, bins);
+}
+
+/** Third argument: samples for MC methods
+ * Fourth argument: component number for Piecewise methods */
+void productOfUniforms(Uniform u1, Uniform u2, int samples, int pu_bins)
 {
 	using namespace std;
 	cout << "X ~ U(" << u1.getLeftMargin() << "," << u1.getRightMargin() << ")"
@@ -245,15 +286,20 @@ void productOfUniforms(Uniform u1, Uniform u2)
 	RandomVariable rv1 = &u1;
 	RandomVariable rv2 = &u2;
 
-	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(1000000));
-	RandomVariable result_mc = rv1 * rv2;
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(samples));
+	RandomVariable result_mc_hist = rv1 * rv2;
 
-	RandomVariable::setAlgorithm(new PiecewiseUniform(100));
+	RandomVariable::setAlgorithm(new MonteCarloAlgorithm(samples, 0));
+	RandomVariable result_mc_emp = rv1 * rv2;
+
+	RandomVariable::setAlgorithm(new PiecewiseUniform(pu_bins));
 	RandomVariable result_pu = rv1 * rv2;
 
 	Gnuplot plot;
-	plot.addRV(result_mc);
+	plot.addRV(result_mc_hist);
+	plot.addRV(result_mc_emp);
 	plot.addRV(result_pu);
+
 	plot.plotBuffered(PDF);
 	plot.plotBuffered(CDF);
 	plot.clearBuffer();

@@ -7,6 +7,7 @@
 
 #include "MonteCarloAlgorithm.h"
 
+#include "../distributions/EmpiricalDistribution.h"
 #include "../distributions/HistogramDistribution.h"
 #include "../distributions/DeltaDistribution.h"
 #include <stdexcept> // for std::out_of_range
@@ -18,6 +19,16 @@ namespace stochastic
 MonteCarloAlgorithm::MonteCarloAlgorithm(int samples)
 {
 	this->numberOfSamples = samples;
+	this->discardSamplesFlag = 1;
+}
+
+/** First argument: number of samples to be drawn at each step
+ * Second argument: a flag indicating if the samples should be discarded at each step
+ * ('0' for not discarding the samples) */
+MonteCarloAlgorithm::MonteCarloAlgorithm(int samples, int flag)
+{
+	this->numberOfSamples = samples;
+	this->discardSamplesFlag = flag;
 }
 
 MonteCarloAlgorithm::~MonteCarloAlgorithm()
@@ -114,7 +125,9 @@ RandomVariable MonteCarloAlgorithm::calculateSum(
 		produced_data.push_back(recursiveSampling(SUM, rv1,
 				rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateDifference(
@@ -130,7 +143,9 @@ RandomVariable MonteCarloAlgorithm::calculateDifference(
 		produced_data.push_back(recursiveSampling(DIFFERENCE,
 				rv1, rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateProduct(
@@ -146,7 +161,9 @@ RandomVariable MonteCarloAlgorithm::calculateProduct(
 		produced_data.push_back(recursiveSampling(PRODUCT, rv1,
 				rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateRatio(
@@ -162,7 +179,9 @@ RandomVariable MonteCarloAlgorithm::calculateRatio(
 		produced_data.push_back(recursiveSampling(RATIO, rv1,
 				rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateMin(
@@ -178,7 +197,9 @@ RandomVariable MonteCarloAlgorithm::calculateMin(
 		produced_data.push_back(recursiveSampling(MIN, rv1,
 				rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateMax(
@@ -194,7 +215,9 @@ RandomVariable MonteCarloAlgorithm::calculateMax(
 		produced_data.push_back(recursiveSampling(MAX, rv1,
 				rv2, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 /*
@@ -217,7 +240,9 @@ RandomVariable MonteCarloAlgorithm::calculateMax(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(SUM, rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateDifference(
@@ -234,7 +259,9 @@ RandomVariable MonteCarloAlgorithm::calculateDifference(
 		produced_data.push_back(recursiveSampling(DIFFERENCE,
 				rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateDifference(
@@ -251,7 +278,9 @@ RandomVariable MonteCarloAlgorithm::calculateDifference(
 		produced_data.push_back(recursiveSampling(DIFFERENCE,
 				delta, rv, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateProduct(
@@ -267,7 +296,9 @@ RandomVariable MonteCarloAlgorithm::calculateProduct(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(PRODUCT, rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateRatio(
@@ -283,7 +314,9 @@ RandomVariable MonteCarloAlgorithm::calculateRatio(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(RATIO, rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateRatio(
@@ -299,7 +332,9 @@ RandomVariable MonteCarloAlgorithm::calculateRatio(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(RATIO, delta, rv, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateMin(
@@ -315,7 +350,9 @@ RandomVariable MonteCarloAlgorithm::calculateMin(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(MIN, rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 RandomVariable MonteCarloAlgorithm::calculateMax(
@@ -331,7 +368,9 @@ RandomVariable MonteCarloAlgorithm::calculateMax(
 		map<string, double> visited_ids;
 		produced_data.push_back(recursiveSampling(MAX, rv, delta, visited_ids));
 	}
-	return new HistogramDistribution(produced_data);
+	if (discardSamplesFlag)
+		return new HistogramDistribution(produced_data);
+	return new EmpiricalDistribution(produced_data);
 }
 
 } // namespace stochastic

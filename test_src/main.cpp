@@ -33,8 +33,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	productOfUniforms(Uniform(0, 1), Uniform(0, 1));
-	productOfUniforms(Uniform(0, 2), Uniform(0, 2));
+	productOfUniforms(argc, argv);
 	return 0;
 
 	Gnuplot plot;
