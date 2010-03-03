@@ -20,7 +20,7 @@ void comparePGwithMC();
 void compareApproximations();
 
 void dependencyMC();
-void testApproximation(RandomVariable, ApproximationAlgorithm&);
+void testApproximation(RandomVariable, ApproximationAlgorithm *);
 
 void productOfUniforms(int argc, char *argv[]);
 void productOfUniforms(Uniform, Uniform, int, int);

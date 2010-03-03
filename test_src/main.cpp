@@ -33,7 +33,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	productOfUniforms(argc, argv);
+	testApproximation(new Gaussian, new PG_EM(100, 1000));
 	return 0;
 
 	Gnuplot plot;

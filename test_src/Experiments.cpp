@@ -208,15 +208,21 @@ void dependencyMC()
 }
 
 void testApproximation(RandomVariable original,
-		ApproximationAlgorithm &algorithm)
+		ApproximationAlgorithm * algorithm)
 {
 	Gnuplot::setAccuracy(100);
 	Gnuplot plot;
+	long int timer, t_ms;
 
 	RandomVariable approximated;
-	approximated = algorithm.approximate(original.getDistribution());
+	timer = clock();
+	approximated = algorithm->approximate(original.getDistribution());
+	t_ms = (clock() - timer) / 1000;
 
-	std::cout << "\tPDF Distance: \t";
+	std::cout << "\ttime:         \t\t" << t_ms;
+	std::cout << std::endl;
+
+	std::cout << "\tPDF Distance: \t\t";
 	std::cout << manhattanDistancePDF(original.getDistribution(),
 			approximated.getDistribution());
 	std::cout << std::endl;
