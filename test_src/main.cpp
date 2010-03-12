@@ -33,7 +33,7 @@ int printArguments(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	testApproximation(new Gaussian, new PG_EM(100, 1000));
+	testApproximation(new Gaussian, new PG_EM2(20));
 	return 0;
 
 	Gnuplot plot;
